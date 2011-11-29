@@ -1,0 +1,155 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+function paymentui_menu() {
+  // Payment overview.
+  $items['admin/reports/payment'] = array(
+    'title' => 'Payments',
+    'page callback' => 'paymentui_payment_list',
+    'access arguments' => array('paymentui.payment.view'),
+    'file' => 'paymentui.admin.inc',
+    'file path' => drupal_get_path('module', 'paymentui') . '/includes',
+  );
+
+  // Payment method configuration.
+  $items['admin/config/services/payment'] = array(
+    'title' => 'Payment methods',
+    'page callback' => 'paymentui_page_payment_method_list',
+    'access arguments' => array('paymentui.method.administer'),
+    'file' => 'paymentui.admin.inc',
+    'file path' => drupal_get_path('module', 'paymentui') . '/includes',
+  );
+  $items['admin/config/services/payment/method'] = array(
+    'title' => 'Payment methods',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+  $items['admin/config/services/payment/method/add'] = array(
+    'title' => 'Add payment method',
+    'page callback' => 'payment_page_payment_method_add_select_controller',
+    'access arguments' => array('paymentui.method.administer'),
+    'file' => 'paymentui.admin.inc',
+    'file path' => drupal_get_path('module', 'paymentui') . '/includes',
+    'type' => MENU_LOCAL_ACTION,
+    'weight' => 1,
+  );
+  $items['admin/config/services/payment/method/add/%payment_method_controller'] = array(
+    'title' => 'Add payment method',
+    'page callback' => 'paymentui_payment_method_form_add',
+    'page arguments' => array(6),
+    'access arguments' => array('paymentui.method.administer'),
+    'file' => 'paymentui.admin.inc',
+    'file path' => drupal_get_path('module', 'paymentui') . '/includes',
+    'type' => MENU_CALLBACK,
+  );
+  $items['admin/config/services/payment/method/edit/%paymentui_menu_payment_method'] = array(
+    'page callback' => 'paymentui_payment_method_form',
+    'page arguments' => array(6),
+    'access arguments' => array('paymentui.method.administer'),
+    'title callback' => 'paymentui_payment_method_title',
+    'title arguments' => array(6),
+    'file' => 'paymentui.admin.inc',
+    'file path' => drupal_get_path('module', 'paymentui') . '/includes',
+    'type' => MENU_CALLBACK,
+  );
+  $items['admin/config/services/payment/method/delete/%paymentui_menu_payment_method'] = array(
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('paymentui_form_payment_method_delete', 6),
+    'access arguments' => array('paymentui.method.administer'),
+    'title callback' => 'paymentui_payment_method_title',
+    'title arguments' => array(6),
+    'file' => 'paymentui.admin.inc',
+    'file path' => drupal_get_path('module', 'paymentui') . '/includes',
+    'type' => MENU_CALLBACK,
+  );
+
+  // General configuration.
+  $items['admin/config/services/payment/global'] = array(
+    'title' => 'Global configuration',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('paymentui_form_global_configuration'),
+    'access arguments' => array('paymentui.method.administer'),
+    'file' => 'paymentui.admin.inc',
+    'file path' => drupal_get_path('module', 'paymentui') . '/includes',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 2,
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function paymentui_permission() {
+  return array(
+    'paymentui.payment.view' => array(
+      'title' => t('View payments'),
+    ),
+    'paymentui.method.administer' => array(
+      'title' => t('Administer payment methods'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_system_info_alter().
+ */
+function paymentui_system_info_alter(&$info, $file, $type) {
+  if ($file->name == 'payment' && $type == 'module') {
+    $info['configure'] = 'admin/config/services/payment';
+  }
+}
+
+/**
+ * Implements hook_forms().
+ */
+function paymentui_forms() {
+  $forms = array();
+  foreach (payment_method_controller_load_multiple() as $controller) {
+    $forms['payment_method_form_' . $controller->payment_method_form_id] = array(
+      'callback' => $controller->payment_method_form_id,
+      'wrapper_callback' => 'paymentui_form_payment_method',
+    );
+  }
+
+  return $forms;
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function paymentui_form_alter(array &$form, array &$form_state, $form_id) {
+  // Check for payment method forms.
+  foreach (payment_method_controller_load_multiple() as $controller) {
+    if ($form_id == 'payment_method_form_' . $controller->payment_method_form_id) {
+      // Add payment method form callbacks. We do this here to make sure the
+      // form provided by the payment method controller doesn't have to set
+      // anything explicitely and the wrapper callback's callbacks are the last
+      // to be executed, so it can save the entire modified payment method.
+      $form['#submit'][] = 'paymentui_form_payment_method_submit';
+    }
+  }
+}
+
+/**
+ * Menu wildcard loader to load a payment method.
+ *
+ * @see entity_load_single()
+ */
+function paymentui_menu_payment_method_load($pmid) {
+  return entity_load_single('payment_method', $pmid);
+}
+
+/**
+ * Title callback for menu items.
+ *
+ * @param $payment_method PaymentMethod
+ *
+ * @return string
+ *   The payment method's title.
+ */
+function paymentui_payment_method_title(PaymentMethod $payment_method) {
+  return $payment_method->title_specific;
+}

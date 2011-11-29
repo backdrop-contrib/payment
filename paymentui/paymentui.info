@@ -1,0 +1,5 @@
+name = Payment Administration Interface
+description = "Allows users to administer payment methods and payments."
+dependencies[] = payment
+core = 7.x
+configure = admin/config/services/payment

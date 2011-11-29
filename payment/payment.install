@@ -1,0 +1,183 @@
+<?php
+
+/**
+ * @file
+ * Installation and uninstallation functions.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function payment_schema() {
+  $schema['payment'] = array(
+    'fields' => array(
+      'amount' => array(
+        'type' => 'float',
+        'size' => 'big',
+      ),
+      'caller_data' => array(
+        'type' => 'blob', 
+        'size' => 'big', 
+        'serialize' => TRUE, 
+      ),
+      'created' => array(
+        'type' => 'int',
+      ),
+      'currency_code' => array(
+        'type' => 'varchar',
+        'length' => 3,
+      ),
+      'description' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'expired' => array(
+        'type' => 'int',
+      ),
+      'finish_callback' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+      'pid' => array(
+        'type' => 'serial',
+      ),
+      'pmid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'default' => 0,
+        'not null' => TRUE,
+      ),
+      'status' => array(
+        'type' => 'varchar',
+        'length' => '255',
+      ),
+      'uid' => array(
+        'description' => 'The {users}.uid this payment belongs to.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'updated' => array(
+        'type' => 'int',
+      ),
+      'vid' => array(
+        'description' => 'The revision ID.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'foreign keys' => array(
+      'pid' => array(
+        'table' => 'payment_revision',
+        'columns' => array(
+          'pid' => 'pid',
+        ),
+      ),
+      'pmid' => array(
+        'table' => 'payment_method',
+        'columns' => array(
+          'pmid' => 'pmid',
+        ),
+      ),
+      'uid' => array(
+        'table' => 'user',
+        'columns' => array(
+          'uid' => 'uid',
+        ),
+      ),
+      'vid' => array(
+        'table' => 'payment_revision',
+        'columns' => array(
+          'vid' => 'vid',
+        ),
+      ),
+    ),
+    'indexes' => array(
+      'pid' => array('pid'),
+    ),
+    'primary key' => array('pid'),
+    'unique keys' => array(
+      'vid' => array('vid'),
+    ),
+  );
+  $schema['payment_revision'] = array(
+    'fields' => array(
+      'created_revision' => array(
+        'type' => 'int',
+      ),
+      'description' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'pid' => array(
+        'description' => 'The payment ID.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'status' => array(
+        'type' => 'varchar',
+        'length' => '255',
+      ),
+      'vid' => array(
+        'type' => 'serial',
+      ),
+    ),
+    'foreign keys' => array(
+      'pid' => array(
+        'table' => 'payment',
+        'columns' => array(
+          'pid' => 'pid',
+        ),
+      ),
+      'vid' => array(
+        'table' => 'payment',
+        'columns' => array(
+          'vid' => 'vid',
+        ),
+      ),
+    ),
+    'indexes' => array(
+      'pid' => array('pid'),
+    ),
+    'primary key' => array('vid'),
+    'unique keys' => array(
+      'vid' => array('vid'),
+    ),
+  );
+  $schema['payment_method'] = array(
+    'fields' => array(
+      'controller_class_name' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'pmid' => array(
+        'type' => 'serial',
+      ),
+      'test' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+      ),
+      'title_generic' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'title_specific' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('pmid'),
+    'unique keys' => array(
+      'pmid' => array('pmid'),
+    ),
+  );
+
+  return $schema;
+}
