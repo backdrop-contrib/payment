@@ -459,12 +459,6 @@ function payment_form_method_controller_settings($payment_method = NULL) {
     '#markup' => '<div id="payment-controller-settings">',
   );
   if ($payment_method) {
-    if ($payment_method->test) {
-      $elements['test'] = array(
-        '#type' => 'markup',
-        '#markup' =>  '<div class="messages warning">' . t('This is a test payment. No actual money will be transferred.') . '</div>',
-      );
-    }
     $elements['change'] = array(
       '#type' => 'submit',
       '#value' => t('Change payment method'),

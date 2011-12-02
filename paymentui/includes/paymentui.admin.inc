@@ -225,12 +225,6 @@ function paymentui_form_payment_method(array $form, array &$form_state, PaymentM
     '#maxlength' => 255,
     '#required' => TRUE,
   );
-  $form['test'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Make test payments only'),
-    '#default_value' => $payment_method->controller->test,
-    '#disabled' => !$payment_method->controller->test,
-  );
   $form['actions'] = array(
     '#type' => 'actions',
   );

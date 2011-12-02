@@ -158,10 +158,6 @@ function payment_schema() {
       'pmid' => array(
         'type' => 'serial',
       ),
-      'test' => array(
-        'type' => 'int',
-        'size' => 'tiny',
-      ),
       'title_generic' => array(
         'type' => 'varchar',
         'length' => 255,

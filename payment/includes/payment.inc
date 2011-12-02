@@ -383,13 +383,6 @@ class PaymentMethodController {
   public $payment_method_form_id = 'payment_form_payment_method';
 
   /**
-   * Whether a testing environment can be used that does not transfer money.
-   *
-   * @var boolean
-   */
-  public $test = FALSE;
-
-  /**
    * The human-readable title.
    *
    * @var array
