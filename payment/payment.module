@@ -5,6 +5,7 @@
  * Hook implementations and shared functions.
  *
  * @todo Add Rules action to change a payment's status.
+ * @todo Expose payments and payment methods (and controllers?) to Views.
  */
 
 /**
@@ -198,7 +199,7 @@ function payment_payment_status_info() {
  * Implements hook_payment_method_controller_info().
  */
 function payment_payment_method_controller_info() {
-  return array('PaymentMethodControllerBasic', 'PaymentMethodControllerDisabled');
+  return array('PaymentMethodControllerDisabled');
 }
 
 /**

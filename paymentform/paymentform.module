@@ -1,6 +1,11 @@
 <?php
 
 /**
+ * @file
+ * Hook implementations and shared functions.
+ */
+
+/**
  * Implements hook_menu().
  */
 function paymentform_menu() {
