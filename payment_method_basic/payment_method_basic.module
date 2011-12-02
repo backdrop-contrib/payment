@@ -12,8 +12,6 @@ function payment_method_basic_payment_method_controller_info() {
   return array('PaymentMethodBasicController');
 }
 
-
-
 /**
  * Implements hook_entity_load().
  */
