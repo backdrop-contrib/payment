@@ -46,9 +46,9 @@ function payment_watchdog(array $log_entry) {
 }
 
 /**
- * Implements hook_modules_uninstalled().
+ * Implements hook_modules_disabled().
  */
-function payment_modules_uninstalled(array $modules) {
+function payment_modules_disabled(array $modules) {
   payment_method_fix_controllerless();
 }
 
