@@ -424,10 +424,10 @@ class PaymentMethodController {
  * do anything else. It is used when no working controller is available for a
  * payment method, so other modules don't have to check for that.
  */
-class PaymentMethodControllerDisabled extends PaymentMethodController {
+class PaymentMethodControllerUnavailable extends PaymentMethodController {
 
   function __construct() {
-    $this->title = t('Disabled');
+    $this->title = t('Unavailable');
   }
 
   /**

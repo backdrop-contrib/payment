@@ -148,7 +148,7 @@ function paymentui_page_payment_method_list() {
  */
 function payment_page_payment_method_add_select_controller() {
   $controllers = payment_method_controller_load_multiple();
-  unset($controllers['PaymentMethodControllerDisabled']);
+  unset($controllers['PaymentMethodControllerUnavailable']);
   if ($controllers) {
     $items = array();
     foreach ($controllers as $controller) {

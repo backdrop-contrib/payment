@@ -199,7 +199,7 @@ function payment_payment_status_info() {
  * Implements hook_payment_method_controller_info().
  */
 function payment_payment_method_controller_info() {
-  return array('PaymentMethodControllerDisabled');
+  return array('PaymentMethodControllerUnavailable');
 }
 
 /**
@@ -358,7 +358,7 @@ $decimal_separator_position = strpos($amount_string, '.');
 }
 
 /**
- * Assign PaymentMethodControllerDisabled to payment methods that use a
+ * Assign PaymentMethodControllerUnavailable to payment methods that use a
  * controller that no longer exists.
  *
  * @return NULL
@@ -366,14 +366,14 @@ $decimal_separator_position = strpos($amount_string, '.');
 function payment_method_fix_controllerless() {
   // Find controllers that are still available.
   $controller_class_names = payment_method_controllers_info();
-  $controller_class_names[] = 'PaymentMethodControllerDisabled';
+  $controller_class_names[] = 'PaymentMethodControllerUnavailable';
 
-  // Set PaymentMethodControllerDisabled for payment methods whose controller
+  // Set PaymentMethodControllerUnavailable for payment methods whose controller
   // is no longer available.
   $query = db_update('payment_method');
   $values = array();
   $query->fields(array(
-    'controller_class_name' => 'PaymentMethodControllerDisabled',
+    'controller_class_name' => 'PaymentMethodControllerUnavailable',
   ));
   $query->condition('controller_class_name', $controller_class_names, 'NOT IN');
   $query->execute();
@@ -397,7 +397,7 @@ function payment_form_method_process(array $element, array &$form_state, array &
   foreach (entity_load('payment_method', $pmids) as $payment_method) {
     // @todo Do basic validation, e.g. for supported currencies.
     // Don't show disabled payment methods.
-    if (get_class($payment_method->controller) != 'PaymentMethodControllerDisabled') {
+    if (get_class($payment_method->controller) != 'PaymentMethodControllerUnavailable') {
       // Cast the PMID to a string or the AJAX callback won't work.
       $pmid_options[(string) $payment_method->pmid] = $payment_method->title_generic;
     }
