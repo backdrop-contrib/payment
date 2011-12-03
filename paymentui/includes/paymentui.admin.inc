@@ -112,8 +112,8 @@ function paymentui_page_payment_method_list() {
     $rows[] = array(
       check_plain($payment_method->title_specific),
       $payment_method->controller->title,
-      l(t('edit'), 'admin/config/services/payment/method/edit/' . $payment_method->pmid),
-      l(t('delete'), 'admin/config/services/payment/method/delete/' . $payment_method->pmid),
+      l(t('edit'), 'admin/config/services/payment/method/' . $payment_method->pmid . '/edit'),
+      l(t('delete'), 'admin/config/services/payment/method/' . $payment_method->pmid . '/delete'),
     );
   }
 
@@ -240,7 +240,7 @@ function paymentui_form_payment_method(array $form, array &$form_state, PaymentM
     $form['actions']['delete'] = array(
       '#type' => 'link',
       '#title' => t('Delete'),
-      '#href' => 'admin/config/services/payment/method/delete/' . $payment_method->pmid,
+      '#href' => 'admin/config/services/payment/method/' . $payment_method->pmid . '/delete',
     );
   }
 

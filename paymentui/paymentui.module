@@ -43,22 +43,22 @@ function paymentui_menu() {
     'file path' => drupal_get_path('module', 'paymentui') . '/includes',
     'type' => MENU_CALLBACK,
   );
-  $items['admin/config/services/payment/method/edit/%paymentui_menu_payment_method'] = array(
+  $items['admin/config/services/payment/method/%paymentui_menu_payment_method/edit'] = array(
     'page callback' => 'paymentui_payment_method_form',
-    'page arguments' => array(6),
+    'page arguments' => array(5),
     'access arguments' => array('paymentui.method.administer'),
     'title callback' => 'paymentui_payment_method_title',
-    'title arguments' => array(6),
+    'title arguments' => array(5),
     'file' => 'paymentui.admin.inc',
     'file path' => drupal_get_path('module', 'paymentui') . '/includes',
     'type' => MENU_CALLBACK,
   );
-  $items['admin/config/services/payment/method/delete/%paymentui_menu_payment_method'] = array(
+  $items['admin/config/services/payment/method/%paymentui_menu_payment_method/delete'] = array(
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('paymentui_form_payment_method_delete', 6),
+    'page arguments' => array('paymentui_form_payment_method_delete', 5),
     'access arguments' => array('paymentui.method.administer'),
     'title callback' => 'paymentui_payment_method_title',
-    'title arguments' => array(6),
+    'title arguments' => array(5),
     'file' => 'paymentui.admin.inc',
     'file path' => drupal_get_path('module', 'paymentui') . '/includes',
     'type' => MENU_CALLBACK,
