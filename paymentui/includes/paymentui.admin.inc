@@ -147,21 +147,25 @@ function paymentui_page_payment_method_list() {
  * @return string
  */
 function payment_page_payment_method_add_select_controller() {
-  $items = array();
   $controllers = payment_method_controller_load_multiple();
   unset($controllers['PaymentMethodControllerDisabled']);
-  foreach ($controllers as $controller) {
-    $items[] = array(
-      'title' => $controller->title,
-      'href' => 'admin/config/services/payment/method/add/' . get_class($controller),
-      'description' => $controller->description,
-      'localized_options' => array(),
-    );
+  if ($controllers) {
+    $items = array();
+    foreach ($controllers as $controller) {
+      $items[] = array(
+        'title' => $controller->title,
+        'href' => 'admin/config/services/payment/method/add/' . get_class($controller),
+        'description' => $controller->description,
+        'localized_options' => array(),
+      );
+    }
+    return theme('admin_block_content', array(
+      'content' => $items,
+    ));
   }
-
-  return theme('admin_block_content', array(
-    'content' => $items,
-  ));
+  else {
+    return t('There are no payment method types available.');
+  }
 }
 
 /**
