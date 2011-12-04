@@ -315,6 +315,9 @@ class PaymentMethodEntityController extends EntityAPIController {
   function attachLoad(&$queries_entities, $revision_id = FALSE) {
     foreach ($queries_entities as $entity) {
       $entity->controller = payment_method_controller_load($entity->controller_class_name);
+      if (!$entity->controller) {
+        $entity->controller = payment_method_controller_load('PaymentMethodControllerUnavailable');
+      }
       unset($entity->controller_class_name);
     }
     parent::attachLoad($queries_entities, $revision_id);

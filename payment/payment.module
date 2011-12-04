@@ -335,7 +335,7 @@ function payment_method_controller_load_multiple(array $controller_class_names =
   // Set FALSE for requested controllers that do not exist.
   $controllers += array_fill_keys(array_diff($controller_class_names, array_keys($controllers)), FALSE);
 
-  return $controller_class_names ? array_intersect_key($controllers, array_flip($controller_class_names)) : $controllers;
+  return $controller_class_names ? array_intersect_key($controllers, array_flip($controller_class_names)) : array_filter($controllers);
 }
 
 /**
