@@ -46,13 +46,6 @@ function payment_watchdog(array $log_entry) {
 }
 
 /**
- * Implements hook_modules_disabled().
- */
-function payment_modules_disabled(array $modules) {
-  payment_method_fix_controllerless();
-}
-
-/**
  * Implements hook_entity_info().
  */
 function payment_entity_info() {
@@ -355,28 +348,6 @@ $decimal_separator_position = strpos($amount_string, '.');
     '!units' => substr($amount_string, 0, $decimal_separator_position),
     '!cents' => substr($amount_string, $decimal_separator_position + 1),
   ));
-}
-
-/**
- * Assign PaymentMethodControllerUnavailable to payment methods that use a
- * controller that no longer exists.
- *
- * @return NULL
- */
-function payment_method_fix_controllerless() {
-  // Find controllers that are still available.
-  $controller_class_names = payment_method_controllers_info();
-  $controller_class_names[] = 'PaymentMethodControllerUnavailable';
-
-  // Set PaymentMethodControllerUnavailable for payment methods whose controller
-  // is no longer available.
-  $query = db_update('payment_method');
-  $values = array();
-  $query->fields(array(
-    'controller_class_name' => 'PaymentMethodControllerUnavailable',
-  ));
-  $query->condition('controller_class_name', $controller_class_names, 'NOT IN');
-  $query->execute();
 }
 
 /**
