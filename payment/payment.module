@@ -250,13 +250,17 @@ function payment_statuses_info() {
  *
  * @param $status string
  *   A status' system name.
+ * @param $unknown boolean
+ *   Whether to return info for PAYMENT_STATUS_UNKNOWN if the requested status
+ *   does not exist.
  *
- * @return array
+ * @return mixed
+ *   An array with payment status info or FALSE if the status does not exist.
  */
-function payment_status_info($status) {
+function payment_status_info($status, $unknown = FALSE) {
   $statuses_info = payment_statuses_info();
 
-  return $statuses_info[$status];
+  return isset($statuses_info[$status]) ? $statuses_info[$status] : ($unknown ? $statuses_info[PAYMENT_STATUS_UNKNOWN] : FALSE);
 }
 
 /**
@@ -264,12 +268,15 @@ function payment_status_info($status) {
  *
  * @param $status string
  *   The payment status for which to get the base status.
+ * @param $unknown boolean
+ *   Whether to return PAYMENT_STATUS_UNKNOWN's base status if the requested
+ *   status does not exist.
  *
  * @return string
  *   The payment status's base status.
  */
-function payment_status_base($status) {
-  $status_info = payment_status_info($status);
+function payment_status_base($status, $unknown = FALSE) {
+  $status_info = payment_status_info($status, $unknown);
 
   return $status_info['base status'];
 }

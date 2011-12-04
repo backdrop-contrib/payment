@@ -73,7 +73,7 @@ function paymentui_payment_list() {
   $payments = entity_load('payment', array_keys($entities['payment']));
   $rows = array();
   foreach ($payments as $payment) {
-    $status_info = payment_status_info($payment->status);
+    $status_info = payment_status_info($payment->status, TRUE);
     $rows[] = array(
       'data' => array(
         format_date($payment->updated, 'small'),
