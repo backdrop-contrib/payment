@@ -16,9 +16,9 @@ function payment_schema() {
         'size' => 'big',
       ),
       'caller_data' => array(
-        'type' => 'blob', 
-        'size' => 'big', 
-        'serialize' => TRUE, 
+        'type' => 'blob',
+        'size' => 'big',
+        'serialize' => TRUE,
       ),
       'created' => array(
         'type' => 'int',

@@ -353,7 +353,7 @@ $decimal_separator_position = strpos($amount_string, '.');
 /**
  * Form process callback for a payment_method element.
  *
- * @see payment_element_info().
+ * @see payment_element_info()
  */
 function payment_form_method_process(array $element, array &$form_state, array &$form) {
   $form_state['payment_parents'] = $element['#parents'];
@@ -367,7 +367,7 @@ function payment_form_method_process(array $element, array &$form_state, array &
   $pmids = empty($element['#pmids']) ? FALSE : $element['#pmids'];
   foreach (entity_load('payment_method', $pmids) as $payment_method) {
     // @todo Do basic validation, e.g. for supported currencies.
-    // Don't show disabled payment methods.
+    // Don't show unavailable payment methods.
     if (get_class($payment_method->controller) != 'PaymentMethodControllerUnavailable') {
       // Cast the PMID to a string or the AJAX callback won't work.
       $pmid_options[(string) $payment_method->pmid] = $payment_method->title_generic;

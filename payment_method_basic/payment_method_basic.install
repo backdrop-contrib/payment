@@ -17,8 +17,8 @@ function payment_method_basic_schema() {
       ),
       'pmid' => array(
         'type' => 'int',
-        'unsigned' => TRUE, 
-        'not null' => TRUE, 
+        'unsigned' => TRUE,
+        'not null' => TRUE,
         'default' => 0,
       ),
       'text_format' => array(
