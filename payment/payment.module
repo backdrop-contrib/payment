@@ -196,6 +196,16 @@ function payment_payment_method_controller_info() {
 }
 
 /**
+ * Implements hook_views_api().
+ */
+function payment_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'payment') . '/includes/views',
+  );
+}
+
+/**
  * Implements hook_rules_event_info().
  */
 function payment_rules_event_info() {
@@ -328,7 +338,9 @@ function payment_method_controller_load_multiple(array $controller_class_names =
   // Load all existing controllers.
   if (is_null($controllers)) {
     foreach (payment_method_controllers_info() as $controller_class_name) {
-      $controllers[$controller_class_name] = new $controller_class_name();
+      $controller = new $controller_class_name();
+      $controller->name = $controller_class_name;
+      $controllers[$controller_class_name] = $controller;
     }
   }
 

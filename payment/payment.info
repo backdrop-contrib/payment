@@ -3,3 +3,7 @@ description = "Allows other modules to let their users make payments using the p
 core = 7.x
 dependencies[] = entity
 files[] = includes/payment.inc
+files[] = includes/views/PaymentViewsHandlerFieldPaymentMethodControllerTitle.inc
+files[] = includes/views/PaymentViewsHandlerFieldPaymentMethodControllerDescription.inc
+files[] = includes/views/PaymentViewsHandlerFieldPaymentMethodControllerOperations.inc
+files[] = includes/views/PaymentViewsHandlerFieldPaymentStatus.inc

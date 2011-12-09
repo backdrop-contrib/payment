@@ -366,6 +366,18 @@ class PaymentMethodController {
   public $description = '';
 
   /**
+   * The machine name.
+   *
+   * This will be set by payment_method_controller_load_multiple() as a
+   * shorthand for get_class($payment_method_controller).
+   *
+   * @see payment_method_controller_load_multiple()
+   *
+   * @var string
+   */
+  public $name = '';
+
+  /**
    * The name of the function that returns form elements to configure this
    * payment method for a specific payment. Using #element_validate callbacks,
    * input can be added to the Payment object in $form_state['payment'].
