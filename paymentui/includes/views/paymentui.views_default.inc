@@ -253,7 +253,7 @@ function paymentui_view_payment_methods() {
   $handler = $view->new_display('default', 'Master', 'default');
   $handler->display->display_options['title'] = 'Payment methods';
   $handler->display->display_options['access']['type'] = 'perm';
-  $handler->display->display_options['access']['perm'] = 'paymentui.method.administer';
+  $handler->display->display_options['access']['perm'] = 'paymentui.payment_method.administer';
   $handler->display->display_options['cache']['type'] = 'none';
   $handler->display->display_options['query']['type'] = 'views_query';
   $handler->display->display_options['query']['options']['query_comment'] = FALSE;

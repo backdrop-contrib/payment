@@ -12,7 +12,7 @@ function paymentui_menu() {
   $items['admin/config/services/payment/method/add'] = array(
     'title' => 'Add payment method',
     'page callback' => 'payment_page_payment_method_add_select_controller',
-    'access arguments' => array('paymentui.method.administer'),
+    'access arguments' => array('paymentui.payment_method.administer'),
     'file' => 'paymentui.admin.inc',
     'file path' => drupal_get_path('module', 'paymentui') . '/includes',
     'type' => MENU_LOCAL_ACTION,
@@ -22,7 +22,7 @@ function paymentui_menu() {
     'title' => 'Add payment method',
     'page callback' => 'paymentui_payment_method_form_add',
     'page arguments' => array(6),
-    'access arguments' => array('paymentui.method.administer'),
+    'access arguments' => array('paymentui.payment_method.administer'),
     'file' => 'paymentui.admin.inc',
     'file path' => drupal_get_path('module', 'paymentui') . '/includes',
     'type' => MENU_CALLBACK,
@@ -30,7 +30,7 @@ function paymentui_menu() {
   $items['admin/config/services/payment/method/%paymentui_menu_payment_method/edit'] = array(
     'page callback' => 'paymentui_payment_method_form',
     'page arguments' => array(5),
-    'access arguments' => array('paymentui.method.administer'),
+    'access arguments' => array('paymentui.payment_method.administer'),
     'title callback' => 'paymentui_payment_method_title',
     'title arguments' => array(5),
     'file' => 'paymentui.admin.inc',
@@ -40,7 +40,7 @@ function paymentui_menu() {
   $items['admin/config/services/payment/method/%paymentui_menu_payment_method/delete'] = array(
     'page callback' => 'drupal_get_form',
     'page arguments' => array('paymentui_form_payment_method_delete', 5),
-    'access arguments' => array('paymentui.method.administer'),
+    'access arguments' => array('paymentui.payment_method.administer'),
     'title callback' => 'paymentui_payment_method_title',
     'title arguments' => array(5),
     'file' => 'paymentui.admin.inc',
@@ -53,7 +53,7 @@ function paymentui_menu() {
     'title' => 'Global configuration',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('paymentui_form_global_configuration'),
-    'access arguments' => array('paymentui.method.administer'),
+    'access arguments' => array('paymentui.payment_method.administer'),
     'file' => 'paymentui.admin.inc',
     'file path' => drupal_get_path('module', 'paymentui') . '/includes',
     'type' => MENU_LOCAL_TASK,
@@ -71,7 +71,7 @@ function paymentui_permission() {
     'paymentui.payment.view' => array(
       'title' => t('View payments'),
     ),
-    'paymentui.method.administer' => array(
+    'paymentui.payment_method.administer' => array(
       'title' => t('Administer payment methods'),
     ),
   );
