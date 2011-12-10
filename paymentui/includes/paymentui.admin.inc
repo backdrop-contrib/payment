@@ -134,7 +134,7 @@ function paymentui_form_payment_method_delete(array $form, array &$form_state, P
 
   return confirm_form($form, t('Do you really want to delete payment method %title?', array(
     '%title' => $form_state['payment_method']->title_specific,
-  )), 'admin/config/services/payment/method', t('Existing payments that use this payment method will become unusable. This action cannot be undone.'));
+  )), 'admin/config/services/payment/method', t('Existing payments that use this payment method will become unusable. This action cannot be undone.'), t('Delete payment method'));
 }
 
 /**
