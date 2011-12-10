@@ -4,23 +4,7 @@
  * Implements hook_menu().
  */
 function paymentui_menu() {
-  // Payment overview.
-  $items['admin/reports/payment'] = array(
-    'title' => 'Payments',
-    'page callback' => 'paymentui_payment_list',
-    'access arguments' => array('paymentui.payment.view'),
-    'file' => 'paymentui.admin.inc',
-    'file path' => drupal_get_path('module', 'paymentui') . '/includes',
-  );
-
   // Payment method configuration.
-  $items['admin/config/services/payment'] = array(
-    'title' => 'Payment methods',
-    'page callback' => 'paymentui_page_payment_method_list',
-    'access arguments' => array('paymentui.method.administer'),
-    'file' => 'paymentui.admin.inc',
-    'file path' => drupal_get_path('module', 'paymentui') . '/includes',
-  );
   $items['admin/config/services/payment/method'] = array(
     'title' => 'Payment methods',
     'type' => MENU_DEFAULT_LOCAL_TASK,
@@ -131,6 +115,16 @@ function paymentui_form_alter(array &$form, array &$form_state, $form_id) {
       $form['#submit'][] = 'paymentui_form_payment_method_submit';
     }
   }
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function paymentui_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'paymentui') . '/includes/views',
+  );
 }
 
 /**
