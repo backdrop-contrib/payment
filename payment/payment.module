@@ -206,28 +206,6 @@ function payment_views_api() {
 }
 
 /**
- * Implements hook_rules_event_info().
- */
-function payment_rules_event_info() {
-  $event['payment_status_change'] = array(
-    'label' => t("After changing a payment's status"),
-    'group' => t('Payment'),
-    'variables' => array(
-      'payment' => array(
-        'type' => 'payment',
-        'label' => t('Payment'),
-      ),
-      'payment_old_status' => array(
-        'type' => 'text',
-        'label' => t("The payment's old status"),
-      ),
-    ),
-  );
-
-  return $event;
-}
-
-/**
  * Gets info about payment statuses.
  *
  * @see hook_payment_status_info()
