@@ -6,7 +6,7 @@
  */
 
 /**
- * An new payment that has not yet been processed.
+ * A new payment for which processing has not yet started.
  */
 define('PAYMENT_STATUS_NEW', 'payment_status_new');
 
