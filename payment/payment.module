@@ -3,9 +3,6 @@
 /**
  * @file
  * Hook implementations and shared functions.
- *
- * @todo Add Rules action to change a payment's status.
- * @todo Expose payments and payment methods (and controllers?) to Views.
  */
 
 /**
@@ -336,9 +333,7 @@ function payment_method_controller_load_multiple(array $controller_class_names =
  * @return string
  */
 function payment_amount_human_readable($amount) {
-  // @todo Is this being used at all?
-  // @todo Use a currency module.
-  // @todo Support three decimals.
+  // @todo Use Currency 7.x-2.x (http://drupal.org/project/currency).
 $amount_string = number_format($amount, 2, '.', '');
 $decimal_separator_position = strpos($amount_string, '.');
   return t('!units.!cents', array(
