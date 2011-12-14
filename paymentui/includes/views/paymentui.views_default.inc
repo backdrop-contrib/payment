@@ -216,6 +216,27 @@ function paymentui_view_payments() {
   $handler->display->display_options['fields']['title_specific']['hide_empty'] = 0;
   $handler->display->display_options['fields']['title_specific']['empty_zero'] = 0;
   $handler->display->display_options['fields']['title_specific']['hide_alter_empty'] = 0;
+  /* Field: Payment: Operations */
+  $handler->display->display_options['fields']['operations']['id'] = 'operations';
+  $handler->display->display_options['fields']['operations']['table'] = 'payment';
+  $handler->display->display_options['fields']['operations']['field'] = 'operations';
+  $handler->display->display_options['fields']['operations']['alter']['alter_text'] = 0;
+  $handler->display->display_options['fields']['operations']['alter']['make_link'] = 0;
+  $handler->display->display_options['fields']['operations']['alter']['absolute'] = 0;
+  $handler->display->display_options['fields']['operations']['alter']['external'] = 0;
+  $handler->display->display_options['fields']['operations']['alter']['replace_spaces'] = 0;
+  $handler->display->display_options['fields']['operations']['alter']['trim_whitespace'] = 0;
+  $handler->display->display_options['fields']['operations']['alter']['nl2br'] = 0;
+  $handler->display->display_options['fields']['operations']['alter']['word_boundary'] = 1;
+  $handler->display->display_options['fields']['operations']['alter']['ellipsis'] = 1;
+  $handler->display->display_options['fields']['operations']['alter']['strip_tags'] = 0;
+  $handler->display->display_options['fields']['operations']['alter']['trim'] = 0;
+  $handler->display->display_options['fields']['operations']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['operations']['element_label_colon'] = 1;
+  $handler->display->display_options['fields']['operations']['element_default_classes'] = 1;
+  $handler->display->display_options['fields']['operations']['hide_empty'] = 0;
+  $handler->display->display_options['fields']['operations']['empty_zero'] = 0;
+  $handler->display->display_options['fields']['operations']['hide_alter_empty'] = 1;
   /* Sort criterion: Payment: Last updated date and time */
   $handler->display->display_options['sorts']['updated']['id'] = 'updated';
   $handler->display->display_options['sorts']['updated']['table'] = 'payment';
