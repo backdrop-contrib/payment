@@ -1,5 +1,5 @@
-name = Payment Administration Interface
-description = "Allows users to administer payment methods and payments."
+name = Payment UI
+description = "Allows users to view and administer payment and payments methods."
 dependencies[] = payment
 dependencies[] = views
 core = 7.x
