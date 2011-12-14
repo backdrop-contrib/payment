@@ -10,16 +10,7 @@ class PaymentViewsHandlerFieldPaymentMethodControllerOperations extends views_ha
    */
   function render($values) {
     $pmid = $this->get_value($values);
-    $links = array(
-      array(
-        'title' => 'edit',
-        'href' => 'admin/config/services/payment/method/' . $pmid . '/edit',
-      ),
-      array(
-        'title' => 'delete',
-        'href' => 'admin/config/services/payment/method/' . $pmid . '/delete',
-      ),
-    );
+    $links = menu_contextual_links('payment', 'admin/config/services/payment/method', array($pmid));
 
     return theme('links', array(
       'links' => $links,
