@@ -7,3 +7,4 @@ files[] = includes/views/PaymentViewsHandlerFieldPaymentMethodControllerTitle.in
 files[] = includes/views/PaymentViewsHandlerFieldPaymentMethodControllerDescription.inc
 files[] = includes/views/PaymentViewsHandlerFieldPaymentMethodControllerOperations.inc
 files[] = includes/views/PaymentViewsHandlerFieldPaymentStatus.inc
+files[] = includes/views/PaymentViewsHandlerFieldPaymentOperations.inc

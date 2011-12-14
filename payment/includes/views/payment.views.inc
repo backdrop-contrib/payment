@@ -98,6 +98,13 @@ function payment_views_data() {
         'handler' => 'views_handler_argument_date',
       ),
     ),
+    'operations' => array(
+      'title' => t('Operations'),
+      'real field' => 'pid',
+      'field' => array(
+        'handler' => 'PaymentViewsHandlerFieldPaymentOperations',
+      ),
+    ),
     'pid' => array(
       'title' => t('Payment ID'),
       'field' => array(

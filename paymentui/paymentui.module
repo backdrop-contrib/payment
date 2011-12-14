@@ -18,6 +18,7 @@ function paymentui_menu() {
   $items['payment/%paymentui_menu_payment/view'] = array(
     'title' => 'View',
     'type' => MENU_DEFAULT_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
     'weight' => -10,
   );
   

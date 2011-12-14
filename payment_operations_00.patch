@@ -1,0 +1,82 @@
+diff --git a/.DS_Store b/.DS_Store
+index 9fabb6a..c31d152 100644
+Binary files a/.DS_Store and b/.DS_Store differ
+diff --git a/payment/.DS_Store b/payment/.DS_Store
+index 3933e83..12ceee1 100644
+Binary files a/payment/.DS_Store and b/payment/.DS_Store differ
+diff --git a/payment/includes/.DS_Store b/payment/includes/.DS_Store
+index 696f096..10df3da 100644
+Binary files a/payment/includes/.DS_Store and b/payment/includes/.DS_Store differ
+diff --git a/payment/includes/views/.DS_Store b/payment/includes/views/.DS_Store
+index aa9d989..086e58d 100644
+Binary files a/payment/includes/views/.DS_Store and b/payment/includes/views/.DS_Store differ
+diff --git a/payment/includes/views/PaymentViewsHandlerFieldPaymentOperations.inc b/payment/includes/views/PaymentViewsHandlerFieldPaymentOperations.inc
+index e69de29..34c1f96 100644
+--- a/payment/includes/views/PaymentViewsHandlerFieldPaymentOperations.inc
++++ b/payment/includes/views/PaymentViewsHandlerFieldPaymentOperations.inc
+@@ -0,0 +1,22 @@
++<?php
++
++/**
++ * Field handler to present a payment's operations links.
++ */
++class PaymentViewsHandlerFieldPaymentOperations extends views_handler_field {
++
++  /**
++   * Implements views_handler_field::render().
++   */
++  function render($values) {
++    $pid = $this->get_value($values);
++    $links = menu_contextual_links('payment', 'payment', array($pid));
++
++    return theme('links', array(
++      'links' => $links,
++      'attributes' => array(
++        'class' => array('links', 'inline', 'operations'),
++      ),
++    ));
++  }
++}
+diff --git a/payment/includes/views/payment.views.inc b/payment/includes/views/payment.views.inc
+index 72c2a49..328b757 100644
+--- a/payment/includes/views/payment.views.inc
++++ b/payment/includes/views/payment.views.inc
+@@ -98,6 +98,13 @@ function payment_views_data() {
+         'handler' => 'views_handler_argument_date',
+       ),
+     ),
++    'operations' => array(
++      'title' => t('Operations'),
++      'real field' => 'pid',
++      'field' => array(
++        'handler' => 'PaymentViewsHandlerFieldPaymentOperations',
++      ),
++    ),
+     'pid' => array(
+       'title' => t('Payment ID'),
+       'field' => array(
+diff --git a/payment/payment.info b/payment/payment.info
+index 86bb377..e8231df 100644
+--- a/payment/payment.info
++++ b/payment/payment.info
+@@ -6,4 +6,5 @@ files[] = includes/payment.inc
+ files[] = includes/views/PaymentViewsHandlerFieldPaymentMethodControllerTitle.inc
+ files[] = includes/views/PaymentViewsHandlerFieldPaymentMethodControllerDescription.inc
+ files[] = includes/views/PaymentViewsHandlerFieldPaymentMethodControllerOperations.inc
+-files[] = includes/views/PaymentViewsHandlerFieldPaymentStatus.inc
+\ No newline at end of file
++files[] = includes/views/PaymentViewsHandlerFieldPaymentStatus.inc
++files[] = includes/views/PaymentViewsHandlerFieldPaymentOperations.inc
+\ No newline at end of file
+diff --git a/paymentui/paymentui.module b/paymentui/paymentui.module
+index f4d7ded..e33bf0f 100644
+--- a/paymentui/paymentui.module
++++ b/paymentui/paymentui.module
+@@ -18,6 +18,7 @@ function paymentui_menu() {
+   $items['payment/%paymentui_menu_payment/view'] = array(
+     'title' => 'View',
+     'type' => MENU_DEFAULT_LOCAL_TASK,
++    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+     'weight' => -10,
+   );
+   
