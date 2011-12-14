@@ -4,6 +4,24 @@
  * Implements hook_menu().
  */
 function paymentui_menu() {
+  // Payment pages.
+  $items['payment/%paymentui_menu_payment'] = array(
+    'title callback' => 'paymentui_payment_title',
+    'title arguments' => array(1),
+    'page callback' => 'paymentui_page_payment_view',
+    'page arguments' => array(1),
+    'access callback' => 'paymentui_payment_access',
+    'access arguments' => array(1),
+    'file' => 'paymentui.payment.inc',
+    'file path' => drupal_get_path('module', 'paymentui') . '/includes',
+  );
+  $items['payment/%paymentui_menu_payment/view'] = array(
+    'title' => 'View',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+  );
+  
+
   // Payment method configuration.
   $items['admin/config/services/payment/method'] = array(
     'title' => 'Payment methods',
@@ -68,8 +86,11 @@ function paymentui_menu() {
  */
 function paymentui_permission() {
   return array(
-    'paymentui.payment.view' => array(
-      'title' => t('View payments'),
+    'paymentui.payment.view.own' => array(
+      'title' => t('View own payments'),
+    ),
+    'paymentui.payment.view.all' => array(
+      'title' => t('View all payments'),
     ),
     'paymentui.payment_method.administer' => array(
       'title' => t('Administer payment methods'),
@@ -125,6 +146,34 @@ function paymentui_views_api() {
     'api' => 3,
     'path' => drupal_get_path('module', 'paymentui') . '/includes/views',
   );
+}
+
+/**
+ * Menu wildcard loader to load a payment.
+ *
+ * @see entity_load_single()
+ */
+function paymentui_menu_payment_load($pid) {
+  return entity_load_single('payment', $pid);
+}
+
+/**
+ * Menu access callback: return a user's access to a payment.
+ *
+ * @param $payment Payment
+ *
+ * @return string
+ */
+function paymentui_payment_access(Payment $payment) {
+  global $user;
+
+  if (user_access('paymentui.payment.view.all')) {
+    return TRUE;
+  }
+  elseif (user_access('paymentui.payment.view.own') && $user->uid == $payment->uid) {
+    return TRUE;
+  }
+  return FALSE;
 }
 
 /**

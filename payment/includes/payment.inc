@@ -251,6 +251,57 @@ class PaymentEntityController extends EntityAPIController {
 
     return $return;
   }
+
+  /**
+   * Implements EntityAPIController::view().
+   */
+  function view($entities, $view_mode = 'full', $langcode = NULL, $page = NULL) {
+    $build = parent::view($entities, $view_mode, $langcode, $page);
+    foreach ($build['payment'] as &$payment_build) {
+      $payment = $payment_build['#entity'];
+
+      $status_info = payment_status_info($payment->status);
+      $payment_build['status'] = array(
+        '#type' => 'item',
+        '#title' => t('Status'),
+        '#markup' => $status_info['title'],
+      );
+      $payment_build['amount'] = array(
+        '#type' => 'item',
+        '#title' => t('Amount'),
+        '#markup' => payment_amount_human_readable($payment->amount),
+      );
+      $payment_build['created'] = array(
+        '#type' => 'item',
+        '#title' => t('Created'),
+        '#markup' => format_date($payment->created),
+      );
+      $payment_build['updated'] = array(
+        '#type' => 'item',
+        '#title' => t('Last updated'),
+        '#markup' => format_date($payment->updated),
+      );
+      $rows = array();
+      $result = db_query("SELECT created_revision, status FROM {payment_revision} WHERE pid = :pid ORDER BY vid DESC", array(
+        ':pid' => $payment->pid,
+      ));
+      foreach ($result as $revision_data) {
+        $status_info = payment_status_info($revision_data->status);
+        $rows[] = array($status_info['title'], format_date($revision_data->created_revision));
+      }
+      $header = array(t('Status'), t('Date'));
+      $payment_build['history'] = array(
+        '#type' => 'markup',
+        '#markup' => theme('table', array(
+          'header' => $header,
+          'rows' => $rows,
+          'caption' => t('Status history'),
+        )),
+      );
+    }
+
+    return $build;
+  }
 }
 
 /**
