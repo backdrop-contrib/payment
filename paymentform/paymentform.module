@@ -88,7 +88,7 @@ function paymentform_form(array $form, array &$form_state, Payment $payment = NU
     $form['#access'] = FALSE;
     drupal_set_message(t('There are no payment methods.'), 'warning');
   }
-  if (!variable_get('paymentform_currency', FALSE)) {
+  if (!variable_get('paymentform_currency_code', FALSE)) {
     $form['#access'] = FALSE;
     drupal_set_message(t('Payment Form has not been configured.') . ' ' . l(t('Configure Payment Form'), 'admin/config/services/paymentform') . '.', 'warning');
   }
