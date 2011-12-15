@@ -245,7 +245,7 @@ function paymentui_view_payments() {
 
   /* Display: Administration page */
   $handler = $view->new_display('page', 'Administration page', 'page_1');
-  $handler->display->display_options['path'] = 'admin/reports/payment';
+  $handler->display->display_options['path'] = 'admin/content/payment';
   $handler->display->display_options['menu']['type'] = 'normal';
   $handler->display->display_options['menu']['title'] = 'Payments';
   $handler->display->display_options['menu']['weight'] = '0';
