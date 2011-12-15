@@ -198,7 +198,7 @@ function payment_payment_method_controller_info() {
 function payment_views_api() {
   return array(
     'api' => 3,
-    'path' => drupal_get_path('module', 'payment') . '/includes/views',
+    'path' => drupal_get_path('module', 'payment') . '/views',
   );
 }
 

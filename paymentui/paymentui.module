@@ -12,8 +12,7 @@ function paymentui_menu() {
     'page arguments' => array(1),
     'access callback' => 'paymentui_payment_access',
     'access arguments' => array(1),
-    'file' => 'paymentui.payment.inc',
-    'file path' => drupal_get_path('module', 'paymentui') . '/includes',
+    'file' => 'paymentui.payment_pages.inc',
   );
   $items['payment/%paymentui_menu_payment/view'] = array(
     'title' => 'View',
@@ -33,7 +32,6 @@ function paymentui_menu() {
     'page callback' => 'payment_page_payment_method_add_select_controller',
     'access arguments' => array('paymentui.payment_method.administer'),
     'file' => 'paymentui.admin.inc',
-    'file path' => drupal_get_path('module', 'paymentui') . '/includes',
     'type' => MENU_LOCAL_ACTION,
     'weight' => 1,
   );
@@ -43,7 +41,6 @@ function paymentui_menu() {
     'page arguments' => array(6),
     'access arguments' => array('paymentui.payment_method.administer'),
     'file' => 'paymentui.admin.inc',
-    'file path' => drupal_get_path('module', 'paymentui') . '/includes',
     'type' => MENU_CALLBACK,
   );
   $items['admin/config/services/payment/method/%paymentui_menu_payment_method'] = array(
@@ -53,7 +50,6 @@ function paymentui_menu() {
     'title callback' => 'paymentui_payment_method_title',
     'title arguments' => array(5),
     'file' => 'paymentui.admin.inc',
-    'file path' => drupal_get_path('module', 'paymentui') . '/includes',
   );
   $items['admin/config/services/payment/method/%paymentui_menu_payment_method/edit'] = array(
     'title' => 'Edit',
@@ -66,7 +62,6 @@ function paymentui_menu() {
     'access arguments' => array('paymentui.payment_method.administer'),
     'title' => 'Delete',
     'file' => 'paymentui.admin.inc',
-    'file path' => drupal_get_path('module', 'paymentui') . '/includes',
     'type' => MENU_LOCAL_TASK,
     'context' => MENU_CONTEXT_INLINE,
     'weight' => 1,
@@ -79,7 +74,6 @@ function paymentui_menu() {
     'page arguments' => array('paymentui_form_global_configuration'),
     'access arguments' => array('paymentui.payment_method.administer'),
     'file' => 'paymentui.admin.inc',
-    'file path' => drupal_get_path('module', 'paymentui') . '/includes',
     'type' => MENU_LOCAL_TASK,
     'weight' => 2,
   );
@@ -150,7 +144,7 @@ function paymentui_form_alter(array &$form, array &$form_state, $form_id) {
 function paymentui_views_api() {
   return array(
     'api' => 3,
-    'path' => drupal_get_path('module', 'paymentui') . '/includes/views',
+    'path' => drupal_get_path('module', 'paymentui') . '/views',
   );
 }
 
