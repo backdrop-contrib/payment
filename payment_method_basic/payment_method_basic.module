@@ -19,7 +19,7 @@ function payment_method_basic_entity_load(array $entities, $entity_type) {
 if ($entity_type == 'payment_method') {
     $pmids = array();
     foreach ($entities as $payment_method) {
-      if (get_class($payment_method->controller) == 'PaymentMethodBasicController') {
+      if ($payment_method->controller->name == 'PaymentMethodBasicController') {
         $pmids[] = $payment_method->pmid;
       }
     }
@@ -42,7 +42,7 @@ if ($entity_type == 'payment_method') {
  * Implements hook_ENTITY_TYPE_ACTION().
  */
 function payment_method_basic_payment_method_insert(PaymentMethod $payment_method) {
-  if (get_class($payment_method->controller) == 'PaymentMethodBasicController') {
+  if ($payment_method->controller->name == 'PaymentMethodBasicController') {
     $payment_method->controller_data += payment_method_basic_controller_data();
     $query = db_insert('payment_method_basic');
     $values = array_merge($payment_method->controller_data, array(
@@ -57,7 +57,7 @@ function payment_method_basic_payment_method_insert(PaymentMethod $payment_metho
  * Implements hook_ENTITY_TYPE_ACTION().
  */
 function payment_method_basic_payment_method_update(PaymentMethod $payment_method) {
-  if (get_class($payment_method->controller) == 'PaymentMethodBasicController') {
+  if ($payment_method->controller->name == 'PaymentMethodBasicController') {
     $query = db_update('payment_method_basic');
     $values = array_merge($payment_method->controller_data, array(
       'pmid' => $payment_method->pmid,
@@ -72,7 +72,7 @@ function payment_method_basic_payment_method_update(PaymentMethod $payment_metho
  * Implements hook_ENTITY_TYPE_ACTION().
  */
 function payment_method_basic_payment_method_delete($entity) {
-  if (get_class($entity->controller) == 'PaymentMethodBasicController') {
+  if ($entity->controller->name == 'PaymentMethodBasicController') {
     db_delete('payment_method_basic')
       ->condition('pmid', $entity->pmid)
       ->execute();

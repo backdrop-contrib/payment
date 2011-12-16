@@ -18,7 +18,7 @@ function payment_page_payment_method_add_select_controller() {
     foreach ($controllers as $controller) {
       $items[] = array(
         'title' => $controller->title,
-        'href' => 'admin/config/services/payment/method/add/' . get_class($controller),
+        'href' => 'admin/config/services/payment/method/add/' . $controller->name,
         'description' => $controller->description,
         'localized_options' => array(),
       );

@@ -410,7 +410,7 @@ class PaymentMethodEntityController extends EntityAPIController {
    * Implements EntityAPIController::save().
    */
   function save($entity, DatabaseTransaction $transaction = NULL) {
-    $entity->controller_class_name = get_class($entity->controller);
+    $entity->controller_class_name = $entity->controller->name;
     $return = parent::save($entity, $transaction);
     unset($entity->controller_class_name);
 
