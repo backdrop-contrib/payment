@@ -56,7 +56,8 @@ function payment_rules_action_info() {
  * Implements Rules action callback for payment_rules_payment_status_change.
  */
 function payment_rules_payment_status_change(Payment $payment, $status_data) {
-  $payment->status = reset($status_data);
+  $payment->setStatus(reset($status_data));
+  enitty_save('payment', $payment);
 }
 
 /**
