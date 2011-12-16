@@ -359,13 +359,6 @@ class PaymentMethod extends PaymentCommon {
   public $pmid = 0;
 
   /**
-   * Whether or not to use the controllers testing environment if there is any.
-   *
-   * @var boolean
-   */
-  public $test = FALSE;
-
-  /**
    * The specific human-readable title, e.g. "Paypal WPS".
    *
    * @var string
