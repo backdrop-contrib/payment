@@ -147,8 +147,12 @@ class Payment extends PaymentCommon {
   function __construct(array $properties = array()) {
     global $user;
 
-    $this->uid = $user->uid;
-    $this->created = time();
+    if (!$this->uid) {
+      $this->uid = $user->uid;
+    }
+    if (!$this->created) {
+      $this->created = time();
+    }
     parent::__construct($properties);
   }
 
@@ -215,6 +219,27 @@ class Payment extends PaymentCommon {
  * Entity API controller for payment entities.
  */
 class PaymentEntityController extends EntityAPIController {
+
+  /**
+   * Implements EntityAPIController::load().
+   */
+  function load($ids = array(), $conditions = array()) {
+    $entities = parent::load($ids, $conditions);
+    foreach ($entities as $payment) {
+      // Cast non-string scalars to their original types, because some backends
+      // store/return all variables as strings.
+      $payment->amount = (float) $payment->amount;
+      $payment->created = (int) $payment->created;
+      $payment->created_revision = (int) $payment->created_revision;
+      $payment->expired = (int) $payment->expired;
+      $payment->pid = (int) $payment->pid;
+      $payment->uid = (int) $payment->uid;
+      $payment->updated = (int) $payment->updated;
+      $payment->vid = (int) $payment->vid;
+    }
+
+    return $entities;
+  }
 
   /**
    * Implements EntityAPIController::attachLoad().
@@ -359,6 +384,20 @@ class PaymentMethod extends PaymentCommon {
  * Entity API controller for payment_method entities.
  */
 class PaymentMethodEntityController extends EntityAPIController {
+
+  /**
+   * Implements EntityAPIController::load().
+   */
+  function load($ids = array(), $conditions = array()) {
+    $entities = parent::load($ids, $conditions);
+    foreach ($entities as $payment) {
+      // Cast non-string scalars to their original types, because some backends
+      // store/return all variables as strings.
+      $payment->pmid = (int) $payment->pmid;
+    }
+
+    return $entities;
+  }
 
   /**
    * Implements EntityAPIController::attachLoad().
