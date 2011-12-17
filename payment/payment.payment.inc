@@ -11,20 +11,20 @@
 function payment_payment_status_info() {
   $status[PAYMENT_STATUS_NEW] = array(
     'terminal' => FALSE,
-    'title' => t('new'),
+    'title' => t('New'),
   );
   $status[PAYMENT_STATUS_PENDING] = array(
     'terminal' => FALSE,
-    'title' => t('pending'),
+    'title' => t('Pending'),
   );
   $status[PAYMENT_STATUS_SUCCESS] = array(
-    'title' => t('completed'),
+    'title' => t('Completed'),
   );
   $status[PAYMENT_STATUS_FAILED] = array(
-    'title' => t('failed'),
+    'title' => t('Failed'),
   );
   $status[PAYMENT_STATUS_UNKNOWN] = array(
-    'title' => t('unknown'),
+    'title' => t('Unknown'),
   );
 
   return $status;
