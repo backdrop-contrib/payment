@@ -406,6 +406,7 @@ function payment_form_method_controller_settings($payment_method = NULL) {
     '#type' => 'markup',
     '#markup' => '<div id="payment-controller-settings">',
   );
+  $elements['controller_settings'] = array();
   if ($payment_method) {
     $elements['change'] = array(
       '#type' => 'submit',
@@ -417,7 +418,7 @@ function payment_form_method_controller_settings($payment_method = NULL) {
       ),
     );
     if ($payment_method->controller->payment_form_elements_callback) {
-      $elements += call_user_func($payment_method->controller->payment_form_elements_callback, $payment_method);
+      $elements['controller_settings'] = call_user_func($payment_method->controller->payment_form_elements_callback, $payment_method);
     }
   }
   $elements['wrapper_suffix'] = array(
@@ -432,12 +433,10 @@ function payment_form_method_controller_settings($payment_method = NULL) {
  * Return a payment method controller's form elements to configure a payment.
  */
 function payment_form_method_controller_settings_ajax_callback(array $form, array &$form_state) {
-  $pmid = (int) drupal_array_get_nested_value($form_state['values'], array_merge($form_state['payment_parents'], array('pmid')));
-  if ($pmid) {
-    if ($payment_method = entity_load_single('payment_method', $pmid)) {
-      // @todo Cache the modified form or input won't be accepted.
-      return payment_form_method_controller_settings($payment_method);
-    }
+  $element = $form;
+  foreach ($form_state['payment_parents'] as $parent) {
+    $element = $element[$parent];
   }
-  return array();
+
+  return $element['controller_settings'] ? $element['controller_settings'] : array();
 }
