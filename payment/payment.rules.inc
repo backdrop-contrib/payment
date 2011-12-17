@@ -31,22 +31,20 @@ function payment_rules_event_info() {
  * Implements hook_rules_action_info().
  */
 function payment_rules_action_info() {
-  $actions['payment_rules_payment_status_change'] = array(
+  $actions['payment_rules_action_payment_set_status'] = array(
     'label' => t('Change the payment status'),
     'parameter' => array(
       'payment' => array(
         'type' => 'payment',
         'label' => t('Label'),
-        'save' => TRUE,
       ),
       'status' => array(
-        'type' => 'list<text>',
+        'type' => 'text',
         'label' => t('Status'),
-        'options list' => 'payment_rules_payment_status_change_options_list',
+        'options list' => 'payment_rules_options_list_payment_set_status',
       ),
     ),
     'group' => t('Payment'),
-    'base' => 'payment_rules_payment_status_change',
   );
 
   return $actions;
@@ -64,7 +62,7 @@ function payment_rules_condition_info() {
         'type' => 'payment',
         'restriction' => 'selector',
       ),
-      'payment_status' => array(
+      'payment_statuses' => array(
         'type' => 'list<text>',
         'label' => t('Payment status'),
         'options list' => 'payment_rules_options_list_payment_has_status',
@@ -88,8 +86,8 @@ function payment_rules_condition_info() {
  *
  * @return boolean
  */
-function payment_rules_condition_payment_has_status(Payment $payment, array $statuses) {
-  return in_array($payment->status, $statuses) || in_array('payment_base_' . payment_status_base($payment->status, TRUE), $statuses);
+function payment_rules_condition_payment_has_status(Payment $payment, array $payment_statuses) {
+  return in_array($payment->status, $payment_statuses) || in_array('payment_base_' . payment_status_base($payment->status, TRUE), $payment_statuses);
 }
 
 /**
@@ -117,7 +115,7 @@ function payment_rules_options_list_payment_has_status() {
 /**
  * Implements Rules action callback for payment_rules_payment_status_change.
  */
-function payment_rules_payment_status_change(Payment $payment, $status_data) {
+function payment_rules_action_payment_set_status(Payment $payment, $status_data) {
   $payment->setStatus(reset($status_data));
   enitty_save('payment', $payment);
 }
@@ -126,7 +124,7 @@ function payment_rules_payment_status_change(Payment $payment, $status_data) {
  * Implements Rules options list callback for
  * payment_rules_payment_status_change.
  */
-function payment_rules_payment_status_change_options_list() {
+function payment_rules_options_list_payment_set_status() {
   $options = array();
   foreach (payment_statuses_info() as $status => $status_info) {
     $options[$status] = $status_info['title'];
