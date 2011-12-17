@@ -71,6 +71,23 @@ function payment_rules_condition_info() {
     ),
     'group' => t('Payment'),
   );
+  $conditions['payment_rules_condition_payment_uses_payment_method'] = array(
+    'label' => t('Payment uses payment method'),
+    'parameter' => array(
+      'payment' => array(
+        'label' => t('Payment'),
+        'type' => 'payment',
+        'restriction' => 'selector',
+      ),
+      'pmids' => array(
+        'type' => 'list<text>',
+        'label' => t('Payment methods'),
+        'options list' => 'payment_rules_options_list_payment_uses_payment_method',
+        'restriction' => 'input',
+      ),
+    ),
+    'group' => t('Payment'),
+  );
 
   return $conditions;
 }
@@ -132,4 +149,32 @@ function payment_rules_options_list_payment_set_status() {
   asort($options);
 
   return $options;
+}
+
+/**
+ * Implements Rules options list callback for
+ * payment_rules_condition_payment_uses_payment_method.
+ */
+function payment_rules_options_list_payment_uses_payment_method() {
+  $options = array();
+  foreach (entity_load('payment_method') as $payment_method) {
+    $options[$payment_method->pmid] = $payment_method->title_specific;
+  }
+
+  return $options;
+}
+
+/**
+ * Implements Rules condition callback: check whether a payment uses one of the
+ * selected payment methods.
+ *
+ * @param $payment Payment
+ *   The payment to check the condition for.
+ * @param $pmids array
+ *   An array with payment method IDs.
+ *
+ * @return boolean
+ */
+function payment_rules_condition_payment_uses_payment_method(Payment $payment, array $pmids) {
+  return in_array($payment->method->pmid, $pmids);
 }
