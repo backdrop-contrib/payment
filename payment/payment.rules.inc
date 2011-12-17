@@ -88,6 +88,23 @@ function payment_rules_condition_info() {
     ),
     'group' => t('Payment'),
   );
+  $conditions['payment_rules_condition_payment_uses_payment_method_type'] = array(
+    'label' => t('Payment uses payment method of type'),
+    'parameter' => array(
+      'payment' => array(
+        'label' => t('Payment'),
+        'type' => 'payment',
+        'restriction' => 'selector',
+      ),
+      'payment_method_controller_class_names' => array(
+        'type' => 'list<text>',
+        'label' => t('Payment method types'),
+        'options list' => 'payment_rules_options_list_payment_uses_payment_method_type',
+        'restriction' => 'input',
+      ),
+    ),
+    'group' => t('Payment'),
+  );
 
   return $conditions;
 }
@@ -177,4 +194,32 @@ function payment_rules_options_list_payment_uses_payment_method() {
  */
 function payment_rules_condition_payment_uses_payment_method(Payment $payment, array $pmids) {
   return in_array($payment->method->pmid, $pmids);
+}
+
+/**
+ * Implements Rules options list callback for
+ * payment_rules_condition_payment_uses_payment_method_type.
+ */
+function payment_rules_options_list_payment_uses_payment_method_type() {
+  $options = array();
+  foreach (payment_method_controller_load_multiple() as $payment_method_controller) {
+    $options[$payment_method_controller->name] = $payment_method_controller->title;
+  }
+
+  return $options;
+}
+
+/**
+ * Implements Rules condition callback: check whether a payment uses one of the
+ * selected payment methods types.
+ *
+ * @param $payment Payment
+ *   The payment to check the condition for.
+ * @param $payment_method_controller_class_names array
+ *   An array with class names of payment method controllers.
+ *
+ * @return boolean
+ */
+function payment_rules_condition_payment_uses_payment_method_type(Payment $payment, array $payment_method_controller_class_names) {
+  return in_array($payment->method->controller->name, $payment_method_controller_class_names);
 }
