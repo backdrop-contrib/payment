@@ -115,13 +115,22 @@ function payment_rules_condition_info() {
  *
  * @param $payment Payment
  *   The payment to check the condition for.
- * @param $statuses array
+ * @param $payment_statuses array
  *   An array with payment statuses.
  *
  * @return boolean
  */
 function payment_rules_condition_payment_has_status(Payment $payment, array $payment_statuses) {
-  return in_array($payment->status, $payment_statuses) || in_array('payment_base_' . payment_status_base($payment->status, TRUE), $payment_statuses);
+  // Check base statuses.
+  foreach ($payment_statuses as $payment_status) {
+    if (substr($payment_status, 0, 13) == 'payment_base_') {
+      if (payment_status_has_base($payment->status, substr($payment_status, 13))) {
+        return TRUE;
+      }
+    }
+  }
+  // Check specific statuses.
+  return in_array($payment->status, $payment_statuses);
 }
 
 /**

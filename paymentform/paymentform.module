@@ -142,7 +142,7 @@ function paymentform_form_submit(array $form, array &$form_state) {
   $payment = $form_state['payment'];
   $payment->amount = $form_state['values']['amount'];
   $payment->execute();
-  if (payment_status_base($payment->status) == PAYMENT_STATUS_FAILED) {
+  if (payment_status_has_base($payment->status. PAYMENT_STATUS_FAILED)) {
     $form_state['rebuild'] = TRUE;
   }
 }
@@ -151,13 +151,13 @@ function paymentform_form_submit(array $form, array &$form_state) {
  * Implements Payment finish callback.
  */
 function paymentform_payment_finish(Payment $payment) {
-  if (payment_status_base($payment->status) == PAYMENT_STATUS_PENDING) {
+  if (payment_status_has_base($payment->status, PAYMENT_STATUS_PENDING)) {
     drupal_set_message(t('Your payment is still being processed.'));
   }
-  if (payment_status_base($payment->status) == PAYMENT_STATUS_SUCCESS) {
+  if (payment_status_has_base($payment->status, PAYMENT_STATUS_SUCCESS)) {
     drupal_set_message(t('Your payment was successfully completed.'));
   }
-  if (payment_status_base($payment->status) == PAYMENT_STATUS_FAILED) {
+  if (payment_status_has_base($payment->status, PAYMENT_STATUS_FAILED)) {
     drupal_set_message(t('Your payment failed.'));
   }
 

@@ -234,21 +234,22 @@ function payment_status_info($status, $unknown = FALSE) {
 }
 
 /**
- * Get a payment status's base status.
+ * Check if payment status is based on a given other status.
  *
  * @param $status string
- *   The payment status for which to get the base status.
- * @param $unknown boolean
- *   Whether to return PAYMENT_STATUS_UNKNOWN's base status if the requested
- *   status does not exist.
+ * @param $base_status string
  *
- * @return string
- *   The payment status's base status.
+ * @return boolean
  */
-function payment_status_base($status, $unknown = FALSE) {
-  $status_info = payment_status_info($status, $unknown);
-
-  return $status_info['base status'];
+function payment_status_has_base($status, $base_status) {
+  $status_info = payment_status_info($status, TRUE);
+  if ($status_info['base status'] == $base_status) {
+    return TRUE;
+  }
+  elseif ($status_info['base status'] != $status) {
+    return payment_status_has_base($status_info['base status'], $base_status);
+  }
+  return FALSE;
 }
 
 /**
