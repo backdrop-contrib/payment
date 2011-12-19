@@ -201,7 +201,6 @@ function payment_statuses_info() {
     $statuses_info = module_invoke_all('payment_status_info');
     $defaults = array(
       'description' => NULL,
-      'terminal' => TRUE,
     );
     foreach ($statuses_info as $status => &$status_info) {
       $status_info += $defaults;

@@ -21,9 +21,6 @@
  *   - description (string)
  *     A human-readable description of the status. Optional. Defaults to an
  *     empty string.
- *   - terminal (boolean)
- *     Whether this status means the payment is terminal, e.g. it is not being
- *     processed any further. Optional. Defaults to TRUE.
  *   - title (string)
  *     A human-readable title. Required.
  */
@@ -31,7 +28,6 @@ function hook_payment_status_info() {
   $status_info[PAYMENT_STATUS_FOO] = array(
     'base status' => PAYMENT_STATUS_PENDING,
     'description' => t('Foo payments are still being processed by bar to guarantee their authenticity.'),
-    'terminal' => FALSE,
     'title' => t('foo to the bar'),
   );
 
