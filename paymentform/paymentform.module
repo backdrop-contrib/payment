@@ -142,7 +142,7 @@ function paymentform_form_submit(array $form, array &$form_state) {
   $payment = $form_state['payment'];
   $payment->amount = $form_state['values']['amount'];
   $payment->execute();
-  if (payment_status_has_base($payment->status. PAYMENT_STATUS_FAILED)) {
+  if (payment_status_has_base($payment->status, PAYMENT_STATUS_FAILED)) {
     $form_state['rebuild'] = TRUE;
   }
 }
