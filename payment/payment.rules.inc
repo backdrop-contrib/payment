@@ -23,6 +23,17 @@ function payment_rules_event_info() {
       ),
     ),
   );
+  $event['payment_pre_execute'] = array(
+    'label' => t('Before executing a payment'),
+    'help' => t('This is '),
+    'group' => t('Payment'),
+    'variables' => array(
+      'payment' => array(
+        'type' => 'payment',
+        'label' => t('Payment'),
+      ),
+    ),
+  );
 
   return $event;
 }

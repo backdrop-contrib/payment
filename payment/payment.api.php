@@ -61,3 +61,18 @@ function hook_payment_method_controller_info() {
 function hook_payment_status_change(Payment $payment, $old_status) {
   // Notify the site administrator, for instance.
 }
+
+/**
+ * Act when a payment is pre-executed. THis is the place to programmatically
+ * alter payments.
+ *
+ * @see Payment::execute()
+ *
+ * @param $payment Payment
+ *
+ * @return NULL
+ */
+function hook_payment_pre_execute(Payment $payment) {
+  // Add a payment method processing fee.
+  $payment->amount += 5.50;
+}

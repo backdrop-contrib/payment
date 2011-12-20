@@ -43,6 +43,9 @@ function payment_hook_info() {
   $hooks['payment_status_change'] = array(
     'group' => 'payment',
   );
+  $hooks['payment_pre_execute'] = array(
+    'group' => 'payment',
+  );
 
   return $hooks;
 }

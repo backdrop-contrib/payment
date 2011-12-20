@@ -162,6 +162,12 @@ class Payment extends PaymentCommon {
    * @return NULL
    */
   function execute() {
+    // Preprocess the payment.
+    module_invoke_all('payment_pre_execute', $this);
+    if (module_exists('rules')) {
+      rules_invoke_event('payment_pre_execute', $this);
+    }
+    // Execute the payment.
     if ($this->method && $this->method->controller->validate($this)) {
       $this->setStatus(PAYMENT_STATUS_PENDING);
       $this->method->controller->execute($this);
