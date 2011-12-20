@@ -46,6 +46,28 @@ function payment_rules_action_info() {
     ),
     'group' => t('Payment'),
   );
+  $calculations = array(
+    'payment_rules_action_payment_amount_add' => t('Add to amount'),
+    'payment_rules_action_payment_amount_subtract' => t('Subtract from amount'),
+    'payment_rules_action_payment_amount_multiply' => t('Multiply amount'),
+    'payment_rules_action_payment_amount_divide' => t('Divide amount'),
+  );
+  foreach ($calculations as $name => $label) {
+    $actions[$name] = array(
+      'label' => $label,
+      'parameter' => array(
+        'payment' => array(
+          'type' => 'payment',
+          'label' => t('Payment'),
+        ),
+        'status' => array(
+          'type' => 'decimal',
+          'label' => t('Amount'),
+        ),
+      ),
+      'group' => t('Payment'),
+    );
+  }
 
   return $actions;
 }
@@ -219,6 +241,50 @@ function payment_rules_options_list_payment_base_statuses() {
 function payment_rules_action_payment_set_status(Payment $payment, $status_data) {
   $payment->setStatus(reset($status_data));
   enitty_save('payment', $payment);
+}
+
+/**
+ * Implements Rules action callback: increase the payment amount.
+ *
+ * @param $payment Payment
+ * @param $amount integer
+ *   The amount to add to the payment amount.
+ */
+function payment_rules_action_payment_amount_add(Payment $payment, $amount) {
+  $payment->amount += $amount;
+}
+
+/**
+ * Implements Rules action callback: decrease the payment amount.
+ *
+ * @param $payment Payment
+ * @param $amount integer
+ *   The amount to subtract from the payment amount.
+ */
+function payment_rules_action_payment_amount_subtract(Payment $payment, $amount) {
+  $payment->amount -= $amount;
+}
+
+/**
+ * Implements Rules action callback: multiply the payment amount.
+ *
+ * @param $payment Payment
+ * @param $amount integer
+ *   The amount to multiply the payment amount with.
+ */
+function payment_rules_action_payment_amount_multiply(Payment $payment, $amount) {
+  $payment->amount *= $amount;
+}
+
+/**
+ * Implements Rules action callback: divide the payment amount.
+ *
+ * @param $payment Payment
+ * @param $amount integer
+ *   The amount to divide the payment amount by.
+ */
+function payment_rules_action_payment_amount_divide(Payment $payment, $amount) {
+  $payment->amount /= $amount;
 }
 
 /**
