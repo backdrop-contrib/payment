@@ -151,14 +151,17 @@ function paymentform_form_submit(array $form, array &$form_state) {
  * Implements Payment finish callback.
  */
 function paymentform_payment_finish(Payment $payment) {
+  if (module_exists('paymentui') && user_access('paymentui.payment.view.own')) {
+    $view = ' ' . l(t('View payment'), 'payment/' . $payment->pid) . '.';
+  }
   if (payment_status_has_base($payment->status, PAYMENT_STATUS_PENDING)) {
-    drupal_set_message(t('Your payment is still being processed.'));
+    drupal_set_message(t('Your payment is still being processed.') . $view);
   }
-  if (payment_status_has_base($payment->status, PAYMENT_STATUS_SUCCESS)) {
-    drupal_set_message(t('Your payment was successfully completed.'));
+  elseif (payment_status_has_base($payment->status, PAYMENT_STATUS_SUCCESS)) {
+    drupal_set_message(t('Your payment was successfully completed.') . $view);
   }
-  if (payment_status_has_base($payment->status, PAYMENT_STATUS_FAILED)) {
-    drupal_set_message(t('Your payment failed.'));
+  elseif (payment_status_has_base($payment->status, PAYMENT_STATUS_FAILED)) {
+    drupal_set_message(t('Your payment failed.') . $view);
   }
 
   // Make sure the user ends up where he came from.
