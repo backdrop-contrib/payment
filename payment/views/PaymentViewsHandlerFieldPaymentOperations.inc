@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Field handler to present a payment's operations links.
+ * Views field handler for a payment's operations links.
  */
 class PaymentViewsHandlerFieldPaymentOperations extends views_handler_field {
 

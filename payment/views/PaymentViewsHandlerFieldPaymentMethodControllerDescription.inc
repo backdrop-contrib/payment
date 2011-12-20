@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Views field handler for a payment method's controller description.
+ */
 class PaymentViewsHandlerFieldPaymentMethodControllerDescription extends views_handler_field {
 
   /**

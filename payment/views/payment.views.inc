@@ -5,217 +5,93 @@
  */
 
 /**
- * Implements hook_views_data().
+ * Implements hook_views_data_alter().
  */
-function payment_views_data() {
-  $data['payment'] = array(
-    'table' => array(
-      'group' => t('Payment'),
-      'base' => array(
-        'field' => 'pid',
-        'title' => t('Payment'),
-      ),
+function payment_views_data_alter(&$data) {
+  // Payment.
+  $data['payment']['operations'] = array(
+    'title' => t('Operations'),
+    'real field' => 'pid',
+    'field' => array(
+      'handler' => 'PaymentViewsHandlerFieldPaymentOperations',
     ),
-    // Field configuration.
-    'amount' => array(
-      'title' => t('Amount'),
-      'field' => array(
-        'handler' => 'views_handler_field_numeric',
-        'click sortable' => TRUE,
-      ),
-      'filter' => array(
-        'handler' => 'views_handler_filter_string',
-      ),
-      'sort' => array(
-        'handler' => 'views_handler_sort',
-      ),
-      'argument' => array(
-        'handler' => 'views_handler_argument_string',
-        'numeric' => TRUE,
-      ),
+  );
+  $data['payment']['pmid']['relationship'] = array(
+    'base' => 'payment_method',
+    'field' => 'pmid',
+    'handler' => 'views_handler_relationship',
+    'label' => t('Payment method'),
+  );
+  $data['payment']['status_human_readable'] = array(
+    'title' => t('Status (human-readable)'),
+    'real field' => 'status',
+    'field' => array(
+      'handler' => 'PaymentViewsHandlerFieldPaymentStatus',
+      'click sortable' => TRUE,
     ),
-    'created' => array(
-      'title' => t('Created date and time'),
-      'field' => array(
-        'handler' => 'views_handler_field_date',
-        'click sortable' => TRUE,
-      ),
-      'sort' => array(
-        'handler' => 'views_handler_sort_date',
-      ),
-      'filter' => array(
-        'handler' => 'views_handler_filter_date',
-      ),
-      'argument' => array(
-        'handler' => 'views_handler_argument_date',
-      ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
     ),
-    'currency_code' => array(
-      'title' => t('Currency code'),
-      'field' => array(
-        'handler' => 'views_handler_field',
-        'click sortable' => TRUE,
-      ),
-      'sort' => array(
-        'handler' => 'views_handler_sort',
-      ),
-      'filter' => array(
-        'handler' => 'views_handler_filter_string',
-      ),
-      'argument' => array(
-        'handler' => 'views_handler_argument_string',
-      ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
     ),
-    'description' => array(
-      'title' => t('Description'),
-      'field' => array(
-        'handler' => 'views_handler_field',
-        'click sortable' => TRUE,
-      ),
-      'sort' => array(
-        'handler' => 'views_handler_sort',
-      ),
-      'filter' => array(
-        'handler' => 'views_handler_filter_string',
-      ),
-      'argument' => array(
-        'handler' => 'views_handler_argument_string',
-      ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_string',
     ),
-    'Expired' => array(
-      'title' => t('Expiration date and time'),
-      'field' => array(
-        'handler' => 'views_handler_field_date',
-        'click sortable' => TRUE,
-      ),
-      'sort' => array(
-        'handler' => 'views_handler_sort_date',
-      ),
-      'filter' => array(
-        'handler' => 'views_handler_filter_date',
-      ),
-      'argument' => array(
-        'handler' => 'views_handler_argument_date',
-      ),
+  );
+  $data['payment']['uid']['relationship'] = array(
+    'base' => 'users',
+    'field' => 'uid',
+    'handler' => 'views_handler_relationship',
+    'label' => t('User'),
+  );
+
+  // Payment method.
+  $data['payment_method']['controller_description'] = array(
+    'title' => t('Payment method type description'),
+    'real field' => 'controller_class_name',
+    'field' => array(
+      'handler' => 'PaymentViewsHandlerFieldPaymentMethodControllerDescription',
+      'click sortable' => TRUE,
     ),
-    'operations' => array(
-      'title' => t('Operations'),
-      'real field' => 'pid',
-      'field' => array(
-        'handler' => 'PaymentViewsHandlerFieldPaymentOperations',
-      ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
     ),
-    'pid' => array(
-      'title' => t('Payment ID'),
-      'field' => array(
-        'handler' => 'views_handler_field',
-        'click sortable' => TRUE,
-      ),
-      'sort' => array(
-        'handler' => 'views_handler_sort',
-      ),
-      'filter' => array(
-        'handler' => 'views_handler_filter_numeric',
-      ),
-      'argument' => array(
-        'handler' => 'views_handler_argument_numeric',
-      ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
     ),
-    'pmid' => array(
-      'title' => t('Payment method ID'),
-      'field' => array(
-        'handler' => 'views_handler_field',
-        'click sortable' => TRUE,
-      ),
-      'sort' => array(
-        'handler' => 'views_handler_sort',
-      ),
-      'filter' => array(
-        'handler' => 'views_handler_filter_numeric',
-      ),
-      'argument' => array(
-        'handler' => 'views_handler_argument_numeric',
-      ),
-      'relationship' => array(
-        'base' => 'payment_method',
-        'field' => 'pmid',
-        'handler' => 'views_handler_relationship',
-        'label' => t('Payment method'),
-      ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_string',
     ),
-    'status' => array(
-      'title' => t('Status'),
-      'field' => array(
-        'handler' => 'views_handler_field',
-        'click sortable' => TRUE,
-      ),
-      'sort' => array(
-        'handler' => 'views_handler_sort',
-      ),
-      'filter' => array(
-        'handler' => 'views_handler_filter_string',
-      ),
-      'argument' => array(
-        'handler' => 'views_handler_argument_string',
-      ),
+  );
+  $data['payment_method']['controller_title'] = array(
+    'title' => t('Payment method type title'),
+    'real field' => 'controller_class_name',
+    'field' => array(
+      'handler' => 'PaymentViewsHandlerFieldPaymentMethodControllerTitle',
+      'click sortable' => TRUE,
     ),
-    'status_human_readable' => array(
-      'title' => t('Status (human-readable)'),
-      'real field' => 'status',
-      'field' => array(
-        'handler' => 'PaymentViewsHandlerFieldPaymentStatus',
-        'click sortable' => TRUE,
-      ),
-      'sort' => array(
-        'handler' => 'views_handler_sort',
-      ),
-      'filter' => array(
-        'handler' => 'views_handler_filter_string',
-      ),
-      'argument' => array(
-        'handler' => 'views_handler_argument_string',
-      ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
     ),
-    'uid' => array(
-      'title' => t('User ID'),
-      'field' => array(
-        'handler' => 'views_handler_field',
-        'click sortable' => TRUE,
-      ),
-      'sort' => array(
-        'handler' => 'views_handler_sort',
-      ),
-      'filter' => array(
-        'handler' => 'views_handler_filter_numeric',
-      ),
-      'argument' => array(
-        'handler' => 'views_handler_argument_numeric',
-      ),
-      'relationship' => array(
-        'base' => 'users',
-        'field' => 'uid',
-        'handler' => 'views_handler_relationship',
-        'label' => t('User'),
-      ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
     ),
-    'updated' => array(
-      'title' => t('Last updated date and time'),
-      'field' => array(
-        'handler' => 'views_handler_field_date',
-        'click sortable' => TRUE,
-      ),
-      'sort' => array(
-        'handler' => 'views_handler_sort_date',
-      ),
-      'filter' => array(
-        'handler' => 'views_handler_filter_date',
-      ),
-      'argument' => array(
-        'handler' => 'views_handler_argument_date',
-      ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_string',
+    ),
+  );
+  $data['payment_method']['operations'] = array(
+    'title' => t('Operations'),
+    'real field' => 'pmid',
+    'field' => array(
+      'handler' => 'PaymentViewsHandlerFieldPaymentMethodOperations',
     ),
   );
 
+  // Payment revision. This is not an alteration, but implementing
+  // hook_views_data() prevents Entity API from exposing our entities to Views
+  // automatically.
   $data['payment_revision'] = array(
     'table' => array(
       'group' => t('Payment revision'),
@@ -298,123 +174,4 @@ function payment_views_data() {
       ),
     ),
   );
-
-  $data['payment_method'] = array(
-    'table' => array(
-      'group' => t('Payment method'),
-      'base' => array(
-        'field' => 'pmid',
-        'title' => t('Payment method'),
-      ),
-    ),
-    // Field configuration.
-    'controller_class_name' => array(
-      'title' => t('Payment method type'),
-      'field' => array(
-        'handler' => 'views_handler_field',
-        'click sortable' => TRUE,
-      ),
-      'sort' => array(
-        'handler' => 'views_handler_sort',
-      ),
-      'filter' => array(
-        'handler' => 'views_handler_filter_string',
-      ),
-      'argument' => array(
-        'handler' => 'views_handler_argument_string',
-      ),
-    ),
-    'controller_description' => array(
-      'title' => t('Payment method type description'),
-      'real field' => 'controller_class_name',
-      'field' => array(
-        'handler' => 'PaymentViewsHandlerFieldPaymentMethodControllerDescription',
-        'click sortable' => TRUE,
-      ),
-      'sort' => array(
-        'handler' => 'views_handler_sort',
-      ),
-      'filter' => array(
-        'handler' => 'views_handler_filter_string',
-      ),
-      'argument' => array(
-        'handler' => 'views_handler_argument_string',
-      ),
-    ),
-    'controller_title' => array(
-      'title' => t('Payment method type title'),
-      'real field' => 'controller_class_name',
-      'field' => array(
-        'handler' => 'PaymentViewsHandlerFieldPaymentMethodControllerTitle',
-        'click sortable' => TRUE,
-      ),
-      'sort' => array(
-        'handler' => 'views_handler_sort',
-      ),
-      'filter' => array(
-        'handler' => 'views_handler_filter_string',
-      ),
-      'argument' => array(
-        'handler' => 'views_handler_argument_string',
-      ),
-    ),
-    'operations' => array(
-      'title' => t('Operations'),
-      'real field' => 'pmid',
-      'field' => array(
-        'handler' => 'PaymentViewsHandlerFieldPaymentMethodControllerOperations',
-      ),
-    ),
-    'pmid' => array(
-      'title' => t('Payment method ID'),
-      'field' => array(
-        'handler' => 'views_handler_field_numeric',
-        'click sortable' => TRUE,
-      ),
-      'filter' => array(
-        'handler' => 'views_handler_filter_numeric',
-      ),
-      'sort' => array(
-        'handler' => 'views_handler_sort',
-      ),
-      'argument' => array(
-        'handler' => 'views_handler_argument_numeric',
-        'numeric' => TRUE,
-      ),
-    ),
-    'title_generic' => array(
-      'title' => t('Title (generic)'),
-      'field' => array(
-        'handler' => 'views_handler_field',
-        'click sortable' => TRUE,
-      ),
-      'sort' => array(
-        'handler' => 'views_handler_sort',
-      ),
-      'filter' => array(
-        'handler' => 'views_handler_filter_string',
-      ),
-      'argument' => array(
-        'handler' => 'views_handler_argument_string',
-      ),
-    ),
-    'title_specific' => array(
-      'title' => t('Title (specific)'),
-      'field' => array(
-        'handler' => 'views_handler_field',
-        'click sortable' => TRUE,
-      ),
-      'sort' => array(
-        'handler' => 'views_handler_sort',
-      ),
-      'filter' => array(
-        'handler' => 'views_handler_filter_string',
-      ),
-      'argument' => array(
-        'handler' => 'views_handler_argument_string',
-      ),
-    ),
-  );
-
-  return $data;
 }

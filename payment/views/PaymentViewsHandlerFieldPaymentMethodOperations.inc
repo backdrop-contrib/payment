@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Field handler to present an order's operations links.
+ * Views field handler for a payment method's operations links.
  */
-class PaymentViewsHandlerFieldPaymentMethodControllerOperations extends views_handler_field {
+class PaymentViewsHandlerFieldPaymentMethodOperations extends views_handler_field {
 
   /**
    * Implements views_handler_field::render().

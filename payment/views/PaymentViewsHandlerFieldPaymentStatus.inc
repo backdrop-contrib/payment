@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Views field handler for a human-readable payment status.
+ */
 class PaymentViewsHandlerFieldPaymentStatus extends views_handler_field {
 
   /**
