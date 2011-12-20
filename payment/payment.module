@@ -99,61 +99,81 @@ function payment_entity_info() {
  * Implements hook_entity_property_info().
  */
 function payment_entity_property_info() {
-  // Payments.
+  // Payment.
   $properties['payment']['properties']['amount'] = array(
-    'label' => t('Payment amount'),
+    'label' => t('Amount'),
+    'required' => TRUE,
+    'schema field' => 'amount',
     'type' => 'decimal',
   );
-  $properties['payment']['properties']['finish_callback'] = array(
-    'label' => t('Finish callback'),
-    'type' => 'text',
+  $properties['payment']['properties']['currency_code'] = array(
+    'description' => t('A three-letter ISO 4217 currency code.'),
+    'label' => t('Currency code'),
+    'required' => TRUE,
+    'schema field' => 'currency_code',
   );
   $properties['payment']['properties']['created'] = array(
     'label' => t('Creation date and time'),
+    'required' => TRUE,
+    'schema field' => 'created',
     'type' => 'date',
   );
   $properties['payment']['properties']['description'] = array(
     'label' => t('Description'),
-    'type' => 'text',
+    'schema field' => 'description',
   );
   $properties['payment']['properties']['expired'] = array(
     'label' => t('Expiration date and time'),
+    'schema field' => 'expired',
     'type' => 'date',
   );
+  $properties['payment']['properties']['finish_callback'] = array(
+    'description' => t('The name of the function to call once payment processing is completed.'),
+    'label' => t('Finish callback'),
+    'required' => TRUE,
+    'schema field' => 'finish_callback',
+  );
   $properties['payment']['properties']['method'] = array(
-    'label' => t('The payment method'),
+    'label' => t('Payment method'),
+    'required' => TRUE,
     'type' => 'payment_method',
   );
   $properties['payment']['properties']['pid'] = array(
     'label' => t('Payment ID'),
-    'type' => 'decimal',
+    'schema field' => 'pid',
+    'type' => 'integer',
   );
   $properties['payment']['properties']['status'] = array(
-    'label' => t('Payment status'),
-    'type' => 'text',
+    'label' => t('Status'),
+    'required' => TRUE,
+    'schema field' => 'status',
   );
   $properties['payment']['properties']['uid'] = array(
     'label' => 'User ID',
     'description' => t('The ID of the user this payment belongs to.'),
-    'type' => 'decimal',
+    'required' => TRUE,
+    'schema field' => 'uid',
+    'type' => 'integer',
   );
   $properties['payment']['properties']['updated'] = array(
     'label' => t('Last updated date and time'),
+    'schema field' => 'updated',
     'type' => 'date',
   );
 
-  // Payment methods.
-  $properties['payment']['properties']['description'] = array(
-    'label' => t('Description'),
-    'type' => 'text',
+  // Payment method.
+  $properties['payment_method']['properties']['pmid'] = array(
+    'label' => t('Payment method ID'),
+    'type' => 'integer',
   );
   $properties['payment_method']['properties']['title_specific'] = array(
     'label' => t('Title (specific)'),
-    'type' => 'date',
+    'required' => TRUE,
+    'schema field' => 'title_specific',
   );
   $properties['payment_method']['properties']['title_generic'] = array(
     'label' => t('Title (generic)'),
-    'type' => 'date',
+    'schema field' => 'title_generic',
   );
 
   return $properties;
