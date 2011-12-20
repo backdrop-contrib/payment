@@ -100,7 +100,7 @@ function paymentform_form(array $form, array &$form_state, Payment $payment = NU
     $payment = new Payment(array(
       'amount' => variable_get('paymentform_amount', 0),
       'currency_code' => variable_get('paymentform_currency_code', 'XXX'),
-      'description' => $description,
+      'description' => strip_tags($description),
       'finish_callback' => 'paymentform_payment_finish',
       'caller_data' => array(
         'location' => $_GET['q'],
@@ -109,7 +109,7 @@ function paymentform_form(array $form, array &$form_state, Payment $payment = NU
   }
 
   $form['description'] = array(
-    '#markup' => $payment->description,
+    '#markup' => $description,
   );
   $form['amount'] = array(
     '#type' => 'paymentform_amount',
