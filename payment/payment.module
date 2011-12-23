@@ -6,6 +6,21 @@
  */
 
 /**
+ * An absolute base status: a payment for which all money has been transferred.
+ */
+define('PAYMENT_STATUS_MONEY_TRANSFERRED', 'payment_status_money_transferred');
+
+/**
+ * An absolute base status: a payment for which no money has been transferred.
+ */
+define('PAYMENT_STATUS_MONEY_NOT_TRANSFERRED', 'payment_status_money_not_transferred');
+
+/**
+ * An absolute base status: a payment whose status is unknown to us.
+ */
+define('PAYMENT_STATUS_UNKNOWN', 'payment_status_unknown');
+
+/**
  * A new payment for which processing has not yet started.
  */
 define('PAYMENT_STATUS_NEW', 'payment_status_new');
@@ -24,11 +39,6 @@ define('PAYMENT_STATUS_SUCCESS', 'payment_status_success');
  * A failed payment, e.g. for which no funds have been transferred.
  */
 define('PAYMENT_STATUS_FAILED', 'payment_status_failed');
-
-/**
- * A payment for which the current status is unknown.
- */
-define('PAYMENT_STATUS_UNKNOWN', 'payment_status_unknown');
 
 /**
  * Implements hook_hook_info().
