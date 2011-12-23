@@ -25,7 +25,6 @@ function payment_rules_event_info() {
   );
   $event['payment_pre_execute'] = array(
     'label' => t('Before executing a payment'),
-    'help' => t('This is '),
     'group' => t('Payment'),
     'variables' => array(
       'payment' => array(
@@ -43,7 +42,7 @@ function payment_rules_event_info() {
  */
 function payment_rules_action_info() {
   $actions['payment_rules_action_payment_set_status'] = array(
-    'label' => t('Change the payment status'),
+    'label' => t('Set payment status'),
     'parameter' => array(
       'payment' => array(
         'type' => 'payment',
@@ -122,7 +121,7 @@ function payment_rules_condition_info() {
     'group' => t('Payment'),
   );
   $conditions['payment_rules_condition_payment_uses_payment_method'] = array(
-    'label' => t('Payment uses payment method'),
+    'label' => t('Payment method is'),
     'parameter' => array(
       'payment' => array(
         'label' => t('Payment'),
@@ -139,7 +138,7 @@ function payment_rules_condition_info() {
     'group' => t('Payment'),
   );
   $conditions['payment_rules_condition_payment_uses_payment_method_type'] = array(
-    'label' => t('Payment uses payment method of type'),
+    'label' => t('Payment method type is'),
     'parameter' => array(
       'payment' => array(
         'label' => t('Payment'),
