@@ -731,6 +731,23 @@ function paymentui_view_payment_methods() {
   $handler->display->display_options['tab_options']['type'] = 'normal';
   $handler->display->display_options['tab_options']['title'] = 'Payment';
   $handler->display->display_options['tab_options']['weight'] = '0';
+  $translatables['payment_methods'] = array(
+    t('Master'),
+    t('Payment methods'),
+    t('more'),
+    t('Apply'),
+    t('Reset'),
+    t('Sort by'),
+    t('Asc'),
+    t('Desc'),
+    t('There are no payment methods yet.'),
+    t('.'),
+    t(','),
+    t('Title'),
+    t('Type'),
+    t('Operations'),
+    t('Administration page'),
+  );
 
   return $view;
 }
