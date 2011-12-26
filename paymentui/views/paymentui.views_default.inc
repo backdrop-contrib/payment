@@ -723,11 +723,14 @@ function paymentui_view_payment_methods() {
 
   /* Display: Administration page */
   $handler = $view->new_display('page', 'Administration page', 'page_1');
-  $handler->display->display_options['path'] = 'admin/config/services/payment';
-  $handler->display->display_options['menu']['type'] = 'normal';
+  $handler->display->display_options['path'] = 'admin/config/services/payment/method';
+  $handler->display->display_options['menu']['type'] = 'default tab';
   $handler->display->display_options['menu']['title'] = 'Payment methods';
   $handler->display->display_options['menu']['weight'] = '0';
   $handler->display->display_options['menu']['name'] = 'management';
+  $handler->display->display_options['tab_options']['type'] = 'normal';
+  $handler->display->display_options['tab_options']['title'] = 'Payment';
+  $handler->display->display_options['tab_options']['weight'] = '0';
 
   return $view;
 }

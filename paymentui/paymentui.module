@@ -23,10 +23,6 @@ function paymentui_menu() {
   
 
   // Payment method configuration.
-  $items['admin/config/services/payment/method'] = array(
-    'title' => 'Payment methods',
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-  );
   $items['admin/config/services/payment/method/add'] = array(
     'title' => 'Add payment method',
     'page callback' => 'payment_page_payment_method_add_select_controller',
