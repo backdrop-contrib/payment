@@ -161,3 +161,63 @@ function paymentui_form_global_configuration(array $form, array &$form_state) {
 
   return system_settings_form($form);
 }
+
+/**
+ * Display a payment status overview.
+ *
+ * @string
+ */
+function paymentui_page_status() {
+  $parents = $children = array();
+  $statuses_info = payment_statuses_info();
+  uasort($statuses_info, 'paymentui_payment_status_sort_title');
+  foreach ($statuses_info as $status_info) {
+    foreach ($status_info->parents as $parent) {
+      $children[$parent][] = $status_info->status;
+    }
+    if (!$status_info->parents) {
+      $parents[] = $status_info->status;
+    }
+  }
+  $rows = array();
+  _paymentui_page_status_rows($parents, $children, $rows);
+  $header = array(t('Title'));
+
+  return theme('table', array(
+    'header' => $header,
+    'rows' => $rows,
+  ));
+}
+
+/**
+ * Helper function to build the rows for the table in paymentui_page_status().
+ *
+ * @see paymentui_page_status()
+ *
+ * @param $statuses array
+ *   The statuses for which to build table rows.
+ * @param $children array
+ *   Keys are payment statuses, values are the statuses that are the keys's
+ *   children.
+ * @param $rows array
+ *   The table rows to which to add new ones.
+ * @param $depth integer
+ *   
+ */
+function _paymentui_page_status_rows(array $statuses, array $children, array &$rows, $depth = 0) {
+  foreach ($statuses as $status) {
+    $rows[] = array(theme('indentation', array(
+    'size' => $depth,
+  )) . payment_status_info($status)->title);
+    if (isset($children[$status])) {
+      _paymentui_page_status_rows($children[$status], $children, $rows, $depth + 1);
+    }
+  }
+}
+
+/**
+ * Implements uasort() callback to sort PaymentStatusInfo objects by title.
+ */
+function paymentui_payment_status_sort_title(PaymentStatusInfo $status_info_a, PaymentStatusInfo $status_info_b) {
+  return strcmp($status_info_a->title, $status_info_b->title);
+}

@@ -63,6 +63,16 @@ function paymentui_menu() {
     'weight' => 1,
   );
 
+  // Payment status overview.
+  $items['admin/config/services/payment/status'] = array(
+    'title' => 'Payment statuses',
+    'page callback' => 'paymentui_page_status',
+    'access arguments' => array('paymentui.payment_status.view'),
+    'file' => 'paymentui.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 1,
+  );
+
   // General configuration.
   $items['admin/config/services/payment/global'] = array(
     'title' => 'Global configuration',
@@ -90,6 +100,9 @@ function paymentui_permission() {
     ),
     'paymentui.payment_method.administer' => array(
       'title' => t('Administer payment methods'),
+    ),
+    'paymentui.payment_status.view' => array(
+      'title' => t('View payment status overview'),
     ),
   );
 }
