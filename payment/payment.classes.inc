@@ -295,7 +295,7 @@ class PaymentEntityController extends EntityAPIController {
       $payment_build['status'] = array(
         '#type' => 'item',
         '#title' => t('Status'),
-        '#markup' => $status_info['title'],
+        '#markup' => $status_info->title,
       );
       $payment_build['amount'] = array(
         '#type' => 'item',
@@ -318,7 +318,7 @@ class PaymentEntityController extends EntityAPIController {
       ));
       foreach ($result as $revision_data) {
         $status_info = payment_status_info($revision_data->status);
-        $rows[] = array($status_info['title'], format_date($revision_data->created_revision));
+        $rows[] = array($status_info->title, format_date($revision_data->created_revision));
       }
       $header = array(t('Status'), t('Date'));
       $payment_build['history'] = array(
@@ -557,4 +557,54 @@ class PaymentMethodControllerUnavailable extends PaymentMethodController {
  */
 function payment_form_payment_method(array $form, array &$form_state) {
   return $form;
+}
+
+/**
+ * A payment status.
+ */
+class PaymentStatusInfo extends PaymentCommon{
+
+  /**
+   * A US English human-readable description.
+   *
+   * @var string
+   */
+  public $description = '';
+
+  /**
+   * The machine names of this status's parent statuses.
+   *
+   * @var array
+   */
+  public $parents = array();
+
+  /**
+   * The status's machine name.
+   *
+   * @var string
+   */
+  public $status = '';
+
+  /**
+   * A US English human-readable title.
+   *
+   * @var string
+   */
+  public $title = '';
+
+  /**
+   * Get this payment status's ancestors.
+   *
+   * @return array
+   *   The machine names of this status's ancestors.
+   */
+  function ancestors() {
+    $ancestors = $this->parents;
+    foreach ($this->parents as $parent) {
+      $parent_info = payment_status_info($parent);
+      $ancestors += $parent_info->ancestors();
+    }
+
+    return array_unique($ancestors);
+  }
 }

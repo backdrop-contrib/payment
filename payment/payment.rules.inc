@@ -86,7 +86,7 @@ function payment_rules_action_info() {
  * Implements hook_rules_condition_info().
  */
 function payment_rules_condition_info() {
-  $conditions['payment_rules_condition_payment_has_status'] = array(
+  $conditions['payment_rules_condition_payment_status_is'] = array(
     'label' => t('Payment status is'),
     'parameter' => array(
       'payment' => array(
@@ -103,8 +103,8 @@ function payment_rules_condition_info() {
     ),
     'group' => t('Payment'),
   );
-  $conditions['payment_rules_condition_payment_has_base_status'] = array(
-    'label' => t('Payment status is or is derived from'),
+  $conditions['payment_rules_condition_payment_status_has_ancestor'] = array(
+    'label' => t('Payment status is derived from'),
     'parameter' => array(
       'payment' => array(
         'label' => t('Payment'),
@@ -114,7 +114,7 @@ function payment_rules_condition_info() {
       'payment_statuses' => array(
         'type' => 'list<text>',
         'label' => t('Payment status is or is derived from'),
-        'options list' => 'payment_rules_options_list_payment_base_statuses',
+        'options list' => 'payment_rules_options_list_payment_status_parents',
         'restriction' => 'input',
       ),
     ),
@@ -184,7 +184,7 @@ function payment_rules_condition_info() {
  *
  * @return boolean
  */
-function payment_rules_condition_payment_has_status(Payment $payment, array $payment_statuses) {
+function payment_rules_condition_payment_status_is(Payment $payment, array $payment_statuses) {
   return in_array($payment->status, $payment_statuses);
 }
 
@@ -193,9 +193,8 @@ function payment_rules_condition_payment_has_status(Payment $payment, array $pay
  */
 function payment_rules_options_list_payment_statuses() {
   $options = array();
-  $statuses_info = payment_statuses_info();
-  foreach ($statuses_info as $status => $status_info) {
-    $options[$status] = $status_info['title'];
+  foreach (payment_statuses_info() as $status => $status_info) {
+    $options[$status] = $status_info->title;
   }
   asort($options);
 
@@ -204,7 +203,7 @@ function payment_rules_options_list_payment_statuses() {
 
 /**
  * Implements Rules condition callback: check whether a payment's status
- * is based on one of the selected statuses.
+ * is a child of any of the selected statuses.
  *
  * @param $payment Payment
  *   The payment to check the condition for.
@@ -213,10 +212,9 @@ function payment_rules_options_list_payment_statuses() {
  *
  * @return boolean
  */
-function payment_rules_condition_payment_has_base_status(Payment $payment, array $payment_statuses) {
-  // Check base statuses.
+function payment_rules_condition_payment_status_has_ancestor(Payment $payment, array $payment_statuses) {
   foreach ($payment_statuses as $payment_status) {
-    if (payment_status_has_base($payment->status, $payment_status)) {
+    if (payment_status_has_ancestor($payment->status, $payment_status)) {
       return TRUE;
     }
   }
@@ -224,21 +222,17 @@ function payment_rules_condition_payment_has_base_status(Payment $payment, array
 }
 
 /**
- * Implements Rules options list: list all base statuses.
+ * Implements Rules options list: list all parent statuses.
  */
-function payment_rules_options_list_payment_base_statuses() {
+function payment_rules_options_list_payment_status_parents() {
   $options = array();
   $statuses_info = payment_statuses_info();
-  $base_statuses = array();
-  // Find all base statuses.
+  $parents = array();
   foreach ($statuses_info as $status => $status_info) {
-    if ($status != $status_info['base status']) {
-      $base_statuses[] = $status_info['base status'];
-    }
+    $parents = array_merge($parents, $status_info->parents);
   }
-  // Add all base statuses to the options list.
-  foreach (array_unique($base_statuses) as $status) {
-    $options[$status] = $statuses_info[$status]['title'];
+  foreach (array_unique($parents) as $status) {
+    $options[$status] = $statuses_info[$status]->title;
   }
   asort($options);
 
@@ -304,7 +298,7 @@ function payment_rules_action_payment_amount_divide(Payment $payment, $amount) {
 function payment_rules_options_list_payment_set_status() {
   $options = array();
   foreach (payment_statuses_info() as $status => $status_info) {
-    $options[$status] = $status_info['title'];
+    $options[$status] = $status_info->title;
   }
   asort($options);
 

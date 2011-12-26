@@ -9,29 +9,17 @@
  * Define payment statuses.
  *
  * @return array
- *   An array where keys are payment status names and values are keyed arrays
- *   with information about that specific status:
- *   - base status (string)
- *     Another status this status is based on. Optional. Statuses may be based
- *     on any other status, but because modules depend on certain bases
- *     statuses, you are advised to use PAYMENT_STATUS_NEW,
- *     PAYMENT_STATUS_PENDING, PAYMENT_STATUS_SUCCESS, PAYMENT_STATUS_FAILED,
- *     or PAYMENT_STATUS_UNKNOWN. Leave empty if this status is not based on
- *     another one.
- *   - description (string)
- *     A human-readable description of the status. Optional. Defaults to an
- *     empty string.
- *   - title (string)
- *     A human-readable title. Required.
+ *   An array with PaymentStatusInfo objects.
  */
 function hook_payment_status_info() {
-  $status_info[PAYMENT_STATUS_FOO] = array(
-    'base status' => PAYMENT_STATUS_PENDING,
-    'description' => t('Foo payments are still being processed by bar to guarantee their authenticity.'),
-    'title' => t('foo to the bar'),
+  return array(
+    new PaymentStatusInfo(array(
+      'description' => t('Foo payments are still being processed by Bar to guarantee their authenticity.'),
+      'status' => PAYMENT_STATUS_FOO,
+      'parents' => array(PAYMENT_STATUS_PENDING),
+      'title' => t('Pending (waiting for Bar authentication)'),
+    )),
   );
-
-  return $status_info;
 }
 
 /**

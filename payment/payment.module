@@ -6,17 +6,17 @@
  */
 
 /**
- * An absolute base status: a payment for which all money has been transferred.
+ * An absolute parent status: a payment for which all money has been transferred.
  */
 define('PAYMENT_STATUS_MONEY_TRANSFERRED', 'payment_status_money_transferred');
 
 /**
- * An absolute base status: a payment for which no money has been transferred.
+ * An absolute parent status: a payment for which no money has been transferred.
  */
 define('PAYMENT_STATUS_MONEY_NOT_TRANSFERRED', 'payment_status_money_not_transferred');
 
 /**
- * An absolute base status: a payment whose status is unknown to us.
+ * An absolute parent status: a payment whose status is unknown to us.
  */
 define('PAYMENT_STATUS_UNKNOWN', 'payment_status_unknown');
 
@@ -231,20 +231,15 @@ function payment_views_api() {
  * @see hook_payment_status_info()
  *
  * @return array
+ *   An array with PaymentStatusInfo objects for all available statuses.
  */
 function payment_statuses_info() {
   static $statuses_info = NULL;
 
   if (!$statuses_info) {
-    $statuses_info = module_invoke_all('payment_status_info');
-    $defaults = array(
-      'description' => NULL,
-    );
-    foreach ($statuses_info as $status => &$status_info) {
-      $status_info += $defaults;
-      if (!isset($status_info['base status'])) {
-        $status_info['base status'] = $status;
-      }
+    $statuses_info = array();
+    foreach (module_invoke_all('payment_status_info') as $status_info) {
+      $statuses_info[$status_info->status] = $status_info;
     }
     drupal_alter('payment_status_info', $statuses_info);
   }
@@ -262,7 +257,7 @@ function payment_statuses_info() {
  *   does not exist.
  *
  * @return mixed
- *   An array with payment status info or FALSE if the status does not exist.
+ *   A PaymentStatusInfo object or FALSE if the status does not exist.
  */
 function payment_status_info($status, $unknown = FALSE) {
   $statuses_info = payment_statuses_info();
@@ -271,22 +266,15 @@ function payment_status_info($status, $unknown = FALSE) {
 }
 
 /**
- * Check if payment status is based on a given other status.
+ * Check if payment status has a given other status as one of its ancestors.
  *
  * @param $status string
- * @param $base_status string
+ * @param $ancestor_status string
  *
  * @return boolean
  */
-function payment_status_has_base($status, $base_status) {
-  $status_info = payment_status_info($status, TRUE);
-  if ($status_info['base status'] == $base_status) {
-    return TRUE;
-  }
-  elseif ($status_info['base status'] != $status) {
-    return payment_status_has_base($status_info['base status'], $base_status);
-  }
-  return FALSE;
+function payment_status_has_ancestor($status, $ancestor_status) {
+  return in_array($ancestor_status, payment_status_info($status, TRUE)->ancestors());
 }
 
 /**
