@@ -9,7 +9,7 @@
  * Base class with common functionality.
  */
 class PaymentCommon {
-  function __construct(array $properties) {
+  function __construct(array $properties = array()) {
     foreach ($properties as $property => $value) {
       $this->$property = $value;
     }
