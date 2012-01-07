@@ -340,17 +340,20 @@ function payment_method_controller_load_multiple(array $controller_class_names =
  * Convert an amount as a float to a human-readable format.
  *
  * @param $amount float
+ * @param $currency_code string
  *
  * @return string
  */
-function payment_amount_human_readable($amount) {
+function payment_amount_human_readable($amount, $currency_code = NULL) {
   // @todo Use Currency 7.x-2.x (http://drupal.org/project/currency).
-$amount_string = number_format($amount, 2, '.', '');
-$decimal_separator_position = strpos($amount_string, '.');
-  return t('!units.!cents', array(
+  $amount_string = number_format($amount, 2, '.', '');
+  $decimal_separator_position = strpos($amount_string, '.');
+  $arguments = array(
+    '!currency_code' => $currency_code,
     '!units' => substr($amount_string, 0, $decimal_separator_position),
     '!cents' => substr($amount_string, $decimal_separator_position + 1),
-  ));
+  );
+  return $currency_code ? t('!currency_code !units.!cents', $arguments) : t('!units.!cents', $arguments);
 }
 
 /**
