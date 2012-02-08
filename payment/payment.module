@@ -309,6 +309,11 @@ function payment_entity_property_info() {
     'schema field' => 'pid',
     'type' => 'integer',
   );
+  $properties['payment']['properties']['pmid'] = array(
+    'label' => t('Payment method ID'),
+    'schema field' => 'pmid',
+    'type' => 'integer',
+  );
   $properties['payment']['properties']['status'] = array(
     'label' => t('Status'),
     'required' => TRUE,
