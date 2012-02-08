@@ -2,8 +2,32 @@
 
 /**
  * @file
- * The Payment administration interface.
+ * The Payment user interface.
  */
+
+/**
+ * Menu title callback: return a payment's title.
+ *
+ * @param $payment Payment
+ *
+ * @return string
+ */
+function payment_title(Payment $payment) {
+  return t('Payment !pid', array(
+    '!pid' => $payment->pid,
+  ));
+}
+
+/**
+ * Menu page callback: show a payment.
+ *
+ * @param $payment Payment
+ *
+ * @return array
+ */
+function payment_page_payment_view(Payment $payment) {
+  return entity_view('payment', array($payment));
+}
 
 /**
  * Shows a page with controllers payment methods can be added for.
@@ -28,7 +52,7 @@ function payment_page_payment_method_add_select_controller() {
     ));
   }
   else {
-    return t('There are no payment method types available.');
+    return t('There are no payment method types available. Enable modules that provide them in order to add payment methods.');
   }
 }
 
@@ -41,12 +65,12 @@ function payment_page_payment_method_add_select_controller() {
  * @return array
  *   A Drupal form.
  */
-function paymentui_payment_method_form_add($controller) {
+function payment_method_form_add($controller) {
   $payment_method = new PaymentMethod(array(
     'controller' => $controller,
   ));
 
-  return paymentui_payment_method_form($payment_method);
+  return payment_method_form($payment_method);
 }
 
 /**
@@ -57,19 +81,19 @@ function paymentui_payment_method_form_add($controller) {
  * @return array
  *   A Drupal form.
  */
-function paymentui_payment_method_form(PaymentMethod $payment_method) {
-  return drupal_get_form('payment_method_form_' . $payment_method->controller->payment_method_form_id, $payment_method);
+function payment_method_form(PaymentMethod $payment_method) {
+  return drupal_get_form('payment_form_payment_method_' . $payment_method->controller->payment_method_form_id, $payment_method);
 }
 
 /**
  * Implements form build callback: the payment method add/edit form.
  *
- * @see paymentui_forms()
- * @see paymentui_payment_method_form()
+ * @see payment_forms()
+ * @see payment_method_form()
  *
  * @param $payment_method PaymentMethod
  */
-function paymentui_form_payment_method(array $form, array &$form_state, PaymentMethod $payment_method) {
+function payment_form_payment_method(array $form, array &$form_state, PaymentMethod $payment_method) {
   $form_state['payment_method'] = $payment_method;
 
   $form['controller'] = array(
@@ -112,9 +136,9 @@ function paymentui_form_payment_method(array $form, array &$form_state, PaymentM
 }
 
 /**
- * Implements form submit callback for paymentui_form_payment_method().
+ * Implements form submit callback for payment_form_payment_method().
  */
-function paymentui_form_payment_method_submit(array $form, array &$form_state) {
+function payment_form_payment_method_submit(array $form, array &$form_state) {
   $values = $form_state['values'];
   $payment_method = $form_state['payment_method'];
   $payment_method->title_specific = $values['title_specific'];
@@ -129,7 +153,7 @@ function paymentui_form_payment_method_submit(array $form, array &$form_state) {
 /**
  * Implements form build callback: payment method deletion form.
  */
-function paymentui_form_payment_method_delete(array $form, array &$form_state, PaymentMethod $payment_method) {
+function payment_form_payment_method_delete(array $form, array &$form_state, PaymentMethod $payment_method) {
   $form_state['payment_method'] = $payment_method;
 
   return confirm_form($form, t('Do you really want to delete payment method %title?', array(
@@ -138,9 +162,9 @@ function paymentui_form_payment_method_delete(array $form, array &$form_state, P
 }
 
 /**
- * Implements form submit callback for paymentui_form_payment_method_delete().
+ * Implements form submit callback for payment_form_payment_method_delete().
  */
-function paymentui_form_payment_method_delete_submit(array $form, array &$form_state) {
+function payment_form_payment_method_delete_submit(array $form, array &$form_state) {
   $payment_method = $form_state['payment_method'];
   entity_delete('payment_method', $payment_method->pmid);
   $form_state['redirect'] = 'admin/config/services/payment/method';
@@ -152,7 +176,7 @@ function paymentui_form_payment_method_delete_submit(array $form, array &$form_s
 /**
  * Implements form build callback: global configuration form.
  */
-function paymentui_form_global_configuration(array $form, array &$form_state) {
+function payment_form_global_configuration(array $form, array &$form_state) {
   $form['payment_display_log_entries'] = array(
     '#type' => 'checkbox',
     '#title' => t('Display <em>Payment</em> log entries on screen'),
@@ -167,10 +191,10 @@ function paymentui_form_global_configuration(array $form, array &$form_state) {
  *
  * @string
  */
-function paymentui_page_status() {
+function payment_page_status() {
   $parents = $children = array();
   $statuses_info = payment_statuses_info();
-  uasort($statuses_info, 'paymentui_payment_status_sort_title');
+  uasort($statuses_info, 'payment_status_sort_title');
   foreach ($statuses_info as $status_info) {
     foreach ($status_info->parents as $parent) {
       $children[$parent][] = $status_info->status;
@@ -180,7 +204,7 @@ function paymentui_page_status() {
     }
   }
   $rows = array();
-  _paymentui_page_status_rows($parents, $children, $rows);
+  _payment_page_status_rows($parents, $children, $rows);
   $header = array(t('Title'));
 
   return theme('table', array(
@@ -190,9 +214,9 @@ function paymentui_page_status() {
 }
 
 /**
- * Helper function to build the rows for the table in paymentui_page_status().
+ * Helper function to build the rows for the table in payment_page_status().
  *
- * @see paymentui_page_status()
+ * @see payment_page_status()
  *
  * @param $statuses array
  *   The statuses for which to build table rows.
@@ -204,13 +228,13 @@ function paymentui_page_status() {
  * @param $depth integer
  *   
  */
-function _paymentui_page_status_rows(array $statuses, array $children, array &$rows, $depth = 0) {
+function _payment_page_status_rows(array $statuses, array $children, array &$rows, $depth = 0) {
   foreach ($statuses as $status) {
     $rows[] = array(theme('indentation', array(
     'size' => $depth,
   )) . payment_status_info($status)->title);
     if (isset($children[$status])) {
-      _paymentui_page_status_rows($children[$status], $children, $rows, $depth + 1);
+      _payment_page_status_rows($children[$status], $children, $rows, $depth + 1);
     }
   }
 }
@@ -218,6 +242,6 @@ function _paymentui_page_status_rows(array $statuses, array $children, array &$r
 /**
  * Implements uasort() callback to sort PaymentStatusInfo objects by title.
  */
-function paymentui_payment_status_sort_title(PaymentStatusInfo $status_info_a, PaymentStatusInfo $status_info_b) {
+function payment_status_sort_title(PaymentStatusInfo $status_info_a, PaymentStatusInfo $status_info_b) {
   return strcmp($status_info_a->title, $status_info_b->title);
 }

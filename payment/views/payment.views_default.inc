@@ -7,12 +7,12 @@
 /**
  * Implements hook_views_default_views().
  */
-function paymentui_views_default_views() {
+function payment_views_default_views() {
   $views = array();
 
-  $view_payments = paymentui_view_payments();
+  $view_payments = payment_view_payments();
   $views[$view_payments->name] = $view_payments;
-  $view_payment_methods = paymentui_view_payment_methods();
+  $view_payment_methods = payment_view_payment_methods();
   $views[$view_payment_methods->name] = $view_payment_methods;
 
   return $views;
@@ -23,7 +23,7 @@ function paymentui_views_default_views() {
  *
  * @return view
  */
-function paymentui_view_payments() {
+function payment_view_payments() {
   $view = new view;
   $view->name = 'payments';
   $view->description = 'List all payments made using Payment module.';
@@ -38,7 +38,7 @@ function paymentui_view_payments() {
   $handler = $view->new_display('default', 'Master', 'default');
   $handler->display->display_options['title'] = 'Payments';
   $handler->display->display_options['access']['type'] = 'perm';
-  $handler->display->display_options['access']['perm'] = 'paymentui.payment.view.own';
+  $handler->display->display_options['access']['perm'] = 'payment.view.own';
   $handler->display->display_options['cache']['type'] = 'none';
   $handler->display->display_options['query']['type'] = 'views_query';
   $handler->display->display_options['query']['options']['query_comment'] = FALSE;
@@ -557,7 +557,7 @@ function paymentui_view_payments() {
  *
  * @return view
  */
-function paymentui_view_payment_methods() {
+function payment_view_payment_methods() {
   $view = new view;
   $view->name = 'payment_methods';
   $view->description = '';
@@ -572,7 +572,7 @@ function paymentui_view_payment_methods() {
   $handler = $view->new_display('default', 'Master', 'default');
   $handler->display->display_options['title'] = 'Payment methods';
   $handler->display->display_options['access']['type'] = 'perm';
-  $handler->display->display_options['access']['perm'] = 'paymentui.payment_method.administer';
+  $handler->display->display_options['access']['perm'] = 'payment_method.administer';
   $handler->display->display_options['cache']['type'] = 'none';
   $handler->display->display_options['query']['type'] = 'views_query';
   $handler->display->display_options['query']['options']['query_comment'] = FALSE;
@@ -723,9 +723,9 @@ function paymentui_view_payment_methods() {
 
   /* Display: Administration page */
   $handler = $view->new_display('page', 'Administration page', 'page_1');
-  $handler->display->display_options['path'] = 'admin/config/services/payment/method';
-  $handler->display->display_options['menu']['type'] = 'default tab';
-  $handler->display->display_options['menu']['title'] = 'Payment methods';
+  $handler->display->display_options['path'] = 'admin/config/services/payment';
+  $handler->display->display_options['menu']['type'] = 'normal';
+  $handler->display->display_options['menu']['title'] = 'Payment';
   $handler->display->display_options['menu']['weight'] = '0';
   $handler->display->display_options['menu']['name'] = 'management';
   $handler->display->display_options['tab_options']['type'] = 'normal';

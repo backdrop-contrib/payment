@@ -480,11 +480,11 @@ class PaymentMethodController {
    *
    * The form's submit callback is expected to add all relevant information to
    * the PaymentMethod object in $form_sate['payment_method], so
-   * paymentui_form_payment_method_submit() can call entity_save() on it.
+   * payment_form_payment_method_submit() can call entity_save() on it.
    *
    * @var string
    */
-  public $payment_method_form_id = 'payment_form_payment_method';
+  public $payment_method_form_id = 'payment_form_payment_method_controller';
 
   /**
    * The human-readable title.
@@ -555,7 +555,7 @@ class PaymentMethodControllerUnavailable extends PaymentMethodController {
  * @return array
  *   A Drupal form.
  */
-function payment_form_payment_method(array $form, array &$form_state) {
+function payment_form_payment_method_controller(array $form, array &$form_state) {
   return $form;
 }
 

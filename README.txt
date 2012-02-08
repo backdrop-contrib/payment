@@ -8,7 +8,6 @@ allow their users to make payments.
   make payments. This means that it doesn't do anything by itself, apart from
   providing other modules with the ability to make payments.
 - Payment Form contains a basic payment form.
-- Payment UI contains the configuration interface and payment overview.
 
 
 GENERAL CONFIGURATION

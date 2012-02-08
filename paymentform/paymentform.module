@@ -151,7 +151,7 @@ function paymentform_form_submit(array $form, array &$form_state) {
  * Implements Payment finish callback.
  */
 function paymentform_payment_finish(Payment $payment) {
-  if (module_exists('paymentui') && user_access('paymentui.payment.view.own')) {
+  if (user_access('payment.view.own') || user_access('payment.view.all')) {
     $view = ' ' . l(t('View payment'), 'payment/' . $payment->pid) . '.';
   }
   if (payment_status_has_ancestor($payment->status, PAYMENT_STATUS_PENDING)) {

@@ -41,6 +41,159 @@ define('PAYMENT_STATUS_SUCCESS', 'payment_status_success');
 define('PAYMENT_STATUS_FAILED', 'payment_status_failed');
 
 /**
+ * Implements hook_menu().
+ *
+ * @see payment_views_default_views()
+ */
+function payment_menu() {
+  // Payment pages.
+  $items['payment/%payment_menu_entity'] = array(
+    'load arguments' => array('payment'),
+    'title callback' => 'payment_title',
+    'title arguments' => array(1),
+    'page callback' => 'payment_page_payment_view',
+    'page arguments' => array(1),
+    'access callback' => 'payment_access',
+    'access arguments' => array(1),
+    'file' => 'payment.ui.inc',
+  );
+  $items['payment/%payment_menu_entity/view'] = array(
+    'load arguments' => array('payment'),
+    'title' => 'View',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+    'weight' => -10,
+  );
+  
+
+  // Payment method configuration.
+  $items['admin/config/services/payment/method'] = array(
+    'title' => 'Payment methods',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    // 'weight' => 1,
+  );
+  $items['admin/config/services/payment/method/add'] = array(
+    'title' => 'Add payment method',
+    'page callback' => 'payment_page_payment_method_add_select_controller',
+    'access arguments' => array('payment.method.administer'),
+    'file' => 'payment.ui.inc',
+    'type' => MENU_LOCAL_ACTION,
+    'weight' => 1,
+  );
+  $items['admin/config/services/payment/method/add/%payment_method_controller'] = array(
+    'title' => 'Add payment method',
+    'page callback' => 'payment_method_form_add',
+    'page arguments' => array(6),
+    'access arguments' => array('payment.method.administer'),
+    'file' => 'payment.ui.inc',
+    'type' => MENU_CALLBACK,
+  );
+  $items['admin/config/services/payment/method/%payment_menu_entity'] = array(
+    'load arguments' => array('payment_method'),
+    'page callback' => 'payment_method_form',
+    'page arguments' => array(5),
+    'access arguments' => array('payment.method.administer'),
+    'title callback' => 'payment_method_title',
+    'title arguments' => array(5),
+    'file' => 'payment.ui.inc',
+  );
+  $items['admin/config/services/payment/method/%payment_menu_entity/edit'] = array(
+    'load arguments' => array('payment_method'),
+    'title' => 'Edit',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'context' => MENU_CONTEXT_INLINE,
+  );
+  $items['admin/config/services/payment/method/%payment_menu_entity/delete'] = array(
+    'load arguments' => array('payment_method'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('payment_form_payment_method_delete', 5),
+    'access arguments' => array('payment.method.administer'),
+    'title' => 'Delete',
+    'file' => 'payment.ui.inc',
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_INLINE,
+    'weight' => 1,
+  );
+
+  // Payment status overview.
+  $items['admin/config/services/payment/status'] = array(
+    'title' => 'Payment statuses',
+    'page callback' => 'payment_page_status',
+    'access arguments' => array('payment.status.view'),
+    'file' => 'payment.ui.inc',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 1,
+  );
+
+  // General configuration.
+  $items['admin/config/services/payment/global'] = array(
+    'title' => 'Global configuration',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('payment_form_global_configuration'),
+    'access arguments' => array('payment.configuration.administer'),
+    'file' => 'payment.ui.inc',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 2,
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function payment_permission() {
+  return array(
+    'payment.view.own' => array(
+      'title' => t('View own payments'),
+    ),
+    'payment.view.all' => array(
+      'title' => t('View all payments'),
+    ),
+    'payment.method.administer' => array(
+      'title' => t('Administer payment methods'),
+    ),
+    'payment.status.view' => array(
+      'title' => t('View payment status overview'),
+    ),
+    'payment.configuration.administer' => array(
+      'title' => t('Administer global Payment configuration'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_forms().
+ */
+function payment_forms() {
+  $forms = array();
+  foreach (payment_method_controller_load_multiple() as $controller) {
+    $forms['payment_form_payment_method_' . $controller->payment_method_form_id] = array(
+      'callback' => $controller->payment_method_form_id,
+      'wrapper_callback' => 'payment_form_payment_method',
+    );
+  }
+
+  return $forms;
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function payment_form_alter(array &$form, array &$form_state, $form_id) {
+  // Check for payment method forms.
+  foreach (payment_method_controller_load_multiple() as $controller) {
+    if ($form_id == 'payment_form_payment_method_' . $controller->payment_method_form_id) {
+      // Add payment method form callbacks. We do this here to make sure the
+      // form provided by the payment method controller doesn't have to set
+      // anything explicitely and the wrapper callback's callbacks are the last
+      // to be executed, so it can save the entire modified payment method.
+      $form['#submit'][] = 'payment_form_payment_method_submit';
+    }
+  }
+}
+
+/**
  * Implements hook_hook_info().
  */
 function payment_hook_info() {
@@ -468,4 +621,49 @@ function payment_form_method_controller_settings_ajax_callback(array $form, arra
   }
 
   return $element['controller_settings'] ? $element['controller_settings'] : array();
+}
+
+/**
+ * Menu wildcard loader to load an entity
+ *
+ * @param $id integer
+ *   The entity's ID.
+ * @param $entity_type string
+ *   The type of the entity to load.
+ *
+ * @see entity_load_single()
+ */
+function payment_menu_entity_load($id, $entity_type) {
+  return entity_load_single('payment', $id);
+}
+
+/**
+ * Menu access callback: return a user's access to a payment.
+ *
+ * @param $payment Payment
+ *
+ * @return string
+ */
+function payment_access(Payment $payment) {
+  global $user;
+
+  if (user_access('payment.view.all')) {
+    return TRUE;
+  }
+  elseif (user_access('payment.view.own') && $user->uid == $payment->uid) {
+    return TRUE;
+  }
+  return FALSE;
+}
+
+/**
+ * Title callback for menu items.
+ *
+ * @param $payment_method PaymentMethod
+ *
+ * @return string
+ *   The payment method's title.
+ */
+function payment_method_title(PaymentMethod $payment_method) {
+  return $payment_method->title_specific;
 }
