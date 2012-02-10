@@ -515,9 +515,19 @@ class PaymentMethodController {
    *  Whether the payment contains all necessary data for execution.
    */
   function validate(Payment $payment) {
-    // @todo Add validation for minimum/maximum amount.
+    $valid = TRUE;
+
+    // Confirm the payment amount is higher than 0.
+    if ($payment->amount <= 0) {
+      $valid = FALSE;
+    }
+
     // Confirm the payment's currency is supported.
-    return empty($this->currencies) || in_array($payment->currency_code, $this->currencies);
+    if (!empty($this->currencies) && !in_array($payment->currency_code, $this->currencies)) {
+      $valid = FALSE;
+    }
+
+    return $valid;
   }
 }
 
