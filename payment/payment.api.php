@@ -6,7 +6,7 @@
  */
 
 /**
- * Define payment statuses.
+ * Defines payment statuses.
  *
  * @return array
  *   An array with PaymentStatusInfo objects.
@@ -23,7 +23,7 @@ function hook_payment_status_info() {
 }
 
 /**
- * Define payment method controllers.
+ * Defines payment method controllers.
  *
  * @return array
  *   An array with the names of payment method controller classes.
@@ -36,7 +36,7 @@ function hook_payment_method_controller_info() {
 }
 
 /**
- * Act on a payment's changed status.
+ * Executes when a payment status has been changed.
  *
  * @see Payment::setStatus()
  *
@@ -51,8 +51,8 @@ function hook_payment_status_change(Payment $payment, $old_status) {
 }
 
 /**
- * Act when a payment is pre-executed. THis is the place to programmatically
- * alter payments.
+ * Executes right before a payment is executed. This is the place to
+ * programmatically alter payments.
  *
  * @see Payment::execute()
  *
