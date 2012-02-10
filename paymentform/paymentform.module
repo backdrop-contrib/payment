@@ -13,13 +13,13 @@ function paymentform_menu() {
     'title' => 'Payment form',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('paymentform_form'),
-    'access callback' => TRUE,
+    'access arguments' => array('paymentform.page.access'),
   );
   $items['admin/config/services/paymentform'] = array(
     'title' => 'Payment Form',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('paymentform_form_configuration'),
-    'access arguments' => array('administer paymentform'),
+    'access arguments' => array('paymentform.administer'),
   );
   $items['admin/config/services/paymentform/configure'] = array(
     'title' => 'Configure Payment Form',
@@ -53,8 +53,13 @@ function paymentform_element_info() {
  */
 function paymentform_permission() {
   return array(
-    'administer paymentform' => array(
+    'paymentform.administer' => array(
       'title' => t('Administer Payment Form'),
+    ),
+    'paymentform.page.access' => array(
+      'title' => t('Access the <a href="@url">payment form page</a>', array(
+        '@url' => url('paymentform'),
+      )),
     ),
   );
 }
