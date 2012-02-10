@@ -23,6 +23,18 @@ function hook_payment_status_info() {
 }
 
 /**
+ * Alters payment statuses.
+ *
+ * @param $statuses_info array
+ *   An array with PaymentStatusInfo objects.
+ *
+ * @return NULL
+ */
+function hook_payment_status_info_alter(&$statuses_info) {
+  $statuses_info[PAYMENT_STATUS_FAILED]->title = 'Something went wrong!';
+}
+
+/**
  * Defines payment method controllers.
  *
  * @return array
@@ -33,6 +45,19 @@ function hook_payment_method_controller_info() {
     'DummyPaymentMethodController',
     'CashOnDeliveryPaymentMethodController',
   );
+}
+
+/**
+ * Alters payment method controllers.
+ *
+ * @param array
+ *   An array with the names of payment method controller classes.
+ */
+function hook_payment_method_controller_info_alter(&$controllers_info) {
+  // Remvove a payment method controller.
+  $reversed = array_reverse($controllers_info);
+  unset($reversed['FooPaymentMethodController']);
+  $controllers_info = array_reverse($reversed);
 }
 
 /**
