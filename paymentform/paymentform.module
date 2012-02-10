@@ -260,13 +260,12 @@ function paymentform_form_validate_amount(array $element, array &$form_state) {
   }
   // Make sure that if there is a decimal mark, it is followed by two digits.
   elseif ($count_fragments == 2 && !preg_match('#[.,]\d\d$#', $value)) {
-    // @todo Imlement Currency 7.x-2.x.
+    // @todo Implement Currency 7.x-2.x.
     // @todo Number of digits can vary from 0 to 3.
     form_set_error('amount', t('The decimal mark must be followed by two digits.'));
   }
   else {
     // Convert the value to a float.
-    // @todo
     $amount = (float) $value;
 
     // Confirm the amount lies within the allowed range.
