@@ -436,13 +436,25 @@ function payment_status_has_ancestor($status, $ancestor_status) {
 }
 
 /**
- * Returns an array with all payment method controller class names.
+ * Returns information about payment method controllers.
+ *
+ * @return array
+ *   Keys are payment method controller class aliases, values are the real
+ *   payment method controller class names. This allows
+ *   hook_payment_method_controller_info_alter() to override payment method
+ *   controllers.
  */
 function payment_method_controllers_info() {
   static $controllers_info = NULL;
 
   if (!$controllers_info) {
     $controllers_info = module_invoke_all('payment_method_controller_info');
+    foreach ($controllers_info as $controller_class_name_alias => $controller_class_name) {
+      if (is_numeric($controller_class_name_alias)) {
+        unset($controllers_info[$controller_class_name_alias]);
+        $controllers_info[$controller_class_name] = $controller_class_name;
+      }
+    }
     drupal_alter('payment_method_controller_info', $controllers_info);
   }
 
@@ -481,10 +493,10 @@ function payment_method_controller_load_multiple(array $controller_class_names =
 
   // Load all existing controllers.
   if (is_null($controllers)) {
-    foreach (payment_method_controllers_info() as $controller_class_name) {
+    foreach (payment_method_controllers_info() as $controller_class_name_alias => $controller_class_name) {
       $controller = new $controller_class_name();
       $controller->name = $controller_class_name;
-      $controllers[$controller_class_name] = $controller;
+      $controllers[$controller_class_name_alias] = $controller;
     }
   }
 
