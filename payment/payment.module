@@ -436,6 +436,19 @@ function payment_status_has_ancestor($status, $ancestor_status) {
 }
 
 /**
+ * Check if payment status is equal to a given other status or has it one of
+ * its ancestors.
+ *
+ * @param $status string
+ * @param $ancestor_status string
+ *
+ * @return boolean
+ */
+function payment_status_is_or_has_ancestor($status, $ancestor_status) {
+  return $status == $ancestor_status || in_array($ancestor_status, payment_status_info($status, TRUE)->ancestors());
+}
+
+/**
  * Returns information about payment method controllers.
  *
  * @return array
