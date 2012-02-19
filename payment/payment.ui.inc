@@ -19,6 +19,28 @@ function payment_title(Payment $payment) {
 }
 
 /**
+ * Menu page callback: show a message that describes the dependencies for
+ * viewing this page have not been met.
+ *
+ * @param $modules array
+ *   Keys are modules' machine names or numeric, values are modules'
+ *   human-readable titles.
+ *
+ * @return string
+ */
+function payment_page_required_modules(array $modules) {
+  foreach ($modules as $name => &$title) {
+    if (is_string($name)) {
+      $title = l($title, 'http://drupal.org/project/' . $name);
+    }
+  }
+
+  return t('This page requires !modules.', array(
+    '!modules' => implode(', ', $modules),
+  ));
+}
+
+/**
  * Menu page callback: show a payment.
  *
  * @param $payment Payment
@@ -245,3 +267,4 @@ function _payment_page_status_rows(array $statuses, array $children, array &$row
 function payment_payment_status_sort_title(PaymentStatus $status_a, PaymentStatus $status_b) {
   return strcmp($status_a->title, $status_b->title);
 }
+

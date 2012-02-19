@@ -136,6 +136,26 @@ function payment_menu() {
     'weight' => 2,
   );
 
+  // Placeholder pages in case certain dependencies have not been met.
+  $base = array(
+      'page callback' => 'payment_page_required_modules',
+      'page arguments' => array(array(
+        'views' => 'Views',
+      )),
+      'file' => 'payment.ui.inc',
+      'menu_name' => 'management',
+  );
+  if (!module_exists('views')) {
+    $items['admin/content/payment'] = array(
+      'title' => 'Payments',
+      'access arguments' => array('payment.view.all'),
+    ) + $base;
+    $items['admin/config/services/payment'] = array(
+      'title' => 'Payment',
+      'access arguments' => array('payment.method.administer'),
+    ) + $base;
+  }
+
   return $items;
 }
 
