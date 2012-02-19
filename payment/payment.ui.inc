@@ -137,7 +137,6 @@ function payment_form_payment_method(array $form, array &$form_state, PaymentMet
     '#description' => t('The generic title is often only displayed to people such as payers who only need to know the generic payment method that is used, for instance <em>Paypal</em>.'),
     '#default_value' => $payment_method->title_generic,
     '#maxlength' => 255,
-    '#required' => TRUE,
   );
   $form['actions'] = array(
     '#type' => 'actions',
@@ -164,7 +163,8 @@ function payment_form_payment_method_submit(array $form, array &$form_state) {
   $values = $form_state['values'];
   $payment_method = $form_state['payment_method'];
   $payment_method->title_specific = $values['title_specific'];
-  $payment_method->title_generic = $values['title_generic'];
+  // The generic title defaults to the specific one.
+  $payment_method->title_generic = $values['title_generic'] ? $values['title_generic'] : $values['title_specific'];
   entity_save('payment_method', $payment_method);
   $form_state['redirect'] = 'admin/config/services/payment/method';
   drupal_set_message(t('Payment method %title has been saved.', array(
