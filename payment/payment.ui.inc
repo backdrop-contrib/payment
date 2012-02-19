@@ -211,7 +211,7 @@ function payment_form_global_configuration(array $form, array &$form_state) {
 /**
  * Display a payment status overview.
  *
- * @string
+ * @return string
  */
 function payment_page_status() {
   $parents = $children = array();
