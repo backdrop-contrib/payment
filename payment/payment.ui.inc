@@ -134,7 +134,7 @@ function payment_form_payment_method(array $form, array &$form_state, PaymentMet
   $form['title_generic'] = array(
     '#type' => 'textfield',
     '#title' => t('Title (generic)'),
-    '#description' => t('The generic title is often only displayed to people such as payers who only need to know the generic payment method that is used, for instance <em>Paypal</em>.'),
+    '#description' => t('The generic title is often only displayed to people such as payers who only need to know the generic payment method that is used, for instance <em>Paypal</em>. Defaults to the specific title.'),
     '#default_value' => $payment_method->title_generic,
     '#maxlength' => 255,
   );
