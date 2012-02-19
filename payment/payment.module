@@ -661,7 +661,7 @@ function payment_form_method_controller_settings_ajax_callback(array $form, arra
  * @see entity_load_single()
  */
 function payment_menu_entity_load($id, $entity_type) {
-  return entity_load_single('payment', $id);
+  return entity_load_single($entity_type, $id);
 }
 
 /**
