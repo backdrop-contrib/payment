@@ -244,7 +244,6 @@ function payment_rules_options_list_payment_status_parents() {
  */
 function payment_rules_action_payment_set_status(Payment $payment, $status_data) {
   $payment->setStatus(reset($status_data));
-  enitty_save('payment', $payment);
 }
 
 /**
