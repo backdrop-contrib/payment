@@ -216,7 +216,7 @@ function payment_form_global_configuration(array $form, array &$form_state) {
 function payment_page_status() {
   $parents = $children = array();
   $statuses = payment_statuses_info();
-  uasort($statuses, 'paymentui_payment_status_sort_title');
+  uasort($statuses, 'payment_payment_status_sort_title');
   foreach ($statuses as $status) {
     foreach ($status->parents as $parent_code) {
       $children[$parent_code][] = $status->code;
