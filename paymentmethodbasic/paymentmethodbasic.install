@@ -8,8 +8,8 @@
 /**
  * Implements hook_schema().
  */
-function payment_method_basic_schema() {
-  $schema['payment_method_basic'] = array(
+function paymentmethodbasic_schema() {
+  $schema['paymentmethodbasic'] = array(
     'fields' => array(
       'message' => array(
         'type' => 'text',

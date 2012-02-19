@@ -8,14 +8,14 @@
 /**
  * Implements hook_payment_method_controller_info().
  */
-function payment_method_basic_payment_method_controller_info() {
+function paymentmethodbasic_payment_method_controller_info() {
   return array('PaymentMethodBasicController');
 }
 
 /**
  * Implements hook_entity_load().
  */
-function payment_method_basic_entity_load(array $entities, $entity_type) {
+function paymentmethodbasic_entity_load(array $entities, $entity_type) {
 if ($entity_type == 'payment_method') {
     $pmids = array();
     foreach ($entities as $payment_method) {
@@ -24,8 +24,8 @@ if ($entity_type == 'payment_method') {
       }
     }
     if ($pmids) {
-      $query = db_select('payment_method_basic')
-        ->fields('payment_method_basic')
+      $query = db_select('paymentmethodbasic')
+        ->fields('paymentmethodbasic')
         ->condition('pmid', $pmids);
       $result = $query->execute();
       while ($data = $result->fetchAssoc()) {
@@ -41,10 +41,10 @@ if ($entity_type == 'payment_method') {
 /**
  * Implements hook_ENTITY_TYPE_ACTION().
  */
-function payment_method_basic_payment_method_insert(PaymentMethod $payment_method) {
+function paymentmethodbasic_payment_method_insert(PaymentMethod $payment_method) {
   if ($payment_method->controller->name == 'PaymentMethodBasicController') {
-    $payment_method->controller_data += payment_method_basic_controller_data();
-    $query = db_insert('payment_method_basic');
+    $payment_method->controller_data += paymentmethodbasic_controller_data();
+    $query = db_insert('paymentmethodbasic');
     $values = array_merge($payment_method->controller_data, array(
       'pmid' => $payment_method->pmid,
     ));
@@ -56,9 +56,9 @@ function payment_method_basic_payment_method_insert(PaymentMethod $payment_metho
 /**
  * Implements hook_ENTITY_TYPE_ACTION().
  */
-function payment_method_basic_payment_method_update(PaymentMethod $payment_method) {
+function paymentmethodbasic_payment_method_update(PaymentMethod $payment_method) {
   if ($payment_method->controller->name == 'PaymentMethodBasicController') {
-    $query = db_update('payment_method_basic');
+    $query = db_update('paymentmethodbasic');
     $values = array_merge($payment_method->controller_data, array(
       'pmid' => $payment_method->pmid,
     ));
@@ -71,9 +71,9 @@ function payment_method_basic_payment_method_update(PaymentMethod $payment_metho
 /**
  * Implements hook_ENTITY_TYPE_ACTION().
  */
-function payment_method_basic_payment_method_delete($entity) {
+function paymentmethodbasic_payment_method_delete($entity) {
   if ($entity->controller->name == 'PaymentMethodBasicController') {
-    db_delete('payment_method_basic')
+    db_delete('paymentmethodbasic')
       ->condition('pmid', $entity->pmid)
       ->execute();
   }
@@ -82,7 +82,7 @@ function payment_method_basic_payment_method_delete($entity) {
 /**
  * Return all payment method-specific property names.
  */
-function payment_method_basic_controller_data() {
+function paymentmethodbasic_controller_data() {
   return array(
     'message' => '',
     'text_format' => '',
@@ -98,9 +98,9 @@ function payment_method_basic_controller_data() {
  */
 class PaymentMethodBasicController extends PaymentMethodController {
 
-  public $payment_method_form_id = 'payment_method_basic_form_payment_method';
+  public $payment_method_form_id = 'paymentmethodbasic_form_payment_method';
 
-  public $payment_form_elements_callback = 'payment_method_basic_payment_form_elements';
+  public $payment_form_elements_callback = 'paymentmethodbasic_payment_form_elements';
 
   function __construct() {
     $this->title = t('Basic');
@@ -128,7 +128,7 @@ class PaymentMethodBasicController extends PaymentMethodController {
  * @return array
  *   A Drupal form.
  */
-function payment_method_basic_form_payment_method(array $form, array &$form_state) {
+function paymentmethodbasic_form_payment_method(array $form, array &$form_state) {
   $controller_data = $form_state['payment_method']->controller_data;
 
   $form['message'] = array(
@@ -142,9 +142,9 @@ function payment_method_basic_form_payment_method(array $form, array &$form_stat
 }
 
 /**
- * Implements form submit callback for payment_method_basic_form_payment_method().
+ * Implements form submit callback for paymentmethodbasic_form_payment_method().
  */
-function payment_method_basic_form_payment_method_submit(array $form, array &$form_state) {
+function paymentmethodbasic_form_payment_method_submit(array $form, array &$form_state) {
   $form_state['payment_method']->controller_data['message'] = $form_state['values']['message']['value'];
   $form_state['payment_method']->controller_data['text_format'] = $form_state['values']['message']['format'];
 }
@@ -152,7 +152,7 @@ function payment_method_basic_form_payment_method_submit(array $form, array &$fo
 /**
  * Implements PaymentMethodController payment_form_elements_callback.
  */
-function payment_method_basic_payment_form_elements(PaymentMethod $payment_method) {
+function paymentmethodbasic_payment_form_elements(PaymentMethod $payment_method) {
   $elements = array();
   $elements['message'] = array(
     '#type' => 'markup',
