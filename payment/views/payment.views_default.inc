@@ -228,6 +228,9 @@ function payment_view_payments() {
 
   /* Display: Administration page */
   $handler = $view->new_display('page', 'Administration page', 'page_1');
+  $handler->display->display_options['defaults']['access'] = FALSE;
+  $handler->display->display_options['access']['type'] = 'perm';
+  $handler->display->display_options['access']['perm'] = 'payment.view.all';
   $handler->display->display_options['defaults']['fields'] = FALSE;
   /* Field: Payment: Last updated date and time */
   $handler->display->display_options['fields']['updated']['id'] = 'updated';
@@ -350,6 +353,9 @@ function payment_view_payments() {
 
   /* Display: User's own payments */
   $handler = $view->new_display('page', 'User\'s own payments', 'page_2');
+  $handler->display->display_options['defaults']['access'] = FALSE;
+  $handler->display->display_options['access']['type'] = 'perm';
+  $handler->display->display_options['access']['perm'] = 'payment.view.own';
   $handler->display->display_options['defaults']['fields'] = FALSE;
   /* Field: Payment: Last updated date and time */
   $handler->display->display_options['fields']['updated']['id'] = 'updated';
@@ -531,7 +537,7 @@ function payment_view_payment_methods() {
   $handler = $view->new_display('default', 'Master', 'default');
   $handler->display->display_options['title'] = 'Payment methods';
   $handler->display->display_options['access']['type'] = 'perm';
-  $handler->display->display_options['access']['perm'] = 'payment_method.administer';
+  $handler->display->display_options['access']['perm'] = 'payment.method.administer';
   $handler->display->display_options['cache']['type'] = 'none';
   $handler->display->display_options['query']['type'] = 'views_query';
   $handler->display->display_options['query']['options']['query_comment'] = FALSE;
