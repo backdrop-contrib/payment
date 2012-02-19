@@ -16,32 +16,19 @@ function payment_views_data_alter(&$data) {
       'handler' => 'PaymentViewsHandlerFieldPaymentOperations',
     ),
   );
+  $data['payment']['pid']['relationship'] = array(
+    'base' => 'payment_status_item',
+    'base field' => 'pid',
+    'handler' => 'views_handler_relationship',
+    'label' => t('Payment status item'),
+  );
   $data['payment']['pmid']['relationship'] = array(
     'base' => 'payment_method',
-    'field' => 'pmid',
     'handler' => 'views_handler_relationship',
     'label' => t('Payment method'),
   );
-  $data['payment']['status_human_readable'] = array(
-    'title' => t('Status (human-readable)'),
-    'real field' => 'status',
-    'field' => array(
-      'handler' => 'PaymentViewsHandlerFieldPaymentStatus',
-      'click sortable' => TRUE,
-    ),
-    'sort' => array(
-      'handler' => 'views_handler_sort',
-    ),
-    'filter' => array(
-      'handler' => 'views_handler_filter_string',
-    ),
-    'argument' => array(
-      'handler' => 'views_handler_argument_string',
-    ),
-  );
   $data['payment']['uid']['relationship'] = array(
     'base' => 'users',
-    'field' => 'uid',
     'handler' => 'views_handler_relationship',
     'label' => t('User'),
   );
@@ -89,22 +76,20 @@ function payment_views_data_alter(&$data) {
     ),
   );
 
-  // Payment revision. This is not an alteration, but implementing
+  // Payment status items. This is not an alteration, but implementing
   // hook_views_data() prevents Entity API from exposing our entities to Views
   // automatically.
-  $data['payment_revision'] = array(
+  $data['payment_status_item'] = array(
     'table' => array(
-      'group' => t('Payment revision'),
-      'join' => array(
-        'payment' => array(
-          'left_field' => 'pid',
-          'field' => 'pid',
-        ),
+      'base' => array(
+        'field' => 'psiid',
+        'title' => t('Payment status item'),
       ),
+      'group' => t('Payment status item'),
     ),
     // Field configuration.
-    'created_revision' => array(
-      'title' => t('Created date and time'),
+    'created' => array(
+      'title' => t('Creation date and time'),
       'field' => array(
         'handler' => 'views_handler_field_date',
         'click sortable' => TRUE,
@@ -119,8 +104,8 @@ function payment_views_data_alter(&$data) {
         'handler' => 'views_handler_argument_date',
       ),
     ),
-    'description' => array(
-      'title' => t('Description'),
+    'code' => array(
+      'title' => t('Status code'),
       'field' => array(
         'handler' => 'views_handler_field',
         'click sortable' => TRUE,
@@ -135,24 +120,8 @@ function payment_views_data_alter(&$data) {
         'handler' => 'views_handler_argument_string',
       ),
     ),
-    'status' => array(
-      'title' => t('Status'),
-      'field' => array(
-        'handler' => 'views_handler_field',
-        'click sortable' => TRUE,
-      ),
-      'sort' => array(
-        'handler' => 'views_handler_sort',
-      ),
-      'filter' => array(
-        'handler' => 'views_handler_filter_string',
-      ),
-      'argument' => array(
-        'handler' => 'views_handler_argument_string',
-      ),
-    ),
-    'vid' => array(
-      'title' => t('Revision ID'),
+    'pid' => array(
+      'title' => t('Payment ID'),
       'field' => array(
         'handler' => 'views_handler_field',
         'click sortable' => TRUE,
@@ -168,9 +137,31 @@ function payment_views_data_alter(&$data) {
       ),
       'relationship' => array(
         'base' => 'payment',
-        'field' => 'vid',
         'handler' => 'views_handler_relationship',
         'label' => t('Payment'),
+      ),
+    ),
+    'psiid' => array(
+      'title' => t('Payment status item ID'),
+      'field' => array(
+        'handler' => 'views_handler_field',
+        'click sortable' => TRUE,
+      ),
+      'sort' => array(
+        'handler' => 'views_handler_sort',
+      ),
+      'filter' => array(
+        'handler' => 'views_handler_filter_numeric',
+      ),
+      'argument' => array(
+        'handler' => 'views_handler_argument_numeric',
+      ),
+    ),
+    'title' => array(
+      'title' => t('Status title'),
+      'real field' => 'code',
+      'field' => array(
+        'handler' => 'PaymentViewsHandlerFieldPaymentStatusTitle',
       ),
     ),
   );

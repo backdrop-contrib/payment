@@ -111,7 +111,7 @@ class PaymentMethodBasicController extends PaymentMethodController {
    * Implements PaymentMethodController::execute().
    */
   function execute(Payment $payment) {
-    $payment->setStatus(PAYMENT_STATUS_SUCCESS);
+    $payment->setStatus(new PaymentStatusItem(PAYMENT_STATUS_SUCCESS));
   }
 
   /**

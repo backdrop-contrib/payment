@@ -48,10 +48,6 @@ function payment_schema() {
         'default' => 0,
         'not null' => TRUE,
       ),
-      'status' => array(
-        'type' => 'varchar',
-        'length' => '255',
-      ),
       'uid' => array(
         'description' => 'The {users}.uid this payment belongs to.',
         'type' => 'int',
@@ -61,20 +57,8 @@ function payment_schema() {
       'updated' => array(
         'type' => 'int',
       ),
-      'vid' => array(
-        'description' => 'The revision ID.',
-        'type' => 'int',
-        'not null' => TRUE,
-        'default' => 0,
-      ),
     ),
     'foreign keys' => array(
-      'pid' => array(
-        'table' => 'payment_revision',
-        'columns' => array(
-          'pid' => 'pid',
-        ),
-      ),
       'pmid' => array(
         'table' => 'payment_method',
         'columns' => array(
@@ -87,30 +71,20 @@ function payment_schema() {
           'uid' => 'uid',
         ),
       ),
-      'vid' => array(
-        'table' => 'payment_revision',
-        'columns' => array(
-          'vid' => 'vid',
-        ),
-      ),
     ),
     'indexes' => array(
       'pid' => array('pid'),
     ),
     'primary key' => array('pid'),
-    'unique keys' => array(
-      'vid' => array('vid'),
-    ),
   );
-  $schema['payment_revision'] = array(
+  $schema['payment_status_item'] = array(
     'fields' => array(
-      'created_revision' => array(
-        'type' => 'int',
-      ),
-      'description' => array(
+      'code' => array(
         'type' => 'varchar',
-        'length' => 255,
-        'not null' => TRUE,
+        'length' => '255',
+      ),
+      'created' => array(
+        'type' => 'int',
       ),
       'pid' => array(
         'description' => 'The payment ID.',
@@ -118,11 +92,7 @@ function payment_schema() {
         'not null' => TRUE,
         'default' => 0,
       ),
-      'status' => array(
-        'type' => 'varchar',
-        'length' => '255',
-      ),
-      'vid' => array(
+      'psiid' => array(
         'type' => 'serial',
       ),
     ),
@@ -133,20 +103,11 @@ function payment_schema() {
           'pid' => 'pid',
         ),
       ),
-      'vid' => array(
-        'table' => 'payment',
-        'columns' => array(
-          'vid' => 'vid',
-        ),
-      ),
     ),
     'indexes' => array(
       'pid' => array('pid'),
     ),
-    'primary key' => array('vid'),
-    'unique keys' => array(
-      'vid' => array('vid'),
-    ),
+    'primary key' => array('psiid'),
   );
   $schema['payment_method'] = array(
     'fields' => array(

@@ -235,11 +235,9 @@ function payment_entity_info() {
     'entity class' => 'Payment',
     'module' => 'payment',
     'base table' => 'payment',
-    'revision table' => 'payment_revision',
     'entity keys' => array(
       'id' => 'pid',
       'label' => 'description',
-      'revision' => 'vid',
     ),
     // @todo Enable static cache once http://drupal.org/node/1273756 is fixed.
     'static cache' => FALSE,
@@ -314,11 +312,6 @@ function payment_entity_property_info() {
     'schema field' => 'pmid',
     'type' => 'integer',
   );
-  $properties['payment']['properties']['status'] = array(
-    'label' => t('Status'),
-    'required' => TRUE,
-    'schema field' => 'status',
-  );
   $properties['payment']['properties']['uid'] = array(
     'label' => 'User ID',
     'description' => t('The ID of the user this payment belongs to.'),
@@ -384,29 +377,29 @@ function payment_views_api() {
 }
 
 /**
- * Gets info about payment statuses.
+ * Gets payment statuses.
  *
  * @see hook_payment_status_info()
  *
  * @return array
- *   An array with PaymentStatusInfo objects for all available statuses.
+ *   An array with PaymentStatus objects for all available statuses.
  */
 function payment_statuses_info() {
-  static $statuses_info = NULL;
+  static $statuses = NULL;
 
-  if (!$statuses_info) {
-    $statuses_info = array();
-    foreach (module_invoke_all('payment_status_info') as $status_info) {
-      $statuses_info[$status_info->status] = $status_info;
+  if (!$statuses) {
+    $statuses = array();
+    foreach (module_invoke_all('payment_status_info') as $status) {
+      $statuses[$status->code] = $status;
     }
-    drupal_alter('payment_status_info', $statuses_info);
+    drupal_alter('payment_status_info', $statuses);
   }
 
-  return $statuses_info;
+  return $statuses;
 }
 
 /**
- * Gets info about a specific payment status.
+ * Gets a specific payment status.
  *
  * @param $status string
  *   A status' system name.
@@ -415,37 +408,41 @@ function payment_statuses_info() {
  *   does not exist.
  *
  * @return mixed
- *   A PaymentStatusInfo object or FALSE if the status does not exist.
+ *   A PaymentStatus object or FALSE if the status does not exist.
  */
-function payment_status_info($status, $unknown = FALSE) {
-  $statuses_info = payment_statuses_info();
+function payment_status_info($code, $unknown = FALSE) {
+  $statuses = payment_statuses_info();
 
-  return isset($statuses_info[$status]) ? $statuses_info[$status] : ($unknown ? $statuses_info[PAYMENT_STATUS_UNKNOWN] : FALSE);
+  return isset($statuses[$code]) ? $statuses[$code] : ($unknown ? $statuses[PAYMENT_STATUS_UNKNOWN] : FALSE);
 }
 
 /**
- * Check if payment status has a given other status as one of its ancestors.
+ * Check if a payment status has a given other status as one of its ancestors.
  *
- * @param $status string
- * @param $ancestor_status string
+ * @param $code string
+ *   The payment status' code.
+ * @param $ancestor_code string
+ *   The code of the ancestor status to check for.
  *
  * @return boolean
  */
-function payment_status_has_ancestor($status, $ancestor_status) {
-  return in_array($ancestor_status, payment_status_info($status, TRUE)->ancestors());
+function payment_status_has_ancestor($code, $ancestor_code) {
+  return in_array($ancestor_code, payment_status_info($code, TRUE)->ancestors());
 }
 
 /**
- * Check if payment status is equal to a given other status or has it one of
+ * Check if a payment status is equal to a given other status or has it one of
  * its ancestors.
  *
- * @param $status string
- * @param $ancestor_status string
+ * @param $code string
+ *   The payment status' code.
+ * @param $ancestor_code string
+ *   The code of the ancestor status to check for.
  *
  * @return boolean
  */
-function payment_status_is_or_has_ancestor($status, $ancestor_status) {
-  return $status == $ancestor_status || in_array($ancestor_status, payment_status_info($status, TRUE)->ancestors());
+function payment_status_is_or_has_ancestor($code, $ancestor_code) {
+  return $code == $ancestor_code || in_array($ancestor_code, payment_status_info($code, TRUE)->ancestors());
 }
 
 /**

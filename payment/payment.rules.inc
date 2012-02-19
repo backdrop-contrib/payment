@@ -193,8 +193,8 @@ function payment_rules_condition_payment_status_is(Payment $payment, array $paym
  */
 function payment_rules_options_list_payment_statuses() {
   $options = array();
-  foreach (payment_statuses_info() as $status => $status_info) {
-    $options[$status] = $status_info->title;
+  foreach (payment_statuses_info() as $status) {
+    $options[$status->code] = $status->title;
   }
   asort($options);
 
@@ -226,13 +226,13 @@ function payment_rules_condition_payment_status_has_ancestor(Payment $payment, a
  */
 function payment_rules_options_list_payment_status_parents() {
   $options = array();
-  $statuses_info = payment_statuses_info();
-  $parents = array();
-  foreach ($statuses_info as $status => $status_info) {
-    $parents = array_merge($parents, $status_info->parents);
+  $statuses = payment_statuses_info();
+  $codes = array();
+  foreach ($statuses_info as $status) {
+    $codes = array_merge($parents, $status->parents);
   }
-  foreach (array_unique($parents) as $status) {
-    $options[$status] = $statuses_info[$status]->title;
+  foreach (array_unique($codes) as $code) {
+    $options[$status] = $statuses[$code]->title;
   }
   asort($options);
 
@@ -297,8 +297,8 @@ function payment_rules_action_payment_amount_divide(Payment $payment, $amount) {
  */
 function payment_rules_options_list_payment_set_status() {
   $options = array();
-  foreach (payment_statuses_info() as $status => $status_info) {
-    $options[$status] = $status_info->title;
+  foreach (payment_statuses_info() as $status) {
+    $options[$status->code] = $status->title;
   }
   asort($options);
 

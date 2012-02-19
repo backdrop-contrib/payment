@@ -125,28 +125,6 @@ function payment_view_payments() {
   $handler->display->display_options['fields']['updated']['empty_zero'] = 0;
   $handler->display->display_options['fields']['updated']['hide_alter_empty'] = 0;
   $handler->display->display_options['fields']['updated']['date_format'] = 'long';
-  /* Field: Payment: Status (human-readable) */
-  $handler->display->display_options['fields']['status_human_readable']['id'] = 'status_human_readable';
-  $handler->display->display_options['fields']['status_human_readable']['table'] = 'payment';
-  $handler->display->display_options['fields']['status_human_readable']['field'] = 'status_human_readable';
-  $handler->display->display_options['fields']['status_human_readable']['label'] = 'Status';
-  $handler->display->display_options['fields']['status_human_readable']['alter']['alter_text'] = 0;
-  $handler->display->display_options['fields']['status_human_readable']['alter']['make_link'] = 0;
-  $handler->display->display_options['fields']['status_human_readable']['alter']['absolute'] = 0;
-  $handler->display->display_options['fields']['status_human_readable']['alter']['external'] = 0;
-  $handler->display->display_options['fields']['status_human_readable']['alter']['replace_spaces'] = 0;
-  $handler->display->display_options['fields']['status_human_readable']['alter']['trim_whitespace'] = 0;
-  $handler->display->display_options['fields']['status_human_readable']['alter']['nl2br'] = 0;
-  $handler->display->display_options['fields']['status_human_readable']['alter']['word_boundary'] = 1;
-  $handler->display->display_options['fields']['status_human_readable']['alter']['ellipsis'] = 1;
-  $handler->display->display_options['fields']['status_human_readable']['alter']['strip_tags'] = 0;
-  $handler->display->display_options['fields']['status_human_readable']['alter']['trim'] = 0;
-  $handler->display->display_options['fields']['status_human_readable']['alter']['html'] = 0;
-  $handler->display->display_options['fields']['status_human_readable']['element_label_colon'] = 1;
-  $handler->display->display_options['fields']['status_human_readable']['element_default_classes'] = 1;
-  $handler->display->display_options['fields']['status_human_readable']['hide_empty'] = 0;
-  $handler->display->display_options['fields']['status_human_readable']['empty_zero'] = 0;
-  $handler->display->display_options['fields']['status_human_readable']['hide_alter_empty'] = 1;
   /* Field: Payment: Currency code */
   $handler->display->display_options['fields']['currency_code']['id'] = 'currency_code';
   $handler->display->display_options['fields']['currency_code']['table'] = 'payment';
@@ -274,28 +252,6 @@ function payment_view_payments() {
   $handler->display->display_options['fields']['updated']['empty_zero'] = 0;
   $handler->display->display_options['fields']['updated']['hide_alter_empty'] = 0;
   $handler->display->display_options['fields']['updated']['date_format'] = 'long';
-  /* Field: Payment: Status (human-readable) */
-  $handler->display->display_options['fields']['status_human_readable']['id'] = 'status_human_readable';
-  $handler->display->display_options['fields']['status_human_readable']['table'] = 'payment';
-  $handler->display->display_options['fields']['status_human_readable']['field'] = 'status_human_readable';
-  $handler->display->display_options['fields']['status_human_readable']['label'] = 'Status';
-  $handler->display->display_options['fields']['status_human_readable']['alter']['alter_text'] = 0;
-  $handler->display->display_options['fields']['status_human_readable']['alter']['make_link'] = 0;
-  $handler->display->display_options['fields']['status_human_readable']['alter']['absolute'] = 0;
-  $handler->display->display_options['fields']['status_human_readable']['alter']['external'] = 0;
-  $handler->display->display_options['fields']['status_human_readable']['alter']['replace_spaces'] = 0;
-  $handler->display->display_options['fields']['status_human_readable']['alter']['trim_whitespace'] = 0;
-  $handler->display->display_options['fields']['status_human_readable']['alter']['nl2br'] = 0;
-  $handler->display->display_options['fields']['status_human_readable']['alter']['word_boundary'] = 1;
-  $handler->display->display_options['fields']['status_human_readable']['alter']['ellipsis'] = 1;
-  $handler->display->display_options['fields']['status_human_readable']['alter']['strip_tags'] = 0;
-  $handler->display->display_options['fields']['status_human_readable']['alter']['trim'] = 0;
-  $handler->display->display_options['fields']['status_human_readable']['alter']['html'] = 0;
-  $handler->display->display_options['fields']['status_human_readable']['element_label_colon'] = 1;
-  $handler->display->display_options['fields']['status_human_readable']['element_default_classes'] = 1;
-  $handler->display->display_options['fields']['status_human_readable']['hide_empty'] = 0;
-  $handler->display->display_options['fields']['status_human_readable']['empty_zero'] = 0;
-  $handler->display->display_options['fields']['status_human_readable']['hide_alter_empty'] = 1;
   /* Field: Payment: Currency code */
   $handler->display->display_options['fields']['currency_code']['id'] = 'currency_code';
   $handler->display->display_options['fields']['currency_code']['table'] = 'payment';
@@ -418,28 +374,6 @@ function payment_view_payments() {
   $handler->display->display_options['fields']['updated']['empty_zero'] = 0;
   $handler->display->display_options['fields']['updated']['hide_alter_empty'] = 0;
   $handler->display->display_options['fields']['updated']['date_format'] = 'long';
-  /* Field: Payment: Status (human-readable) */
-  $handler->display->display_options['fields']['status_human_readable']['id'] = 'status_human_readable';
-  $handler->display->display_options['fields']['status_human_readable']['table'] = 'payment';
-  $handler->display->display_options['fields']['status_human_readable']['field'] = 'status_human_readable';
-  $handler->display->display_options['fields']['status_human_readable']['label'] = 'Status';
-  $handler->display->display_options['fields']['status_human_readable']['alter']['alter_text'] = 0;
-  $handler->display->display_options['fields']['status_human_readable']['alter']['make_link'] = 0;
-  $handler->display->display_options['fields']['status_human_readable']['alter']['absolute'] = 0;
-  $handler->display->display_options['fields']['status_human_readable']['alter']['external'] = 0;
-  $handler->display->display_options['fields']['status_human_readable']['alter']['replace_spaces'] = 0;
-  $handler->display->display_options['fields']['status_human_readable']['alter']['trim_whitespace'] = 0;
-  $handler->display->display_options['fields']['status_human_readable']['alter']['nl2br'] = 0;
-  $handler->display->display_options['fields']['status_human_readable']['alter']['word_boundary'] = 1;
-  $handler->display->display_options['fields']['status_human_readable']['alter']['ellipsis'] = 1;
-  $handler->display->display_options['fields']['status_human_readable']['alter']['strip_tags'] = 0;
-  $handler->display->display_options['fields']['status_human_readable']['alter']['trim'] = 0;
-  $handler->display->display_options['fields']['status_human_readable']['alter']['html'] = 0;
-  $handler->display->display_options['fields']['status_human_readable']['element_label_colon'] = 1;
-  $handler->display->display_options['fields']['status_human_readable']['element_default_classes'] = 1;
-  $handler->display->display_options['fields']['status_human_readable']['hide_empty'] = 0;
-  $handler->display->display_options['fields']['status_human_readable']['empty_zero'] = 0;
-  $handler->display->display_options['fields']['status_human_readable']['hide_alter_empty'] = 1;
   /* Field: Payment: Currency code */
   $handler->display->display_options['fields']['currency_code']['id'] = 'currency_code';
   $handler->display->display_options['fields']['currency_code']['table'] = 'payment';
@@ -548,6 +482,31 @@ function payment_view_payments() {
   $handler->display->display_options['menu']['title'] = 'Payments';
   $handler->display->display_options['menu']['weight'] = '0';
   $handler->display->display_options['menu']['name'] = 'user-menu';
+  $translatables['payments'] = array(
+    t('Master'),
+    t('Payments'),
+    t('more'),
+    t('Apply'),
+    t('Reset'),
+    t('Sort by'),
+    t('Asc'),
+    t('Desc'),
+    t('Items per page'),
+    t('- All -'),
+    t('Offset'),
+    t('There are no payments yet.'),
+    t('Payment method'),
+    t('Last updated'),
+    t('Amount'),
+    t('[currency_code] [amount]'),
+    t('.'),
+    t(','),
+    t('Title (generic)'),
+    t('Operations'),
+    t('Administration page'),
+    t('User\'s own payments'),
+    t('All'),
+  );
 
   return $view;
 }

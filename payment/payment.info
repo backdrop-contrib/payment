@@ -7,5 +7,5 @@ files[] = payment.classes.inc
 files[] = views/PaymentViewsHandlerFieldPaymentMethodControllerTitle.inc
 files[] = views/PaymentViewsHandlerFieldPaymentMethodControllerDescription.inc
 files[] = views/PaymentViewsHandlerFieldPaymentMethodOperations.inc
-files[] = views/PaymentViewsHandlerFieldPaymentStatus.inc
+files[] = views/PaymentViewsHandlerFieldPaymentStatusTitle.inc
 files[] = views/PaymentViewsHandlerFieldPaymentOperations.inc

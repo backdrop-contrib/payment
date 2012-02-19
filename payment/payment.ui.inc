@@ -193,14 +193,14 @@ function payment_form_global_configuration(array $form, array &$form_state) {
  */
 function payment_page_status() {
   $parents = $children = array();
-  $statuses_info = payment_statuses_info();
-  uasort($statuses_info, 'payment_status_sort_title');
-  foreach ($statuses_info as $status_info) {
-    foreach ($status_info->parents as $parent) {
-      $children[$parent][] = $status_info->status;
+  $statuses = payment_statuses_info();
+  uasort($statuses, 'paymentui_payment_status_sort_title');
+  foreach ($statuses as $status) {
+    foreach ($status->parents as $parent_code) {
+      $children[$parent_code][] = $status->code;
     }
-    if (!$status_info->parents) {
-      $parents[] = $status_info->status;
+    if (!$status->parents) {
+      $parents[] = $status->code;
     }
   }
   $rows = array();
@@ -240,8 +240,8 @@ function _payment_page_status_rows(array $statuses, array $children, array &$row
 }
 
 /**
- * Implements uasort() callback to sort PaymentStatusInfo objects by title.
+ * Implements uasort() callback to sort PaymentStatus objects by title.
  */
-function payment_status_sort_title(PaymentStatusInfo $status_info_a, PaymentStatusInfo $status_info_b) {
-  return strcmp($status_info_a->title, $status_info_b->title);
+function payment_payment_status_sort_title(PaymentStatus $status_a, PaymentStatus $status_b) {
+  return strcmp($status_a->title, $status_b->title);
 }

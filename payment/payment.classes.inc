@@ -106,13 +106,13 @@ class Payment extends PaymentCommon {
   public $pid = 0;
 
   /**
-   * The current status. Do not set directly.
+   * The status log. Contains PaymentStatusItem objects ordered by datetime.
    *
    * @see Payment::setStatus()
    *
-   * @var string
+   * @var array
    */
-  public $status = PAYMENT_STATUS_NEW;
+  protected $statuses = array();
 
   /**
    * The UID of the user this payment belongs to.
@@ -129,13 +129,6 @@ class Payment extends PaymentCommon {
   public $updated = 0;
 
   /**
-   * The internal revision ID of this payment.
-   *
-   * @var integer
-   */
-  public $vid = 0;
-
-  /**
    * Constructor.
    *
    * @param $properties array
@@ -147,13 +140,19 @@ class Payment extends PaymentCommon {
   function __construct(array $properties = array()) {
     global $user;
 
+    parent::__construct($properties);
+
     if (!$this->uid) {
       $this->uid = $user->uid;
     }
     if (!$this->created) {
       $this->created = time();
     }
-    parent::__construct($properties);
+    if (!$this->statuses) {
+      // We purposefully avoid Payment::setStatus(), because this is the
+      // payment's first status.
+      $this->statuses[] = new PaymentStatusItem(PAYMENT_STATUS_NEW);
+    }
   }
 
   /**
@@ -169,11 +168,11 @@ class Payment extends PaymentCommon {
     }
     // Execute the payment.
     if ($this->method && $this->method->controller->validate($this)) {
-      $this->setStatus(PAYMENT_STATUS_PENDING);
+      $this->setStatus(new PaymentStatusItem(PAYMENT_STATUS_PENDING));
       $this->method->controller->execute($this);
     }
     else {
-      $this->setStatus(PAYMENT_STATUS_FAILED);
+      $this->setStatus(new PaymentStatusItem(PAYMENT_STATUS_FAILED));
     }
     // This is only called if the payment execution didn't redirect the user
     // offsite. Otherwise it's the payment method return page's responsibility.
@@ -193,31 +192,67 @@ class Payment extends PaymentCommon {
   /**
    * Set the payment status.
    *
-   * @param $status
+   * @param $status_item PaymentStatusItem
    *
    * @return NULL
    */
-  function setStatus($status) {
+  function setStatus(PaymentStatusItem $status_item) {
     // A fail-safe to ensure hook implementations are only called if the status
     // has really changed.
-    if ($this->status == $status) {
+    if ($this->getStatus()->code == $status_item->code) {
       return;
     }
 
-    $old_status = $this->status;
-    $this->status = $status;
+    $previous_status_item = $this->getStatus();
+    $status_item->pid = $this->pid;
+    $this->statuses[] = $status_item;
     foreach (module_implements('payment_status_change') as $module_name) {
-      call_user_func($module_name . '_payment_status_change', $this, $old_status);
-      // If a hook invocation has changed the status, a new loop with
+      call_user_func($module_name . '_payment_status_change', $this, $previous_status_item);
+      // If a hook invocation has added another log item, a new loop with
       // invocations has already been executed and we don't need to continue
       // with this one.
-      if ($this->status != $status) {
+      if ($this->getStatus()->code != $status_item->code) {
         return;
       }
     }
     if (module_exists('rules')) {
-      rules_invoke_event('payment_status_change', $this, $old_status);
+      rules_invoke_event('payment_status_change', $this, $previous_status_item);
     }
+  }
+
+  /**
+   * Set this payment's statuses. hook_payment_status_change() and the
+   * corresponding Rules event are NOT fired. This is an internal workaround
+   * for PaymentEntityController::attachLoad().
+   *
+   * @see Payment::setStatus()
+   *
+   * @param $status_items array
+   *
+   * @return NULL
+   */
+  function _setStatuses(array $status_items) {
+    if ($status_items) {
+      $this->statuses = $status_items;
+    }
+  }
+
+  /**
+   * Get the current payment status.
+   *
+   * @return PaymentStatusItem
+   */
+  function getStatus() {
+    return end($this->statuses);
+  }
+
+  /**
+   * Get all this payment's statuses.
+   *
+   * @var array
+   */
+  function getStatuses() {
+    return $this->statuses;
   }
 }
 
@@ -236,12 +271,10 @@ class PaymentEntityController extends EntityAPIController {
       // store/return all variables as strings.
       $payment->amount = (float) $payment->amount;
       $payment->created = (int) $payment->created;
-      $payment->created_revision = (int) $payment->created_revision;
       $payment->expired = (int) $payment->expired;
       $payment->pid = (int) $payment->pid;
       $payment->uid = (int) $payment->uid;
       $payment->updated = (int) $payment->updated;
-      $payment->vid = (int) $payment->vid;
     }
 
     return $entities;
@@ -250,12 +283,35 @@ class PaymentEntityController extends EntityAPIController {
   /**
    * Implements EntityAPIController::attachLoad().
    */
-  function attachLoad(&$queries_entities, $revision_id = FALSE) {
-    foreach ($queries_entities as $entity) {
-      $entity->method = entity_load_single('payment_method', $entity->pmid);
-      unset($entity->pmid);
+  function attachLoad(&$queried_entities, $revision_id = FALSE) {
+    // Load the payments's payment methods.
+    $pmids = array();
+    foreach ($queried_entities as $payment) {
+      $pmids[] = $payment->pmid;
     }
-    parent::attachLoad($queries_entities, $revision_id);
+    $methods = entity_load('payment_method', $pmids);
+
+    // Load the payments's status logs.
+    $pids = array_keys($queried_entities);
+    $result = db_select('payment_status_item')
+      ->fields('payment_status_item')
+      ->condition('pid', $pids)
+      ->orderBy('created')
+      ->execute();
+    $status_items = array();
+    while ($data = $result->fetchObject()) {
+      $status_item = new PaymentStatusItem($data->code, $data->created, $data->pid, $data->psiid);
+      $status_items[$status_item->pid][] = $status_item;
+    }
+
+    // Add all data to the payments.
+    foreach ($queried_entities as $payment) {
+      $payment->_setStatuses($status_items[$payment->pid]);
+      $payment->method = $methods[$payment->pmid];
+      unset($payment->pmid);
+    }
+
+    parent::attachLoad($queried_entities, $revision_id);
   }
 
   /**
@@ -263,22 +319,21 @@ class PaymentEntityController extends EntityAPIController {
    */
   function save($entity, DatabaseTransaction $transaction = NULL) {
     $payment = $entity;
+
     // Save the payment.
     $payment->updated = time();
     $payment->pmid = $payment->method->pmid;
     $return = parent::save($payment, $transaction);
     unset($payment->pmid);
-    // Insert a new revision.
-    $payment->created_revision = time();
-    $payment->vid = 0;
-    drupal_write_record('payment_revision', $payment);
-    // Update the payment with the new revision information.
-    db_update('payment')
-      ->fields(array(
-        'vid' => $payment->vid,
-      ))
-      ->condition('pid', $payment->pid)
-      ->execute();
+
+    // Save the payment's status items.
+    foreach ($payment->getStatuses() as $status_item) {
+      // Statuses cannot be edited, so only save the ones without a PSIID set.
+      if (!$status_item->psiid) {
+        $status_item->pid = $payment->pid;
+        drupal_write_record('payment_status_item', $status_item);
+      }
+    }
 
     return $return;
   }
@@ -291,11 +346,11 @@ class PaymentEntityController extends EntityAPIController {
     foreach ($build['payment'] as &$payment_build) {
       $payment = $payment_build['#entity'];
 
-      $status_info = payment_status_info($payment->status);
+      $status = payment_status_info($payment->getStatus()->code, TRUE);
       $payment_build['status'] = array(
         '#type' => 'item',
         '#title' => t('Status'),
-        '#markup' => $status_info->title,
+        '#markup' => $status->title,
       );
       $payment_build['amount'] = array(
         '#type' => 'item',
@@ -313,12 +368,9 @@ class PaymentEntityController extends EntityAPIController {
         '#markup' => format_date($payment->updated),
       );
       $rows = array();
-      $result = db_query("SELECT created_revision, status FROM {payment_revision} WHERE pid = :pid ORDER BY vid DESC", array(
-        ':pid' => $payment->pid,
-      ));
-      foreach ($result as $revision_data) {
-        $status_info = payment_status_info($revision_data->status);
-        $rows[] = array($status_info->title, format_date($revision_data->created_revision));
+      foreach (array_reverse($payment->getStatuses()) as $status_item) {
+        $status = payment_status_info($status_item->code);
+        $rows[] = array($status->title, format_date($status_item->created));
       }
       $header = array(t('Status'), t('Date'));
       $payment_build['history'] = array(
@@ -548,7 +600,7 @@ class PaymentMethodControllerUnavailable extends PaymentMethodController {
    * Implements PaymentMethodController::execute().
    */
   function execute(Payment $payment) {
-    $payment->setStatus(PAYMENT_STATUS_UNKNOWN);
+    $payment->setStatus(new PaymentStatusItem(PAYMENT_STATUS_UNKNOWN));
   }
 
   /**
@@ -572,7 +624,7 @@ function payment_form_payment_method_controller(array $form, array &$form_state)
 /**
  * A payment status.
  */
-class PaymentStatusInfo extends PaymentCommon{
+class PaymentStatus extends PaymentCommon {
 
   /**
    * A US English human-readable description.
@@ -589,11 +641,11 @@ class PaymentStatusInfo extends PaymentCommon{
   public $parents = array();
 
   /**
-   * The status's machine name.
+   * The status code (machine name).
    *
    * @var string
    */
-  public $status = '';
+  public $code = '';
 
   /**
    * A US English human-readable title.
@@ -610,11 +662,52 @@ class PaymentStatusInfo extends PaymentCommon{
    */
   function ancestors() {
     $ancestors = $this->parents;
-    foreach ($this->parents as $parent) {
-      $parent_info = payment_status_info($parent);
-      $ancestors += $parent_info->ancestors();
+    foreach ($this->parents as $code) {
+      $parent = payment_status_info($code);
+      $ancestors += $parent->ancestors();
     }
 
     return array_unique($ancestors);
+  }
+}
+
+/**
+ * A payment status log item.
+ */
+class PaymentStatusItem {
+
+  /**
+   * The status's machine name.
+   *
+   * @var string
+   */
+  public $code = '';
+
+  /**
+   * The Unix datetime this status was set.
+   *
+   * @var integer
+   */
+  public $created = 0;
+
+  /**
+   * The PID of the payment this status item belongs to.
+   *
+   * @var integer
+   */
+  public $pid = 0;
+
+  /**
+   * The unique internal ID of this payment status item.
+   *
+   * @var integer
+   */
+  public $psiid = 0;
+
+  function __construct($code, $created = 0, $pid = 0, $psiid = 0) {
+    $this->code = $code;
+    $this->created = $created ? $created : time();
+    $this->pid = $pid;
+    $this->psiid = $psiid;
   }
 }
