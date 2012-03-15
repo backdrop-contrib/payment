@@ -1,0 +1,38 @@
+<?php
+
+/**
+ * @file
+ * Tests for payment.module.
+ */
+
+/**
+ * Tests action hook invocations.
+ */
+class PaymentActionHookTest extends DrupalWebTestCase {
+
+  static function getInfo() {
+    return array(
+      'name' => 'Action hook invocations',
+      'group' => 'Payment',
+    );
+  }
+
+  function setUp() {
+    parent::setUp('payment_test', 'paymentmethodbasic');
+  }
+
+  /**
+   * Test whether hook_payment_validate() is invoked.
+   */
+  function testHookPaymentValidate() {
+    $payment_method = new PaymentMethod(array(
+      'controller' => payment_method_controller_load('PaymentMethodBasicController'),
+    ));
+    $payment = new Payment(array(
+      'method' => $payment_method,
+      'amount' => 1,
+    ));
+    $payment_method->validate($payment);
+    $this->assertTrue(isset($payment->payment_test_payment_validate), t('hook_payment_validate() is invoked when validating a payment.'));
+  }
+}

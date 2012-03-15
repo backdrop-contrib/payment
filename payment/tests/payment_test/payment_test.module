@@ -1,0 +1,15 @@
+<?php
+
+/**
+ * @file
+ * Hook implementations and shared functions.
+ */
+
+/**
+ * Implements hook_payment_validate().
+ */
+function payment_test_payment_validate(Payment $payment, PaymentMethod $payment_method) {
+  $payment->payment_test_payment_validate = TRUE;
+
+  return TRUE;
+}

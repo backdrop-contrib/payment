@@ -96,3 +96,18 @@ function hook_payment_pre_execute(Payment $payment) {
   // Add a payment method processing fee.
   $payment->amount += 5.50;
 }
+
+/**
+ * Validate a payment against a payment method.
+ *
+ * This hook may be called multiple times for the exact same payment, but for
+ * different payment methods, for example when looking for payment methods that
+ * are capable of processing a payment.
+ *
+ * @param $payment Payment
+ * @param $payment_method PaymentMethod
+ *
+ * @return boolean
+ *   Whether the payment and/or the payment method are valid.
+ */
+function hook_payment_validate(Payment $payment, PaymentMethod $payment_method) {}

@@ -167,7 +167,7 @@ class Payment extends PaymentCommon {
       rules_invoke_event('payment_pre_execute', $this);
     }
     // Execute the payment.
-    if ($this->method && $this->method->controller->validate($this)) {
+    if ($this->method && $this->method->validate($this)) {
       $this->setStatus(new PaymentStatusItem(PAYMENT_STATUS_PENDING));
       $this->method->controller->execute($this);
     }
@@ -253,6 +253,31 @@ class Payment extends PaymentCommon {
    */
   function getStatuses() {
     return $this->statuses;
+  }
+
+  /**
+   * Get available/valid payment methods for this payment.
+   *
+   * @param $payment_methods array
+   *   An array with the PaymentMethod objects to check for. Use an empty
+   *   array to check the availability of all payment methods.
+   *
+   * @param array
+   *   An array with PaymentMethod objects usable for Payment in its current
+   *   state, keyed by PMID.
+   */
+  function availablePaymentMethods(array $payment_methods = array()) {
+    if (!$payment_methods) {
+      $payment_methods = entity_load('payment_method', FALSE);
+    }
+    $available = array();
+    foreach ($payment_methods as $payment_method) {
+      if ($payment_method->validate($this)) {
+        $available[$payment_method->pmid] = $payment_method;
+      }
+    }
+
+    return $available;
   }
 }
 
@@ -429,6 +454,27 @@ class PaymentMethod extends PaymentCommon {
    * @var string
    */
   public $title_generic = NULL;
+
+  /**
+   * Validate a payment against this payment method.
+   *
+   * @param $payment Payment
+   *
+   * @return boolean
+   *   Whether the payment can work with the this payment method.
+   */
+  function validate(Payment $payment) {
+    if ($this->controller->validate($payment, $this) !== TRUE) {
+      return FALSE;
+    }
+    foreach(module_implements('payment_validate') as $module) {
+      if (module_invoke($module, 'payment_validate', $payment, $this) !== TRUE) {
+        return FALSE;
+      }
+    }
+    // No validator returned FALSE, so the payment is valid.
+    return TRUE;
+  }
 }
 
 /**
@@ -556,17 +602,19 @@ class PaymentMethodController {
   function execute(Payment $payment) {}
 
   /**
-   * Validate a payment's data.
+   * Validate a payment against a payment method and this controller. Don't
+   * call directly. Use PaymentMethod::validate() instead.
    *
-   * Because we're dealing with real money, this is a 'last defense' in case
-   * payment data is missing or incorrect.
+   * @see PaymentMethod::validate()
    *
    * @param $payment Payment
+   * @param $payment_method PaymentMethod
    *
    * @return boolean
-   *  Whether the payment contains all necessary data for execution.
+   *   Whether the payment, the provided payment method and its controller can
+   *   work together.
    */
-  function validate(Payment $payment) {
+  function validate(Payment $payment, PaymentMethod $payment_method) {
     $valid = TRUE;
 
     // Confirm the payment amount is higher than 0.
@@ -606,7 +654,7 @@ class PaymentMethodControllerUnavailable extends PaymentMethodController {
   /**
    * Implements PaymentMethodController::validate().
    */
-  function validate(Payment $payment) {
+  function validate(Payment $payment, PaymentMethod $payment_method) {
     return FALSE;
   }
 }
