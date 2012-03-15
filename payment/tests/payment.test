@@ -31,8 +31,11 @@ class PaymentActionHookTest extends DrupalWebTestCase {
     $payment = new Payment(array(
       'method' => $payment_method,
       'amount' => 1,
+      'finish_callback' => 'payment_test_finish_callback',
     ));
-    $payment_method->validate($payment);
-    $this->assertTrue(isset($payment->payment_test_payment_validate), t('hook_payment_validate() is invoked when validating a payment.'));
+    $payment->execute();
+    $this->assertTrue(isset($payment->payment_test_payment_validate), t('hook_payment_validate() is invoked when validating a payment before execution.'));
+    $this->assertTrue(isset($payment->payment_test_payment_pre_execute), t('hook_payment_pre_execute() is invoked before executing a payment.'));
+    $this->assertTrue(isset($payment->payment_test_payment_status_change), t('hook_payment_status_change() is invoked before executing a payment.'));
   }
 }

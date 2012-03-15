@@ -13,3 +13,22 @@ function payment_test_payment_validate(Payment $payment, PaymentMethod $payment_
 
   return TRUE;
 }
+
+/**
+ * Implements hook_payment_status_change().
+ */
+function payment_test_payment_status_change(Payment $payment, $old_status) {
+  $payment->payment_test_payment_status_change = TRUE;
+}
+
+/**
+ * Implements hook_payment_pre_execute().
+ */
+function payment_test_payment_pre_execute(Payment $payment) {
+  $payment->payment_test_payment_pre_execute = TRUE;
+}
+
+/**
+ * Implements Payment finish callback.
+ */
+function payment_test_finish_callback() {}
