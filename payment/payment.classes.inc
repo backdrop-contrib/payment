@@ -321,7 +321,7 @@ class PaymentEntityController extends EntityAPIController {
     $result = db_select('payment_status_item')
       ->fields('payment_status_item')
       ->condition('pid', $pids)
-      ->orderBy('created')
+      ->orderBy('psiid')
       ->execute();
     $status_items = array();
     while ($data = $result->fetchObject()) {
