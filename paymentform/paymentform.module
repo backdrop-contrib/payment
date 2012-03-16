@@ -89,6 +89,7 @@ function paymentform_block_view($delta = '') {
  *  The form build array.
  */
 function paymentform_form(array $form, array &$form_state, Payment $payment = NULL) {
+  // Conditions that need to be met in order to show the form.
   if (!entity_load('payment_method')) {
     $form['#access'] = FALSE;
     drupal_set_message(t('There are no payment methods.'), 'warning');
@@ -98,46 +99,87 @@ function paymentform_form(array $form, array &$form_state, Payment $payment = NU
     drupal_set_message(t('Payment Form has not been configured.') . ' ' . l(t('Configure Payment Form'), 'admin/config/services/paymentform') . '.', 'warning');
   }
 
-  $form['#contextual_links']['paymentform'] = array('admin/config/services/paymentform', array());
+  // Multistep information.
+  $form_state += array(
+    'payment_step' => 0,
+  );
+
   $description = paymentform_description();
   $description = check_markup($description['value'], $description['format']);
-  if (!$payment) {
-    $payment = new Payment(array(
-      'amount' => variable_get('paymentform_amount', 0),
-      'currency_code' => variable_get('paymentform_currency_code', 'XXX'),
-      'description' => strip_tags($description),
-      'finish_callback' => 'paymentform_payment_finish',
-      'caller_data' => array(
-        'location' => $_GET['q'],
-      ),
-    ));
+
+  // Create/set the payment.
+  if (!isset($form_state['payment'])) {
+    if (!$payment) {
+      $payment = new Payment(array(
+        'amount' => variable_get('paymentform_amount', 0),
+        'currency_code' => variable_get('paymentform_currency_code', 'XXX'),
+        'description' => strip_tags($description),
+        'finish_callback' => 'paymentform_payment_finish',
+        'caller_data' => array(
+          'location' => $_GET['q'],
+        ),
+      ));
+    }
+    $form_state['payment'] = $payment;
+  }
+  else {
+    $payment = $form_state['payment'];
   }
 
+  // Build the form.
+  $form['#contextual_links']['paymentform'] = array('admin/config/services/paymentform', array());
+  $form['actions'] = array(
+    '#type' => 'actions',
+    '#weight' => 1,
+  );
+  $form['actions']['submit'] = array(
+    '#type' => 'submit',
+  );
   $form['description'] = array(
     '#markup' => $description,
   );
-  $form['amount'] = array(
-    '#type' => 'paymentform_amount',
-    '#title' => t('Amount'),
-    '#amount' => $payment->amount,
-    '#minimum_amount' => $payment->amount,
-    '#currency_code' => $payment->currency_code,
-  );
-  $form['payment_method'] = array(
-    '#type' => 'payment_method',
-    '#title' => t('Payment method'),
-    '#payment' => $payment,
-    '#required' => TRUE,
-  );
-  $form['actions'] = array(
-    '#type' => 'actions',
-  );
-  $form['actions']['pay'] = array(
-    '#type' => 'submit',
-    '#value' => t('Pay'),
-  );
+  if ($form_state['payment_step'] == 0) {
+    $form['actions']['submit']['#value'] = t('Select payment method');
+    $form['amount'] = array(
+      '#type' => 'paymentform_amount',
+      '#title' => t('Amount'),
+      '#amount' => $payment->amount,
+      '#minimum_amount' => variable_get('paymentform_amount', 0),
+      '#currency_code' => $payment->currency_code,
+    );
+  }
+  else {
+    $form['actions']['submit']['#value'] = t('Pay');
+    $form['amount_human_readable'] = array(
+      '#type' => 'item',
+      '#title' => t('Amount'),
+      '#markup' => payment_amount_human_readable($payment->amount),
+    );
+    $form['payment_method'] = array(
+      '#type' => 'payment_method',
+      '#title' => t('Payment method'),
+      '#payment' => $payment,
+      '#required' => TRUE,
+    );
+  }
 
   return $form;
+}
+
+/**
+ * Implements form validate callback for paymentform_form().
+ */
+function paymentform_form_validate(array $form, array &$form_state) {
+  $payment = $form_state['payment'];
+
+  if ($form_state['payment_step'] == 0) {
+    $payment->amount = $form_state['values']['amount'];
+    $form_state['payment_step']++;
+    $form_state['rebuild'] = TRUE;
+  }
+  else {
+    $payment->method = entity_load_single('payment_method', $form_state['values']['payment_method']['pmid']);
+  }
 }
 
 /**
@@ -145,10 +187,12 @@ function paymentform_form(array $form, array &$form_state, Payment $payment = NU
  */
 function paymentform_form_submit(array $form, array &$form_state) {
   $payment = $form_state['payment'];
-  $payment->amount = $form_state['values']['amount'];
-  $payment->execute();
-  if (payment_status_has_ancestor($payment->getStatus()->code, PAYMENT_STATUS_FAILED)) {
-    $form_state['rebuild'] = TRUE;
+
+  if ($form_state['payment_step'] == 1) {
+    $payment->execute();
+    if (payment_status_has_ancestor($payment->getStatus()->code, PAYMENT_STATUS_FAILED)) {
+      $form_state['rebuild'] = TRUE;
+    }
   }
 }
 
@@ -224,7 +268,7 @@ function paymentform_form_process_amount(array $element) {
   $element['#type'] = 'textfield';
   $element['#required'] = TRUE;
   if ($element['#amount']) {
-    $element['#default_value'] = payment_amount_human_readable($element['#amount']);
+    // $element['#default_value'] = payment_amount_human_readable($element['#amount']);
   }
   $description = NULL;
   if ($element['#minimum_amount'] > 0) {

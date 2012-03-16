@@ -372,13 +372,12 @@ function payment_entity_property_info() {
  * Implements hook_element_info().
  */
 function payment_element_info() {
+  // A payment method selection and configuration element. Every form this
+  // element is used in should have a Payment object in $form_state['payment'].
   $elements['payment_method'] = array(
     '#input' => TRUE,
     '#process' => array('payment_form_method_process'),
     '#element_validate' => array('payment_form_method_validate'),
-    // The Payment object to get a method for. It will end up in
-    // $form_state['payment'].
-    '#payment' => NULL,
     // An array with IDs of the allowed payment methods. Leave empty to allow all.
     '#pmids' => array(),
   );
@@ -563,21 +562,14 @@ function payment_amount_human_readable($amount, $currency_code = NULL) {
  */
 function payment_form_method_process(array $element, array &$form_state, array &$form) {
   $form_state['payment_parents'] = $element['#parents'];
-  if (empty($form_state['payment'])) {
-    $form_state['payment'] = $element['#payment'];
-  }
   $payment = $form_state['payment'];
 
   $element['#tree'] = TRUE;
   $pmid_options = array();
   $pmids = empty($element['#pmids']) ? FALSE : $element['#pmids'];
-  foreach (entity_load('payment_method', $pmids) as $payment_method) {
-    // @todo Do basic validation, e.g. for supported currencies.
-    // Don't show unavailable payment methods.
-    if ($payment_method->controller->name != 'PaymentMethodControllerUnavailable') {
-      // Cast the PMID to a string or the AJAX callback won't work.
-      $pmid_options[(string) $payment_method->pmid] = $payment_method->title_generic;
-    }
+  foreach ($payment->availablePaymentMethods(entity_load('payment_method', $pmids)) as $payment_method) {
+    // Cast the PMID to a string or the AJAX callback won't work.
+    $pmid_options[(string) $payment_method->pmid] = $payment_method->title_generic;
   }
   $element['pmid'] = array(
     '#type' => 'select',
@@ -603,6 +595,10 @@ function payment_form_method_process(array $element, array &$form_state, array &
   );
   $element += payment_form_method_controller_settings($payment->method);
 
+  // The element itself has no input, only its children, so mark it not
+  // required to prevent validation errors.
+  $element['#required'] = FALSE;
+
   return $element;
 }
 
@@ -612,7 +608,6 @@ function payment_form_method_validate(array $element, array &$form_state) {
     $payment = $form_state['payment'];
     if (!$payment->method || $payment->method->pmid != $pmid) {
       $form_state['rebuild'] = TRUE;
-      $payment->method = entity_load_single('payment_method', $pmid);
     }
   }
 }
