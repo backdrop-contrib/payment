@@ -381,25 +381,10 @@ class PaymentEntityController extends EntityAPIController {
       $payment = $payment_build['#entity'];
 
       $status = payment_status_info($payment->getStatus()->code, TRUE);
-      $payment_build['status'] = array(
-        '#type' => 'item',
-        '#title' => t('Status'),
-        '#markup' => $status->title,
-      );
       $payment_build['amount'] = array(
         '#type' => 'item',
         '#title' => t('Amount'),
-        '#markup' => payment_amount_human_readable($payment->amount),
-      );
-      $payment_build['created'] = array(
-        '#type' => 'item',
-        '#title' => t('Created'),
-        '#markup' => format_date($payment->created),
-      );
-      $payment_build['updated'] = array(
-        '#type' => 'item',
-        '#title' => t('Last updated'),
-        '#markup' => format_date($payment->updated),
+        '#markup' => payment_amount_human_readable($payment->amount, $payment->currency_code),
       );
       $rows = array();
       foreach (array_reverse($payment->getStatuses()) as $status_item) {
