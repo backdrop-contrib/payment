@@ -329,7 +329,7 @@ function payment_rules_options_list_payment_uses_payment_method() {
  * @return boolean
  */
 function payment_rules_condition_payment_uses_payment_method(Payment $payment, array $pmids) {
-  return in_array($payment->method->pmid, $pmids);
+  return in_array($payment->method()->pmid, $pmids);
 }
 
 /**
@@ -357,7 +357,7 @@ function payment_rules_options_list_payment_uses_payment_method_type() {
  * @return boolean
  */
 function payment_rules_condition_payment_uses_payment_method_type(Payment $payment, array $payment_method_controller_class_names) {
-  return in_array($payment->method->controller->name, $payment_method_controller_class_names);
+  return in_array($payment->method()->controller->name, $payment_method_controller_class_names);
 }
 
 /**
@@ -372,5 +372,5 @@ function payment_rules_condition_payment_uses_payment_method_type(Payment $payme
  * @return boolean
  */
 function payment_rules_condition_payment_method_controller_supports_currency(Payment $payment, $currency) {
-  return empty($payment->method->controller->currencies) ? TRUE : in_array($currency, $payment->method->controller->currencies);
+  return empty($payment->method()->controller->currencies) ? TRUE : in_array($currency, $payment->method()->controller->currencies);
 }

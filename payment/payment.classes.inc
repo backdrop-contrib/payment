@@ -85,13 +85,6 @@ class Payment extends PaymentCommon {
   public $caller_data = array();
 
   /**
-   * The payment method used for this payment.
-   *
-   * @var PaymentMethod
-   */
-  public $method = NULL;
-
-  /**
    * Information about this payment that is specific to its payment method.
    *
    * @var array
@@ -104,6 +97,13 @@ class Payment extends PaymentCommon {
    * @var integer
    */
   public $pid = 0;
+
+  /**
+   * The internal ID of this payment's payment method.
+   *
+   * @var integer
+   */
+  public $pmid = 0;
 
   /**
    * The status log. Contains PaymentStatusItem objects ordered by datetime.
@@ -156,6 +156,27 @@ class Payment extends PaymentCommon {
   }
 
   /**
+   * Get this payment's payment method.
+   *
+   * @return mixed
+   *   Either a PaymentMethod object, or FALSE if $this->pmid = 0 or if there
+   *   is no payment method with that PMID.
+   */
+  function method() {
+    static $method = NULL;
+
+    if (is_null($method) || $method->pmid != $this->pmid) {
+      if ($this->pmid) {
+        $method = entity_load_single('payment_method', $this->pmid);
+      }
+      else {
+        return FALSE;
+      }
+    }
+    return $method;
+  }
+
+  /**
    * Execute the actual payment.
    *
    * @return NULL
@@ -167,9 +188,9 @@ class Payment extends PaymentCommon {
       rules_invoke_event('payment_pre_execute', $this);
     }
     // Execute the payment.
-    if ($this->method && $this->method->validate($this)) {
+    if ($this->method() && $this->method()->validate($this)) {
       $this->setStatus(new PaymentStatusItem(PAYMENT_STATUS_PENDING));
-      $this->method->controller->execute($this);
+      $this->method()->controller->execute($this);
     }
     else {
       $this->setStatus(new PaymentStatusItem(PAYMENT_STATUS_FAILED));
@@ -228,6 +249,7 @@ class Payment extends PaymentCommon {
    * @see Payment::setStatus()
    *
    * @param $status_items array
+   *   An array with PaymentStatusItem objects
    *
    * @return NULL
    */
@@ -298,6 +320,7 @@ class PaymentEntityController extends EntityAPIController {
       $payment->created = (int) $payment->created;
       $payment->expired = (int) $payment->expired;
       $payment->pid = (int) $payment->pid;
+      $payment->pmid = (int) $payment->pmid;
       $payment->uid = (int) $payment->uid;
       $payment->updated = (int) $payment->updated;
     }
@@ -309,13 +332,6 @@ class PaymentEntityController extends EntityAPIController {
    * Implements EntityAPIController::attachLoad().
    */
   function attachLoad(&$queried_entities, $revision_id = FALSE) {
-    // Load the payments's payment methods.
-    $pmids = array();
-    foreach ($queried_entities as $payment) {
-      $pmids[] = $payment->pmid;
-    }
-    $methods = entity_load('payment_method', $pmids);
-
     // Load the payments's status logs.
     $pids = array_keys($queried_entities);
     $result = db_select('payment_status_item')
@@ -325,15 +341,10 @@ class PaymentEntityController extends EntityAPIController {
       ->execute();
     $status_items = array();
     while ($data = $result->fetchObject()) {
-      $status_item = new PaymentStatusItem($data->code, $data->created, $data->pid, $data->psiid);
-      $status_items[$status_item->pid][] = $status_item;
+      $status_items[$data->pid][] = new PaymentStatusItem($data->code, $data->created, $data->pid, $data->psiid);
     }
-
-    // Add all data to the payments.
     foreach ($queried_entities as $payment) {
       $payment->_setStatuses($status_items[$payment->pid]);
-      $payment->method = $methods[$payment->pmid];
-      unset($payment->pmid);
     }
 
     parent::attachLoad($queried_entities, $revision_id);
@@ -347,9 +358,7 @@ class PaymentEntityController extends EntityAPIController {
 
     // Save the payment.
     $payment->updated = time();
-    $payment->pmid = $payment->method->pmid;
     $return = parent::save($payment, $transaction);
-    unset($payment->pmid);
 
     // Save the payment's status items.
     foreach ($payment->getStatuses() as $status_item) {

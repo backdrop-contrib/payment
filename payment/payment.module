@@ -575,7 +575,7 @@ function payment_form_method_process(array $element, array &$form_state, array &
     '#type' => 'select',
     '#title' => isset($element['#title']) ? $element['#title'] : NULL,
     '#options' => $pmid_options,
-    '#default_value' => $payment->method ? $payment->method->pmid : NULL,
+    '#default_value' => $payment->method() ? $payment->method()->pmid : NULL,
     '#empty_value' => 'select',
     '#required' => $element['#required'],
     '#ajax' => array(
@@ -587,13 +587,13 @@ function payment_form_method_process(array $element, array &$form_state, array &
     // Disable the selector for non-JS pages. This means that if we're
     // executing an AJAX callback, _triggering_element_name is set and we leave
     // the element enabled.
-    '#disabled' => !empty($payment->method) && !isset($form_state['input']['_triggering_element_name']),
+    '#disabled' => $payment->method() && !isset($form_state['input']['_triggering_element_name']),
     '#attached' => array(
       'js' => array(drupal_get_path('module', 'payment') . '/js/payment.js'),
     ),
     '#id' => 'payment-method-pmid',
   );
-  $element += payment_form_method_controller_settings($payment->method);
+  $element += payment_form_method_controller_settings($payment->method());
 
   // The element itself has no input, only its children, so mark it not
   // required to prevent validation errors.
@@ -606,7 +606,7 @@ function payment_form_method_validate(array $element, array &$form_state) {
   $pmid = drupal_array_get_nested_value($form_state['values'], array_merge($element['#parents'], array('pmid')));
   if ($pmid) {
     $payment = $form_state['payment'];
-    if (!$payment->method || $payment->method->pmid != $pmid) {
+    if (!$payment->method() || $payment->method()->pmid != $pmid) {
       $form_state['rebuild'] = TRUE;
     }
   }
@@ -615,7 +615,7 @@ function payment_form_method_validate(array $element, array &$form_state) {
 function payment_form_method_change_submit(array $form, array &$form_state) {
   $pmid = drupal_array_get_nested_value($form_state['values'], array_merge($form_state['payment_parents'], array('pmid')));
   unset($pmid);
-  $form_state['payment']->method = NULL;
+  $form_state['payment']->pmid = 0;
   $form_state['rebuild'] = TRUE;
 }
 
