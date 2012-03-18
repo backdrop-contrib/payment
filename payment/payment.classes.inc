@@ -496,10 +496,10 @@ class PaymentMethodEntityController extends EntityAPIController {
    */
   function load($ids = array(), $conditions = array()) {
     $entities = parent::load($ids, $conditions);
-    foreach ($entities as $payment) {
+    foreach ($entities as $payment_method) {
       // Cast non-string scalars to their original types, because some backends
       // store/return all variables as strings.
-      $payment->pmid = (int) $payment->pmid;
+      $payment_method->pmid = (int) $payment_method->pmid;
     }
 
     return $entities;
