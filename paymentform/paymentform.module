@@ -104,16 +104,13 @@ function paymentform_form(array $form, array &$form_state, Payment $payment = NU
     'payment_step' => 0,
   );
 
-  $description = paymentform_description();
-  $description = check_markup($description['value'], $description['format']);
-
   // Create/set the payment.
   if (!isset($form_state['payment'])) {
     if (!$payment) {
       $payment = new Payment(array(
         'amount' => variable_get('paymentform_amount', 0),
         'currency_code' => variable_get('paymentform_currency_code', 'XXX'),
-        'description' => strip_tags($description),
+        'description' => paymentform_description(),
         'finish_callback' => 'paymentform_payment_finish',
         'caller_data' => array(
           'location' => $_GET['q'],
@@ -135,8 +132,9 @@ function paymentform_form(array $form, array &$form_state, Payment $payment = NU
   $form['actions']['submit'] = array(
     '#type' => 'submit',
   );
-  $form['description'] = array(
-    '#markup' => $description,
+  $message = paymentform_form_message();
+  $form['message'] = array(
+    '#markup' => check_markup($message['value'], $message['format']),
   );
   if ($form_state['payment_step'] == 0) {
     $form['actions']['submit']['#value'] = t('Select payment method');
@@ -236,15 +234,35 @@ function paymentform_form_configuration(array $form, array &$form_state) {
     '#default_value' => variable_get('paymentform_currency_code', NULL),
     '#required' => TRUE,
   );
-  $description = paymentform_description();
   $form['paymentform_description'] = array(
-    '#type' => 'text_format',
+    '#type' => 'textfield',
     '#title' => t('Description'),
-    '#default_value' => $description['value'],
-    '#format' => $description['format'],
+    '#default_value' => paymentform_description(),
+    '#required' => TRUE,
+  );
+  $message = paymentform_form_message();
+  $form['paymentform_form_message'] = array(
+    '#type' => 'text_format',
+    '#title' => t('Payment form message'),
+    '#default_value' => $message['value'],
+    '#format' => $message['format'],
   );
 
   return system_settings_form($form);
+}
+
+/**
+ * Return the payment form message.
+ *
+ * @return string
+ */
+function paymentform_form_message() {
+  return variable_get('paymentform_form_message', array(
+    'value' => t('Make a payment to @site_name.', array(
+      '@site_name' => variable_get('site_name', NULL),
+    )),
+    'format' => NULL,
+  ));
 }
 
 /**
@@ -253,12 +271,9 @@ function paymentform_form_configuration(array $form, array &$form_state) {
  * @return string
  */
 function paymentform_description() {
-  return variable_get('paymentform_description', array(
-    'value' => t('Make a payment to @site_name.', array(
-      '@site_name' => variable_get('site_name', NULL),
-    )),
-    'format' => NULL,
-  ));
+  return variable_get('paymentform_description', t('Payment to @site_name', array(
+    '@site_name' => variable_get('site_name', NULL),
+  )));
 }
 
 /**
