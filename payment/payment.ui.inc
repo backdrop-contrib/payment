@@ -196,19 +196,6 @@ function payment_form_payment_method_delete_submit(array $form, array &$form_sta
 }
 
 /**
- * Implements form build callback: global configuration form.
- */
-function payment_form_global_configuration(array $form, array &$form_state) {
-  $form['payment_display_log_entries'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Display <em>Payment</em> log entries on screen'),
-    '#default_value' => variable_get('payment_display_log_entries', TRUE),
-  );
-
-  return system_settings_form($form);
-}
-
-/**
  * Display a payment status overview.
  *
  * @return string

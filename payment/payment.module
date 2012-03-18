@@ -125,17 +125,6 @@ function payment_menu() {
     'weight' => 1,
   );
 
-  // General configuration.
-  $items['admin/config/services/payment/global'] = array(
-    'title' => 'Global configuration',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('payment_form_global_configuration'),
-    'access arguments' => array('payment.configuration.administer'),
-    'file' => 'payment.ui.inc',
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 2,
-  );
-
   // Placeholder pages in case certain dependencies have not been met.
   $base = array(
       'page callback' => 'payment_page_required_modules',
@@ -231,18 +220,6 @@ function payment_hook_info() {
   );
 
   return $hooks;
-}
-
-/**
- * Implements hook_watchdog().
- */
-function payment_watchdog(array $log_entry) {
-  // If debugging mode is enabled, display all Payment log entries on the screen.
-  if ($log_entry['type'] == 'Payment' && variable_get('payment_display_log_entries', TRUE)) {
-    $message = t($log_entry['message'], $log_entry['variables'] ? $log_entry['variables'] : array());
-    $help = l(t('Do not display log entries on screen'), 'admin/config/services/payment/global');
-    drupal_set_message($message . ' ' . $help . '.', 'error');
-  }
 }
 
 /**
