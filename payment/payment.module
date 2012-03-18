@@ -165,9 +165,6 @@ function payment_permission() {
     'payment.status.view' => array(
       'title' => t('View payment status overview'),
     ),
-    'payment.configuration.administer' => array(
-      'title' => t('Administer global Payment configuration'),
-    ),
   );
 }
 
