@@ -268,7 +268,7 @@ function paymentform_form_process_amount(array $element) {
   $element['#type'] = 'textfield';
   $element['#required'] = TRUE;
   if ($element['#amount']) {
-    // $element['#default_value'] = payment_amount_human_readable($element['#amount']);
+    $element['#default_value'] = payment_amount_human_readable($element['#amount']);
   }
   $description = NULL;
   if ($element['#minimum_amount'] > 0) {
