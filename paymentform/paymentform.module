@@ -37,8 +37,6 @@ function paymentform_element_info() {
   $elements['paymentform_amount'] = array(
     '#input' => TRUE,
     '#process' => array('paymentform_form_process_amount'),
-    // The payment amount as a float.
-    '#amount' => 0,
     // The minimum payment amount as a float that needs to be entered.
     '#minimum_amount' => 0,
     // The ISO 4217 currency code.
@@ -281,19 +279,12 @@ function paymentform_description() {
  */
 function paymentform_form_process_amount(array $element) {
   $element['#type'] = 'textfield';
-  $element['#required'] = TRUE;
-  if ($element['#amount']) {
-    $element['#default_value'] = payment_amount_human_readable($element['#amount']);
-  }
+  $element['#field_prefix'] = $element['#currency_code'];
   $description = NULL;
   if ($element['#minimum_amount'] > 0) {
-    // @todo Add currency.
     $description = t('The minimum amount is !amount.', array(
-      '!amount' => payment_amount_human_readable($element['#minimum_amount']),
+      '!amount' => payment_amount_human_readable($element['#minimum_amount'], $element['#currency_code']),
     ));
-  }
-  if ($element['#currency_code'] != 'XXX') {
-    $element['#field_prefix'] = $element['#currency_code'];
   }
   $element['#description'] = $description;
   $element['#size'] = 16;
@@ -333,10 +324,14 @@ function paymentform_form_validate_amount(array $element, array &$form_state) {
     $amount = (float) $value;
 
     // Confirm the amount lies within the allowed range.
-    $minimum_amount = max($element['#minimum_amount'], 0);
-    if ($amount < $minimum_amount) {
-      form_set_error('amount', t('The minimum amount is €!amount.', array(
-        '!amount' => payment_amount_human_readable(max($element['#minimum_amount'], 1)),
+    if ($amount <= 0) {
+      form_set_error('amount', t('The amount should be higher than !amount.', array(
+        '!amount' => payment_amount_human_readable(0, $element['#currency_code']),
+      )));
+    }
+    if ($amount < $element['#minimum_amount']) {
+      form_set_error('amount', t('The minimum amount is !amount.', array(
+        '!amount' => payment_amount_human_readable($element['#minimum_amount'], $element['#currency_code']),
       )));
     }
 
