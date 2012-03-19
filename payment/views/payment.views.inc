@@ -17,17 +17,20 @@ function payment_views_data_alter(&$data) {
     ),
   );
   $data['payment']['pid']['relationship'] = array(
+    'title' => t('Status items'),
     'base' => 'payment_status_item',
     'base field' => 'pid',
     'handler' => 'views_handler_relationship',
     'label' => t('Payment status item'),
   );
   $data['payment']['pmid']['relationship'] = array(
+    'title' => t('Payment method'),
     'base' => 'payment_method',
     'handler' => 'views_handler_relationship',
     'label' => t('Payment method'),
   );
   $data['payment']['uid']['relationship'] = array(
+    'title' => t('User'),
     'base' => 'users',
     'handler' => 'views_handler_relationship',
     'label' => t('User'),
@@ -136,6 +139,7 @@ function payment_views_data_alter(&$data) {
         'handler' => 'views_handler_argument_numeric',
       ),
       'relationship' => array(
+        'title' => t('Payment'),
         'base' => 'payment',
         'handler' => 'views_handler_relationship',
         'label' => t('Payment'),
