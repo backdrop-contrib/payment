@@ -153,6 +153,10 @@ function payment_menu() {
  */
 function payment_permission() {
   return array(
+    'payment.rules.administer' => array(
+      'title' => t('Administer rule configurations'),
+      'restrict access' => TRUE,
+    ),
     'payment.view.own' => array(
       'title' => t('View own payments'),
     ),
@@ -685,4 +689,11 @@ function payment_access(Payment $payment) {
  */
 function payment_method_title(PaymentMethod $payment_method) {
   return $payment_method->title_specific;
+}
+
+/**
+ * Implements Rules access callback.
+ */
+function payment_rules_access($type, $name) {
+  return user_access('payment.rules.administer');
 }

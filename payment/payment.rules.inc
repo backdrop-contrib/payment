@@ -12,6 +12,7 @@ function payment_rules_event_info() {
   $event['payment_status_change'] = array(
     'label' => t("After changing a payment's status"),
     'group' => t('Payment'),
+    'access callback' => 'payment_rules_access',
     'variables' => array(
       'payment' => array(
         'type' => 'payment',
@@ -26,6 +27,7 @@ function payment_rules_event_info() {
   $event['payment_pre_execute'] = array(
     'label' => t('Before executing a payment'),
     'group' => t('Payment'),
+    'access callback' => 'payment_rules_access',
     'variables' => array(
       'payment' => array(
         'type' => 'payment',
@@ -43,6 +45,7 @@ function payment_rules_event_info() {
 function payment_rules_action_info() {
   $actions['payment_rules_action_payment_set_status'] = array(
     'label' => t('Set payment status'),
+    'access callback' => 'payment_rules_access',
     'parameter' => array(
       'payment' => array(
         'type' => 'payment',
@@ -65,6 +68,7 @@ function payment_rules_action_info() {
   foreach ($calculations as $name => $label) {
     $actions[$name] = array(
       'label' => $label,
+      'access callback' => 'payment_rules_access',
       'parameter' => array(
         'payment' => array(
           'type' => 'payment',
@@ -88,6 +92,7 @@ function payment_rules_action_info() {
 function payment_rules_condition_info() {
   $conditions['payment_rules_condition_payment_status_is'] = array(
     'label' => t('Payment status is'),
+    'access callback' => 'payment_rules_access',
     'parameter' => array(
       'payment' => array(
         'label' => t('Payment'),
@@ -105,6 +110,7 @@ function payment_rules_condition_info() {
   );
   $conditions['payment_rules_condition_payment_status_has_ancestor'] = array(
     'label' => t('Payment status is derived from'),
+    'access callback' => 'payment_rules_access',
     'parameter' => array(
       'payment' => array(
         'label' => t('Payment'),
@@ -122,6 +128,7 @@ function payment_rules_condition_info() {
   );
   $conditions['payment_rules_condition_payment_uses_payment_method'] = array(
     'label' => t('Payment method is'),
+    'access callback' => 'payment_rules_access',
     'parameter' => array(
       'payment' => array(
         'label' => t('Payment'),
@@ -139,6 +146,7 @@ function payment_rules_condition_info() {
   );
   $conditions['payment_rules_condition_payment_uses_payment_method_type'] = array(
     'label' => t('Payment method type is'),
+    'access callback' => 'payment_rules_access',
     'parameter' => array(
       'payment' => array(
         'label' => t('Payment'),
@@ -156,6 +164,7 @@ function payment_rules_condition_info() {
   );
   $conditions['payment_rules_condition_payment_method_controller_supports_currency'] = array(
     'label' => t('Payment method type supports currency'),
+    'access callback' => 'payment_rules_access',
     'parameter' => array(
       'payment' => array(
         'label' => t('Payment'),
