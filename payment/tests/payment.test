@@ -39,3 +39,72 @@ class PaymentActionHookTest extends DrupalWebTestCase {
     $this->assertTrue(isset($payment->payment_test_payment_status_change), t('hook_payment_status_change() is invoked before executing a payment.'));
   }
 }
+
+/**
+ * Tests info hook return values.
+ */
+class PaymentInfoHookTest extends DrupalWebTestCase {
+
+  static function getInfo() {
+    return array(
+      'name' => 'Info hook data',
+      'group' => 'Payment',
+    );
+  }
+
+  function setUp() {
+    parent::setUp($this->modules());
+  }
+
+  /**
+   * Return modules whose hook implementations should be tested.
+   *
+   * @return array
+   */
+  function modules() {
+    return array('payment', 'paymentmethodbasic');
+  }
+
+  /**
+   * Test hook_payment_method_controller_info().
+   */
+  function testHookPaymentMethodControllerInfo() {
+    $module_info = system_get_info('module');
+    foreach ($this->modules() as $module) {
+      if ($controller_info = module_invoke($module, 'payment_method_controller_info')) {
+        foreach ($controller_info as $controller_name) {
+          $valid = TRUE;
+          if (!is_string($controller_name)) {
+            $valid = FALSE;
+            break;
+          }
+        }
+        $this->assertTrue($valid, t("%module's hook_payment_method_controller_info() implementation returns strings.", array(
+          '%module' => $module_info[$module]['name'],
+        )));
+      }
+    }
+  }
+
+  /**
+   * Test hook_payment_method_controller_info().
+   */
+  function testHookPaymentStatusInfo() {
+    $module_info = system_get_info('module');
+    foreach ($this->modules() as $module) {
+      if ($status_info = module_invoke($module, 'payment_status_info')) {
+        $status_info = module_invoke($module, 'payment_status_info');
+        foreach ($status_info as $status) {
+          $valid = TRUE;
+          if (!is_a($status, 'PaymentStatus')) {
+            $valid = FALSE;
+            break;
+          }
+        }
+        $this->assertTrue($valid, t("%module's hook_payment_status_info() implementation returns PaymentStatus objects.", array(
+          '%module' => $module_info[$module]['name'],
+        )));
+      }
+    }
+  }
+}
