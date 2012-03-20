@@ -37,6 +37,7 @@ function payment_view_payments() {
   /* Display: Master */
   $handler = $view->new_display('default', 'Master', 'default');
   $handler->display->display_options['title'] = 'Payments';
+  $handler->display->display_options['group_by'] = TRUE;
   $handler->display->display_options['access']['type'] = 'perm';
   $handler->display->display_options['access']['perm'] = 'payment.view.own';
   $handler->display->display_options['cache']['type'] = 'none';
@@ -97,11 +98,16 @@ function payment_view_payments() {
   $handler->display->display_options['empty']['area']['content'] = 'There are no payments yet.';
   $handler->display->display_options['empty']['area']['format'] = 'filtered_html';
   $handler->display->display_options['empty']['area']['tokenize'] = 0;
-  /* Relationship: Payment: Payment method ID */
+  /* Relationship: Payment: Payment method */
   $handler->display->display_options['relationships']['pmid']['id'] = 'pmid';
   $handler->display->display_options['relationships']['pmid']['table'] = 'payment';
   $handler->display->display_options['relationships']['pmid']['field'] = 'pmid';
   $handler->display->display_options['relationships']['pmid']['required'] = 0;
+  /* Relationship: Payment: Payment amounts */
+  $handler->display->display_options['relationships']['pid_amount']['id'] = 'pid_amount';
+  $handler->display->display_options['relationships']['pid_amount']['table'] = 'payment';
+  $handler->display->display_options['relationships']['pid_amount']['field'] = 'pid_amount';
+  $handler->display->display_options['relationships']['pid_amount']['required'] = 0;
   /* Field: Payment: Last updated date and time */
   $handler->display->display_options['fields']['updated']['id'] = 'updated';
   $handler->display->display_options['fields']['updated']['table'] = 'payment';
@@ -148,7 +154,7 @@ function payment_view_payments() {
   $handler->display->display_options['fields']['currency_code']['hide_empty'] = 0;
   $handler->display->display_options['fields']['currency_code']['empty_zero'] = 0;
   $handler->display->display_options['fields']['currency_code']['hide_alter_empty'] = 0;
-  /* Field: Payment: Amount */
+  /* Field: Broken/missing handler */
   $handler->display->display_options['fields']['amount']['id'] = 'amount';
   $handler->display->display_options['fields']['amount']['table'] = 'payment';
   $handler->display->display_options['fields']['amount']['field'] = 'amount';
@@ -170,7 +176,6 @@ function payment_view_payments() {
   $handler->display->display_options['fields']['amount']['hide_empty'] = 0;
   $handler->display->display_options['fields']['amount']['empty_zero'] = 0;
   $handler->display->display_options['fields']['amount']['hide_alter_empty'] = 0;
-  $handler->display->display_options['fields']['amount']['format_plural'] = 0;
   /* Field: Payment method: Title (specific) */
   $handler->display->display_options['fields']['title_specific']['id'] = 'title_specific';
   $handler->display->display_options['fields']['title_specific']['table'] = 'payment_method';
@@ -278,10 +283,12 @@ function payment_view_payments() {
   $handler->display->display_options['fields']['currency_code']['hide_empty'] = 0;
   $handler->display->display_options['fields']['currency_code']['empty_zero'] = 0;
   $handler->display->display_options['fields']['currency_code']['hide_alter_empty'] = 0;
-  /* Field: Payment: Amount */
+  /* Field: SUM(Payment amount: Amount) */
   $handler->display->display_options['fields']['amount']['id'] = 'amount';
-  $handler->display->display_options['fields']['amount']['table'] = 'payment';
+  $handler->display->display_options['fields']['amount']['table'] = 'payment_amount';
   $handler->display->display_options['fields']['amount']['field'] = 'amount';
+  $handler->display->display_options['fields']['amount']['relationship'] = 'pid_amount';
+  $handler->display->display_options['fields']['amount']['group_type'] = 'sum';
   $handler->display->display_options['fields']['amount']['alter']['alter_text'] = 1;
   $handler->display->display_options['fields']['amount']['alter']['text'] = '[currency_code] [amount]';
   $handler->display->display_options['fields']['amount']['alter']['make_link'] = 0;
@@ -299,8 +306,7 @@ function payment_view_payments() {
   $handler->display->display_options['fields']['amount']['element_default_classes'] = 1;
   $handler->display->display_options['fields']['amount']['hide_empty'] = 0;
   $handler->display->display_options['fields']['amount']['empty_zero'] = 0;
-  $handler->display->display_options['fields']['amount']['hide_alter_empty'] = 0;
-  $handler->display->display_options['fields']['amount']['format_plural'] = 0;
+  $handler->display->display_options['fields']['amount']['hide_alter_empty'] = 1;
   /* Field: Payment method: Title (specific) */
   $handler->display->display_options['fields']['title_specific']['id'] = 'title_specific';
   $handler->display->display_options['fields']['title_specific']['table'] = 'payment_method';
@@ -403,10 +409,12 @@ function payment_view_payments() {
   $handler->display->display_options['fields']['currency_code']['hide_empty'] = 0;
   $handler->display->display_options['fields']['currency_code']['empty_zero'] = 0;
   $handler->display->display_options['fields']['currency_code']['hide_alter_empty'] = 0;
-  /* Field: Payment: Amount */
+  /* Field: SUM(Payment amount: Amount) */
   $handler->display->display_options['fields']['amount']['id'] = 'amount';
-  $handler->display->display_options['fields']['amount']['table'] = 'payment';
+  $handler->display->display_options['fields']['amount']['table'] = 'payment_amount';
   $handler->display->display_options['fields']['amount']['field'] = 'amount';
+  $handler->display->display_options['fields']['amount']['relationship'] = 'pid_amount';
+  $handler->display->display_options['fields']['amount']['group_type'] = 'sum';
   $handler->display->display_options['fields']['amount']['alter']['alter_text'] = 1;
   $handler->display->display_options['fields']['amount']['alter']['text'] = '[currency_code] [amount]';
   $handler->display->display_options['fields']['amount']['alter']['make_link'] = 0;
@@ -424,8 +432,7 @@ function payment_view_payments() {
   $handler->display->display_options['fields']['amount']['element_default_classes'] = 1;
   $handler->display->display_options['fields']['amount']['hide_empty'] = 0;
   $handler->display->display_options['fields']['amount']['empty_zero'] = 0;
-  $handler->display->display_options['fields']['amount']['hide_alter_empty'] = 0;
-  $handler->display->display_options['fields']['amount']['format_plural'] = 0;
+  $handler->display->display_options['fields']['amount']['hide_alter_empty'] = 1;
   /* Field: Payment method: Title (generic) */
   $handler->display->display_options['fields']['title_generic']['id'] = 'title_generic';
   $handler->display->display_options['fields']['title_generic']['table'] = 'payment_method';
@@ -502,14 +509,14 @@ function payment_view_payments() {
     t('Offset'),
     t('There are no payments yet.'),
     t('Payment method'),
+    t('Payment amounts'),
     t('Last updated'),
-    t('Amount'),
+    t('Broken handler payment.amount'),
     t('[currency_code] [amount]'),
-    t('.'),
-    t(','),
     t('Title (generic)'),
     t('Operations'),
     t('Administration page'),
+    t('Amount'),
     t('User\'s own payments'),
     t('All'),
   );

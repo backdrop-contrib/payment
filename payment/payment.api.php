@@ -68,6 +68,45 @@ function hook_payment_method_controller_info_alter(&$controllers_info) {
 }
 
 /**
+ * Defines payment amount types.
+ *
+ * @see payment_amount_extract()
+ *
+ * @return array
+ *   An array with PaymentAmountInfo objects.
+ */
+function hook_payment_amount_info() {
+  return array(
+    new PaymentAmountInfo(array(
+      'name' => 'foo_fee_credit_card',
+      'title' => t('Credit card fee'),
+    )),
+    new PaymentAmountInfo(array(
+      'name' => 'foo_fee_wire_transfer',
+      'title' => t('Wire transfer fee'),
+    )),
+    new PaymentAmountInfo(array(
+      // Use a custom callback, so we can extract any/all payment amounts we
+      // need simultaneously.
+      'callback' => 'foo_payment_extract_amount_fee',
+      'name' => 'foo_fee',
+      'title' => t('Any payment method fee'),
+    )),
+  );
+}
+
+/**
+ * Alters payment amount types.
+ *
+ * @param array
+ *   An array with PaymentAmountInfo objects, keyed by PaymentAmountInfo::name.
+ */
+function hook_payment_amount_info_alter(&$amounts_info) {
+  // Set an extraction callback for an amount.
+  $amounts_info['foo_fee_credit_card']['callback'] = 'foo_payment_extract_amount';
+}
+
+/**
  * Executes when a payment status has been changed.
  *
  * @see Payment::setStatus()
@@ -94,9 +133,8 @@ function hook_payment_status_change(Payment $payment, $old_status) {
  */
 function hook_payment_pre_execute(Payment $payment) {
   // Add a payment method processing fee.
-  $payment->amount += 5.50;
+  $payment->setAmount('foo_fee', 5.50, 'Credit card fee');
 }
-
 /**
  * Validate a payment against a payment method.
  *

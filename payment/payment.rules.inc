@@ -59,29 +59,78 @@ function payment_rules_action_info() {
     ),
     'group' => t('Payment'),
   );
-  $calculations = array(
-    'payment_rules_action_payment_amount_add' => t('Add to amount'),
-    'payment_rules_action_payment_amount_subtract' => t('Subtract from amount'),
-    'payment_rules_action_payment_amount_multiply' => t('Multiply amount'),
-    'payment_rules_action_payment_amount_divide' => t('Divide amount'),
-  );
-  foreach ($calculations as $name => $label) {
-    $actions[$name] = array(
-      'label' => $label,
-      'access callback' => 'payment_rules_access',
-      'parameter' => array(
-        'payment' => array(
-          'type' => 'payment',
-          'label' => t('Payment'),
-        ),
-        'status' => array(
-          'type' => 'decimal',
-          'label' => t('Amount'),
-        ),
+  $actions['payment_rules_action_payment_amount_delete'] = array(
+    'label' => t('Delete a payment amount'),
+    'access callback' => 'payment_rules_access',
+    'group' => t('Payment'),
+    'parameter' => array(
+      'payment' => array(
+        'type' => 'payment',
+        'label' => t('Payment'),
       ),
-      'group' => t('Payment'),
-    );
-  }
+      'name' => array(
+        'type' => 'text',
+        'label' => t('Machine name'),
+      ),
+    ),
+  );
+  $actions['payment_rules_action_payment_amount_set_fixed'] = array(
+    'label' => t('Set a fixed payment amount'),
+    'access callback' => 'payment_rules_access',
+    'group' => t('Payment'),
+    'parameter' => array(
+      'payment' => array(
+        'type' => 'payment',
+        'label' => t('Payment'),
+      ),
+      'name' => array(
+        'type' => 'text',
+        'label' => t('Machine name'),
+      ),
+      'description' => array(
+        'type' => 'text',
+        'label' => t('Description'),
+      ),
+      'amount' => array(
+        'type' => 'decimal',
+        'label' => t('Amount'),
+      ),
+    ),
+  );
+  $actions['payment_rules_action_payment_amount_set_calculated'] = array(
+    'label' => t('Set a calculated payment amount'),
+    'access callback' => 'payment_rules_access',
+    'group' => t('Payment'),
+    'parameter' => array(
+      'payment' => array(
+        'type' => 'payment',
+        'label' => t('Payment'),
+      ),
+      'name' => array(
+        'type' => 'text',
+        'label' => t('Machine name'),
+      ),
+      'description' => array(
+        'type' => 'text',
+        'label' => t('Description'),
+        'optional' => TRUE,
+      ),
+      'source_name' => array(
+        'type' => 'text',
+        'label' => t("Source amount"),
+        'options list' => 'payment_rules_options_list_payment_amount_name',
+      ),
+      'calculation' => array(
+        'type' => 'text',
+        'label' => t("Calculation"),
+        'options list' => 'payment_rules_options_list_calculations',
+      ),
+      'factor' => array(
+        'type' => 'decimal',
+        'label' => 'Amount',
+      ),
+    ),
+  );
 
   return $actions;
 }
@@ -256,47 +305,89 @@ function payment_rules_action_payment_set_status(Payment $payment, $status_data)
 }
 
 /**
- * Implements Rules action callback: increase the payment amount.
+ * Implements Rules action callback: set a fixed payment amount.
  *
  * @param $payment Payment
  * @param $amount integer
  *   The amount to add to the payment amount.
  */
-function payment_rules_action_payment_amount_add(Payment $payment, $amount) {
-  $payment->amount += $amount;
+function payment_rules_action_payment_amount_set_fixed(Payment $payment, $name, $description, $amount) {
+  $payment->setAmount($name, $amount, $description);
 }
 
 /**
- * Implements Rules action callback: decrease the payment amount.
+ * Implements Rules action callback: set a calculated payment amount.
+ *
+ * @see PaymentAmount
  *
  * @param $payment Payment
- * @param $amount integer
- *   The amount to subtract from the payment amount.
+ * @param $name string
+ *   The machine name of the new amount.
+ * @param $description string
+ *   The amount's human-readable description.
+ * @param $source_name string
+ *   The machine name of the payment amount to use for the calculation.
+ * @param $calculation string
+ *   One of the keys returned by payment_rules_options_list_calculations().
+ * @param $factor float
+ *   The factor to use for the calculation.
  */
-function payment_rules_action_payment_amount_subtract(Payment $payment, $amount) {
-  $payment->amount -= $amount;
+function payment_rules_action_payment_amount_set_calculated($payment, $name, $description, $source_name, $calculation, $factor) {
+  if ($source_amounts = payment_amount_extract($source_name, $payment)) {
+    $source_amount = $payment->totalAmount($source_amounts);
+    switch ($calculation) {
+      case 'add':
+        $amount = $source_amount + $factor;
+        break;
+      case 'subtract':
+        $amount = $source_amount - $factor;
+        break;
+      case 'multiply':
+        $amount = $source_amount * $factor;
+        break;
+      case 'divide':
+        $amount = $source_amount / $factor;
+        break;
+    }
+    $payment->setAmount($name, $amount, $description);
+  }
 }
 
 /**
- * Implements Rules action callback: multiply the payment amount.
- *
- * @param $payment Payment
- * @param $amount integer
- *   The amount to multiply the payment amount with.
+ * Implements Rules options list callback for
+ * payment_rules_action_payment_amount_set_calculated().
  */
-function payment_rules_action_payment_amount_multiply(Payment $payment, $amount) {
-  $payment->amount *= $amount;
+function payment_rules_options_list_payment_amount_name() {
+  $options = array();
+  foreach (payment_amounts_info() as $amount_info) {
+    $options[$amount_info->name] = $amount_info->title;
+  }
+
+  return $options;
 }
 
 /**
- * Implements Rules action callback: divide the payment amount.
+ * Implements Rules options list callback for
+ * payment_rules_action_payment_amount_set_calculated().
+ */
+function payment_rules_options_list_calculations() {
+  return array(
+    'add' => t('Add'),
+    'subtract' => t('Subtract'),
+    'multiply' => t('Multiply by'),
+    'divide' => t('Divide by'),
+  );
+}
+
+/**
+ * Implements Rules action callback: delete a payment amount.
  *
  * @param $payment Payment
- * @param $amount integer
- *   The amount to divide the payment amount by.
+ * @param $name string
+ *   The machine name of the payment amount to delete.
  */
-function payment_rules_action_payment_amount_divide(Payment $payment, $amount) {
-  $payment->amount /= $amount;
+function payment_rules_action_payment_amount_delete(Payment $payment, $name) {
+  unset($payment->amounts[$name]);
 }
 
 /**

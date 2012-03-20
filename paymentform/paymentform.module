@@ -81,6 +81,18 @@ function paymentform_block_view($delta = '') {
 }
 
 /**
+ * Implements hook_payment_amount_info().
+ */
+function paymentform_payment_amount_info() {
+  return array(
+    new PaymentAmountInfo(array(
+      'name' => 'paymentform',
+      'title' => t('Payment Form amount'),
+    )),
+  );
+}
+
+/**
  * Form build callback: render the donation form.
  *
  * @return array
@@ -106,9 +118,7 @@ function paymentform_form(array $form, array &$form_state, Payment $payment = NU
   if (!isset($form_state['payment'])) {
     if (!$payment) {
       $payment = new Payment(array(
-        'amount' => variable_get('paymentform_amount', 0),
         'currency_code' => variable_get('paymentform_currency_code', 'XXX'),
-        'description' => paymentform_description(),
         'finish_callback' => 'paymentform_payment_finish',
         'caller_data' => array(
           'location' => $_GET['q'],
@@ -139,7 +149,7 @@ function paymentform_form(array $form, array &$form_state, Payment $payment = NU
     $form['amount'] = array(
       '#type' => 'paymentform_amount',
       '#title' => t('Amount'),
-      '#amount' => $payment->amount,
+      '#amount' => $payment->totalAmount(),
       '#minimum_amount' => variable_get('paymentform_amount', 0),
       '#currency_code' => $payment->currency_code,
     );
@@ -170,6 +180,11 @@ function paymentform_form_validate(array $form, array &$form_state) {
 
   if ($form_state['payment_step'] == 0) {
     $payment->amount = $form_state['values']['amount'];
+    // @todo Submitted amount is a string and should be a float.
+    // @todo $description should be US English, but can be anything.
+    // Remove any possible previous amounts.
+    $payment->amounts = array();
+    $payment->setAmount('paymentform', $form_state['values']['amount'], paymentform_description());
     $form_state['payment_step']++;
     $form_state['rebuild'] = TRUE;
   }

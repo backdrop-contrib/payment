@@ -213,6 +213,9 @@ function payment_hook_info() {
   $hooks['payment_method_controller_info'] = array(
     'group' => 'payment',
   );
+  $hooks['payment_amount_info'] = array(
+    'group' => 'payment',
+  );
   $hooks['payment_status_change'] = array(
     'group' => 'payment',
   );
@@ -265,12 +268,6 @@ function payment_entity_info() {
  */
 function payment_entity_property_info() {
   // Payment.
-  $properties['payment']['properties']['amount'] = array(
-    'label' => t('Amount'),
-    'required' => TRUE,
-    'schema field' => 'amount',
-    'type' => 'decimal',
-  );
   $properties['payment']['properties']['currency_code'] = array(
     'description' => t('A three-letter ISO 4217 currency code.'),
     'label' => t('Currency code'),
@@ -414,6 +411,44 @@ function payment_status_info($code, $unknown = FALSE) {
   $statuses = payment_statuses_info();
 
   return isset($statuses[$code]) ? $statuses[$code] : ($unknown ? $statuses[PAYMENT_STATUS_UNKNOWN] : FALSE);
+}
+
+/**
+ * Returns information about all payment amount types.
+ *
+ * @see hook_payment_amount_info()
+ *
+ * @return array
+ *   An array with PaymentAmountInfo objects, keyed by PaymentAmountInfo::name.
+ */
+function payment_amounts_info() {
+  static $amounts = NULL;
+
+  if (is_null($amounts)) {
+    $amounts = array();
+    foreach (module_invoke_all('payment_amount_info') as $amount) {
+      $amounts[$amount->name] = $amount;
+    }
+    drupal_alter('payment_amount_info', $amounts);
+  }
+
+  return $amounts;
+}
+
+/**
+ * Returns information about a specific payment amount type.
+ *
+ * @param $name string
+ *   The payment amount type's machine name.
+ *
+ * @return mixed
+ *   A PaymentAmountInfo object or FALSE if the requested info could not be
+ *   found.
+ */
+function payment_amount_info($name) {
+  $amounts = payment_amounts_info();
+
+  return isset($amounts[$name]) ? $amounts[$name] : FALSE;
 }
 
 /**
@@ -680,17 +715,39 @@ function payment_access(Payment $payment) {
 }
 
 /**
- * Title callback for menu items.
+ * Extract a payment amount from a payment.
  *
- * @param $payment_method PaymentMethod
+ * @param $name string
+ *   The requested amount(s)'s machine name, as possibly defined in
+ *   hook_payment_amount_info().
+ * @param $payment Payment
  *
- * @return string
- *   The payment method's title.
+ * @return mixed
+ *   Either an array with PaymentAmount objects or FALSE if nothing could be
+ *   extracted.
  */
-function payment_method_title(PaymentMethod $payment_method) {
-  return $payment_method->title_specific;
+function payment_amount_extract($name, Payment $payment) {
+  if ($amount_info = payment_amount_info($name)) {
+    return call_user_func($amount_info->callback, $name, $payment);
+  }
+  else {
+    return payment_amount_extract_specific($name, $payment);
+  }
 }
 
+/**
+ * Implements PaymentAmountInfo::callback.
+ */
+function payment_amount_extract_specific($name, Payment $payment) {
+  return isset($payment->amounts[$name]) ? array($payment->amounts[$name]) : FALSE;
+}
+
+/**
+ * Implements PaymentAmountInfo::callback.
+ */
+function payment_amount_extract_total($name, Payment $payment) {
+  return $payment->amounts;
+}
 /**
  * Implements Rules access callback.
  */

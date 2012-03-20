@@ -6,6 +6,19 @@
  */
 
 /**
+ * Implements hook_payment_amount_info().
+ */
+function payment_test_payment_amount_info() {
+  return array(
+    new PaymentAmountInfo(array(
+      'callback' => 'payment_test_amount_extract',
+      'name' => 'payment_test',
+      'title' => t('Payment Form amount'),
+    )),
+  );
+}
+
+/**
  * Implements hook_payment_validate().
  */
 function payment_test_payment_validate(Payment $payment, PaymentMethod $payment_method) {
@@ -32,3 +45,10 @@ function payment_test_payment_pre_execute(Payment $payment) {
  * Implements Payment finish callback.
  */
 function payment_test_finish_callback() {}
+
+/**
+ * Implements PaymentAmount::callback.
+ */
+function payment_test_amount_extract($name, Payment $payment) {
+  return(array($payment->amounts['foo'], $payment->amounts['bar']));
+}

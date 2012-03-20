@@ -25,13 +25,14 @@ class PaymentCommon {
 class Payment extends PaymentCommon {
 
   /**
-   * The payment amount.
+   * An array with PaymentAmount objects.
    *
-   * The number of decimals depends on the ISO 4217 currency used.
+   * @see Payment::__construct()
+   * @see Payment::setAmount()
    *
-   * @var float
+   * @var array
    */
-  public $amount = 0;
+  public $amounts = array();
 
   /**
    * The name of a function to call when the payment has been completed. It
@@ -61,13 +62,6 @@ class Payment extends PaymentCommon {
    * @var string
    */
   public $currency_code = 'XXX';
-
-  /**
-   * The payment description.
-   *
-   * @var string
-   */
-  public $description = '';
 
   /**
    * The Unix datetime the payment expires.
@@ -190,6 +184,53 @@ class Payment extends PaymentCommon {
   }
 
   /**
+   * Set a payment amount.
+   *
+   * @see payment_amount_extract()
+   *
+   * @param $name string
+   *   The machine name of this amount.
+   * @param $amount float
+   *   The payment amount. The number of decimals depends on the ISO 4217
+   *   currency used.
+   * @param $description string
+   *   A US English human-readable description for this amount. May contain HTML.
+   * @param $description_arguments array
+   *   Arguments to pass on to t() when translating $description.
+   *
+   * @return NULL
+   */
+  function setAmount($name, $amount, $description = '', $description_arguments = array()) {
+    $this->amounts[$name] = new PaymentAmount(array(
+      'amount' => $amount,
+      'name' => $name,
+      'description' => $description,
+      'description_arguments' => $description_arguments,
+    ));
+  }
+
+  /**
+   * Get the total payment amount.
+   *
+   * @param $amounts array
+   *   An array with PaymentAmount objects to calculate the total from. Leave
+   *   empty to use $this->amounts.
+   *
+   * @return float
+   */
+  function totalAmount(array $amounts = array()) {
+    $total = 0;
+    if (!$amounts) {
+      $amounts = $this->amounts;
+    }
+    foreach ($amounts as $amount) {
+      $total += $amount->amount;
+    }
+
+    return $total;
+  }
+
+  /**
    * Set the payment status.
    *
    * @param $status_item PaymentStatusItem
@@ -294,7 +335,6 @@ class PaymentEntityController extends EntityAPIController {
     foreach ($entities as $payment) {
       // Cast non-string scalars to their original types, because some backends
       // store/return all variables as strings.
-      $payment->amount = (float) $payment->amount;
       $payment->created = (int) $payment->created;
       $payment->expired = (int) $payment->expired;
       $payment->pid = (int) $payment->pid;
@@ -309,6 +349,8 @@ class PaymentEntityController extends EntityAPIController {
    * Implements EntityAPIController::attachLoad().
    */
   function attachLoad(&$queried_entities, $revision_id = FALSE) {
+    $pids = array_keys($queried_entities);
+
     // Load the payments's payment methods.
     $pmids = array();
     foreach ($queried_entities as $payment) {
@@ -316,8 +358,19 @@ class PaymentEntityController extends EntityAPIController {
     }
     $methods = entity_load('payment_method', $pmids);
 
+    // Load payment amounts.
+    $result = db_select('payment_amount')
+      ->fields('payment_amount')
+      ->condition('pid', $pids)
+      ->execute();
+    $amounts = array();
+    while ($amount_data = $result->fetchAssoc('name', PDO::FETCH_ASSOC)) {
+      $amount_data['description_arguments'] = unserialize($amount_data['description_arguments']);
+      $amount_data['amount'] = (float) $amount_data['amount'];
+      $amounts[$amount_data['pid']][$amount_data['name']] = new PaymentAmount($amount_data);
+    }
+
     // Load the payments's status logs.
-    $pids = array_keys($queried_entities);
     $result = db_select('payment_status_item')
       ->fields('payment_status_item')
       ->condition('pid', $pids)
@@ -332,6 +385,7 @@ class PaymentEntityController extends EntityAPIController {
     // Add all data to the payments.
     foreach ($queried_entities as $payment) {
       $payment->_setStatuses($status_items[$payment->pid]);
+      $payment->amounts = $amounts[$payment->pid];
       $payment->method = $methods[$payment->pmid];
       unset($payment->pmid);
     }
@@ -350,6 +404,23 @@ class PaymentEntityController extends EntityAPIController {
     $payment->pmid = $payment->method->pmid;
     $return = parent::save($payment, $transaction);
     unset($payment->pmid);
+
+    // Save payment amounts.
+    foreach ($payment->amounts as $amount) {
+      db_merge('payment_amount')
+        ->key(array(
+          'name' => $amount->name,
+          'pid' => $payment->pid,
+        ))
+        ->fields(array(
+          'amount' => $amount->amount,
+          'description' => $amount->description,
+          'description_arguments' => serialize($amount->description_arguments),
+          'name' => $amount->name,
+          'pid' => $payment->pid,
+        ))
+        ->execute();
+    }
 
     // Save the payment's status items.
     foreach ($payment->getStatuses() as $status_item) {
@@ -371,12 +442,30 @@ class PaymentEntityController extends EntityAPIController {
     foreach ($build['payment'] as &$payment_build) {
       $payment = $payment_build['#entity'];
 
-      $status = payment_status_info($payment->getStatus()->code, TRUE);
-      $payment_build['amount'] = array(
-        '#type' => 'item',
-        '#title' => t('Amount'),
-        '#markup' => payment_amount_human_readable($payment->amount, $payment->currency_code),
+      // Payment amounts.
+      $header = array(t('Description'), t('Amount'));
+      $rows = array();
+      foreach ($payment->amounts as $name => $amount) {
+        $rows[] = array(
+          'data' => array(t($amount->description, $amount->description_arguments), payment_amount_human_readable($amount->amount, $payment->currency_code)),
+          'class' => array('payment-amount-' . $name),
+        );
+      }
+      $rows[] = array(
+        'data' => array(t('Total amount'), payment_amount_human_readable($payment->totalAmount(), $payment->currency_code)),
+        'class' => array('payment-amount-total'),
       );
+      $payment_build['amounts'] = array(
+        '#type' => 'markup',
+        '#markup' => theme('table', array(
+          'header' => $header,
+          'rows' => $rows,
+          'caption' => t('Payment amount'),
+        )),
+      );
+
+      // Status history.
+      $status = payment_status_info($payment->getStatus()->code, TRUE);
       $rows = array();
       foreach (array_reverse($payment->getStatuses()) as $status_item) {
         $status = payment_status_info($status_item->code);
@@ -705,6 +794,42 @@ class PaymentStatus extends PaymentCommon {
 }
 
 /**
+ * A payment amount 'line item'.
+ *
+ * @see Payment::setAmount()
+ */
+class PaymentAmount extends PaymentCommon {
+
+  /**
+   * The payment amount. The number of decimals depends on the ISO 4217
+   * currency used.
+   *
+   * @var float
+   */
+  public $amount = 0;
+
+  /**
+   * A US English human-readable description for this amount. May contain HTML.
+   *
+   * @var string
+   */
+  public $description = '';
+
+  /**
+   * Arguments to pass on to t() when translating $this->description.
+   *
+   * @var array
+   */
+  public $description_arguments = array();
+
+  /**
+   * The machine name of this amount.
+   *
+   * @var string
+   */
+  public $name = '';
+}
+/**
  * A payment status log item.
  */
 class PaymentStatusItem {
@@ -743,4 +868,39 @@ class PaymentStatusItem {
     $this->pid = $pid;
     $this->psiid = $psiid;
   }
+}
+
+/**
+ * Information about a type of payment amount.
+ */
+class PaymentAmountInfo extends PaymentCommon {
+
+  /**
+   * The callback function to extract this payment amount from the Payment.
+   *
+   * The function accepts the machine name of the amount to extract and the
+   * Payment object to extract the amount from as parameters. It should return
+   * an array with PaymentAmount objects or FALSE if the Payment object does
+   * not contain any matching amounts.
+   *
+   * @see payment_amount_extract()
+   * @see payment_amount_extract_total()
+   *
+   * @var string
+   */
+  public $callback = '';
+
+  /**
+   * The payment amounts's machine name.
+   *
+   * @var string
+   */
+  public $name = '';
+
+  /**
+   * The payment amounts's human-readable title.
+   *
+   * @var string
+   */
+  public $title = '';
 }

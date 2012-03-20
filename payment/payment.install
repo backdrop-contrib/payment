@@ -9,12 +9,48 @@
  * Implements hook_schema().
  */
 function payment_schema() {
-  $schema['payment'] = array(
+  $schema['payment_amount'] = array(
     'fields' => array(
       'amount' => array(
         'type' => 'float',
         'size' => 'big',
       ),
+      'description' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'description_arguments' => array(
+        'type' => 'blob',
+        'size' => 'big',
+        'serialize' => TRUE,
+      ),
+      'name' => array(
+        'type' => 'varchar',
+        'length' => '255',
+      ),
+      'pid' => array(
+        'description' => 'The {payment}.pid this amount belongs to.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'primary key' => array('name', 'pid'),
+    'foreign keys' => array(
+      'pid' => array(
+        'table' => 'payment',
+        'columns' => array(
+          'pid' => 'pid',
+        ),
+      ),
+    ),
+    'indexes' => array(
+      'pid' => array('pid'),
+    ),
+  );
+  $schema['payment'] = array(
+    'fields' => array(
       'caller_data' => array(
         'type' => 'blob',
         'size' => 'big',
@@ -26,11 +62,6 @@ function payment_schema() {
       'currency_code' => array(
         'type' => 'varchar',
         'length' => 3,
-      ),
-      'description' => array(
-        'type' => 'varchar',
-        'length' => 255,
-        'not null' => TRUE,
       ),
       'expired' => array(
         'type' => 'int',

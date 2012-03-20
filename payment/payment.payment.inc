@@ -51,3 +51,16 @@ function payment_payment_status_info() {
 function payment_payment_method_controller_info() {
   return array('PaymentMethodControllerUnavailable');
 }
+
+/**
+ * Implements hook_payment_amount_info().
+ */
+function payment_payment_amount_info() {
+  return array(
+    new PaymentAmountInfo(array(
+      'callback' => 'payment_amount_extract_total',
+      'name' => 'payment_total',
+      'title' => t('Total amount'),
+    )),
+  );
+}

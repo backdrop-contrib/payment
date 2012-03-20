@@ -23,6 +23,17 @@ function payment_views_data_alter(&$data) {
     'handler' => 'views_handler_relationship',
     'label' => t('Payment status item'),
   );
+  $data['payment']['pid_amount'] = array(
+    'title' => t('Payment amounts'),
+    'real field' => 'pid',
+    'relationship' => array(
+      'title' => t('Payment amounts'),
+      'base' => 'payment_amount',
+      'base field' => 'pid',
+      'handler' => 'views_handler_relationship',
+      'label' => t('Payment amounts'),
+    ),
+  );
   $data['payment']['pmid']['relationship'] = array(
     'title' => t('Payment method'),
     'base' => 'payment_method',
@@ -34,6 +45,90 @@ function payment_views_data_alter(&$data) {
     'base' => 'users',
     'handler' => 'views_handler_relationship',
     'label' => t('User'),
+  );
+
+  // Payment amounts. This is not an alteration, but implementing
+  // hook_views_data() prevents Entity API from exposing our entities to Views
+  // automatically. See http://drupal.org/node/1377364.
+  $data['payment_amount'] = array(
+    'table' => array(
+      'base' => array(
+        'title' => t('Payment amount'),
+      ),
+      'group' => t('Payment amount'),
+    ),
+    // Field configuration.
+    'amount' => array(
+      'title' => t('Amount'),
+      'field' => array(
+        'handler' => 'views_handler_field',
+        'click sortable' => TRUE,
+      ),
+      'sort' => array(
+        'handler' => 'views_handler_sort',
+      ),
+      'filter' => array(
+        'handler' => 'views_handler_filter_numeric',
+      ),
+      'argument' => array(
+        'handler' => 'views_handler_argument_numeric',
+      ),
+    ),
+    'description' => array(
+      'title' => t('Description'),
+      'field' => array(
+        'handler' => 'PaymentViewsHandlerFieldPaymentAmountDescription',
+        'click sortable' => TRUE,
+      ),
+      'sort' => array(
+        'handler' => 'views_handler_sort',
+      ),
+      'filter' => array(
+        'handler' => 'views_handler_filter_string',
+      ),
+      'argument' => array(
+        'handler' => 'views_handler_argument_string',
+      ),
+    ),
+    'name' => array(
+      'title' => t('Machine name'),
+      'field' => array(
+        'handler' => 'views_handler_field',
+        'click sortable' => TRUE,
+      ),
+      'sort' => array(
+        'handler' => 'views_handler_sort',
+      ),
+      'filter' => array(
+        'handler' => 'views_handler_filter_numeric',
+      ),
+      'argument' => array(
+        'handler' => 'views_handler_argument_numeric',
+      ),
+    ),
+    'pid' => array(
+      'title' => t('Payment ID'),
+      'field' => array(
+        'handler' => 'views_handler_field',
+        'click sortable' => TRUE,
+      ),
+      'sort' => array(
+        'handler' => 'views_handler_sort',
+      ),
+      'filter' => array(
+        'handler' => 'views_handler_filter_numeric',
+      ),
+      'argument' => array(
+        'handler' => 'views_handler_argument_numeric',
+      ),
+      'relationship' => array(
+        'title' => t('Payment'),
+        'base' => 'payment',
+        'field' => 'pid',
+        'handler' => 'views_handler_relationship',
+        'label' => t('Payment'),
+      ),
+    ),
   );
 
   // Payment method.

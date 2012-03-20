@@ -62,7 +62,7 @@ class PaymentInfoHookTest extends DrupalWebTestCase {
    * @return array
    */
   function modules() {
-    return array('payment', 'paymentmethodbasic');
+    return array('payment', 'paymentform', 'paymentmethodbasic');
   }
 
   /**
@@ -89,22 +89,84 @@ class PaymentInfoHookTest extends DrupalWebTestCase {
   /**
    * Test hook_payment_method_controller_info().
    */
-  function testHookPaymentStatusInfo() {
+  function hookThatReturnsObjects($hook, $class_name) {
     $module_info = system_get_info('module');
     foreach ($this->modules() as $module) {
-      if ($status_info = module_invoke($module, 'payment_status_info')) {
-        $status_info = module_invoke($module, 'payment_status_info');
-        foreach ($status_info as $status) {
+      if ($infos = module_invoke($module, $hook)) {
+        foreach ($infos as $info) {
           $valid = TRUE;
-          if (!is_a($status, 'PaymentStatus')) {
+          if (!is_a($info, $class_name)) {
             $valid = FALSE;
             break;
           }
         }
-        $this->assertTrue($valid, t("%module's hook_payment_status_info() implementation returns PaymentStatus objects.", array(
+        $this->assertTrue($valid, t("%hook returns %class_name objects.", array(
           '%module' => $module_info[$module]['name'],
+          '%hook' => $module . '_' . $hook . '()',
+          '%class_name' => $class_name,
         )));
       }
     }
+  }
+
+  /**
+   * Test hook_payment_method_controller_info().
+   */
+  function testHookPaymentStatusInfo() {
+    $this->hookThatReturnsObjects('payment_status_info', 'PaymentStatus');
+  }
+
+  /**
+   * Test hook_payment_method_controller_info().
+   */
+  function testHookPaymentAmountInfo() {
+    $this->hookThatReturnsObjects('payment_amount_info', 'PaymentAmountInfo');
+  }
+}
+
+/**
+ * Test payment amount handling.
+ */
+class PaymentAmountHandlingTest extends DrupalWebTestCase {
+
+  static function getInfo() {
+    return array(
+      'name' => 'Payment amount handling',
+      'group' => 'Payment',
+    );
+  }
+
+  function setUp() {
+    parent::setUp('payment_test');
+  }
+
+  /**
+   * Test payment amount handling.
+   */
+  function testPaymentAmountHandling() {
+    $payment = new Payment;
+
+    // Test Payment::setAmount();
+    $payment->setAmount('foo', 19.11);
+    $this->assertTrue($payment->amounts['foo']->name == 'foo', t('Payment::setAmount() adds a PaymentAmount object to Payment::amounts.'));
+
+    // Test Payment::totalAmount() without passed on amounts.
+    $payment->setAmount('bar', 19.78);
+    $this->assertTrue($payment->totalAmount() == 38.89, t('Payment::totalAmount() adds up all payment amounts.'));
+
+    // Test Payment::totalAmount() with passed on amounts.
+    $payment->setAmount('beer', 47.11);
+    $amounts = payment_amount_extract('payment_test', $payment);
+    $this->assertTrue($payment->totalAmount($amounts) == 38.89, t('Payment::totalAmount() adds up only passed on payment amounts.'));
+
+    // Test payment_amount_extract_specific() and whether
+    // payment_amount_extract() can extract amounts that are not exposed
+    // through hook_payment_amount_info()..
+    $amounts = payment_amount_extract('beer', $payment);
+    $this->assertTrue($payment->totalAmount($amounts) == 47.11, t('payment_amount_extract_specific() only returns the requested amount.'));
+
+    // Test payment_amount_extract_total().
+    $amounts = payment_amount_extract('payment_total', $payment);
+    $this->assertTrue($payment->totalAmount($amounts) == 86, t('payment_amount_extract_total() returns all amounts.'));
   }
 }
