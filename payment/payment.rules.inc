@@ -251,8 +251,8 @@ function payment_rules_condition_payment_status_is(Payment $payment, array $paym
  */
 function payment_rules_options_list_payment_statuses() {
   $options = array();
-  foreach (payment_statuses_info() as $status) {
-    $options[$status->code] = $status->title;
+  foreach (payment_statuses_info() as $status_info) {
+    $options[$status_info->status] = $status_info->title;
   }
   asort($options);
 
@@ -318,7 +318,7 @@ function payment_rules_action_payment_amount_set_fixed(Payment $payment, $name, 
 /**
  * Implements Rules action callback: set a calculated payment amount.
  *
- * @see PaymentAmount
+ * @see PaymentAmountItem
  *
  * @param $payment Payment
  * @param $name string
@@ -396,8 +396,8 @@ function payment_rules_action_payment_amount_delete(Payment $payment, $name) {
  */
 function payment_rules_options_list_payment_set_status() {
   $options = array();
-  foreach (payment_statuses_info() as $status) {
-    $options[$status->code] = $status->title;
+  foreach (payment_statuses_info() as $status_info) {
+    $options[$status_info->status] = $status_info->title;
   }
   asort($options);
 

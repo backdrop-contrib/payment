@@ -379,20 +379,20 @@ function payment_views_api() {
  * @see hook_payment_status_info()
  *
  * @return array
- *   An array with PaymentStatus objects for all available statuses.
+ *   An array with PaymentStatusInfo objects for all available statuses.
  */
 function payment_statuses_info() {
-  static $statuses = NULL;
+  static $statuses_info = NULL;
 
-  if (!$statuses) {
-    $statuses = array();
-    foreach (module_invoke_all('payment_status_info') as $status) {
-      $statuses[$status->code] = $status;
+  if (!$statuses_info) {
+    $statuses_info = array();
+    foreach (module_invoke_all('payment_status_info') as $status_info) {
+      $statuses_info[$status_info->status] = $status_info;
     }
-    drupal_alter('payment_status_info', $statuses);
+    drupal_alter('payment_status_info', $statuses_info);
   }
 
-  return $statuses;
+  return $statuses_info;
 }
 
 /**
@@ -405,7 +405,7 @@ function payment_statuses_info() {
  *   does not exist.
  *
  * @return mixed
- *   A PaymentStatus object or FALSE if the status does not exist.
+ *   A PaymentStatusInfo object or FALSE if the status does not exist.
  */
 function payment_status_info($code, $unknown = FALSE) {
   $statuses = payment_statuses_info();
@@ -723,8 +723,8 @@ function payment_access(Payment $payment) {
  * @param $payment Payment
  *
  * @return mixed
- *   Either an array with PaymentAmount objects or FALSE if nothing could be
- *   extracted.
+ *   Either an array with PaymentAmountItem objects or FALSE if nothing could
+ *   be extracted.
  */
 function payment_amount_extract($name, Payment $payment) {
   if ($amount_info = payment_amount_info($name)) {

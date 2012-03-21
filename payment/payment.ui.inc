@@ -202,14 +202,14 @@ function payment_form_payment_method_delete_submit(array $form, array &$form_sta
  */
 function payment_page_status() {
   $parents = $children = array();
-  $statuses = payment_statuses_info();
-  uasort($statuses, 'payment_payment_status_sort_title');
-  foreach ($statuses as $status) {
-    foreach ($status->parents as $parent_code) {
-      $children[$parent_code][] = $status->code;
+  $statuses_info = payment_statuses_info();
+  uasort($statuses_info, 'payment_payment_status_sort_title');
+  foreach ($statuses_info as $status_info) {
+    foreach ($status_info->parents as $parent_status) {
+      $children[$parent_status][] = $status_info->status;
     }
-    if (!$status->parents) {
-      $parents[] = $status->code;
+    if (!$status_info->parents) {
+      $parents[] = $status_info->status;
     }
   }
   $rows = array();
@@ -249,9 +249,9 @@ function _payment_page_status_rows(array $statuses, array $children, array &$row
 }
 
 /**
- * Implements uasort() callback to sort PaymentStatus objects by title.
+ * Implements uasort() callback to sort PaymentStatusInfo objects by title.
  */
-function payment_payment_status_sort_title(PaymentStatus $status_a, PaymentStatus $status_b) {
+function payment_payment_status_sort_title(PaymentStatusInfo $status_a, PaymentStatusInfo $status_b) {
   return strcmp($status_a->title, $status_b->title);
 }
 

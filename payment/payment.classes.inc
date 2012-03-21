@@ -25,7 +25,7 @@ class PaymentCommon {
 class Payment extends PaymentCommon {
 
   /**
-   * An array with PaymentAmount objects.
+   * An array with PaymentAmountItem objects.
    *
    * @see Payment::__construct()
    * @see Payment::setAmount()
@@ -201,7 +201,7 @@ class Payment extends PaymentCommon {
    * @return NULL
    */
   function setAmount($name, $amount, $description = '', $description_arguments = array()) {
-    $this->amounts[$name] = new PaymentAmount(array(
+    $this->amounts[$name] = new PaymentAmountItem(array(
       'amount' => $amount,
       'name' => $name,
       'description' => $description,
@@ -213,8 +213,8 @@ class Payment extends PaymentCommon {
    * Get the total payment amount.
    *
    * @param $amounts array
-   *   An array with PaymentAmount objects to calculate the total from. Leave
-   *   empty to use $this->amounts.
+   *   An array with PaymentAmountItem objects to calculate the total from.
+   *   Leave empty to use $this->amounts.
    *
    * @return float
    */
@@ -240,7 +240,7 @@ class Payment extends PaymentCommon {
   function setStatus(PaymentStatusItem $status_item) {
     // A fail-safe to ensure hook implementations are only called if the status
     // has really changed.
-    if ($this->getStatus()->code == $status_item->code) {
+    if ($this->getStatus()->status == $status_item->status) {
       return;
     }
 
@@ -252,7 +252,7 @@ class Payment extends PaymentCommon {
       // If a hook invocation has added another log item, a new loop with
       // invocations has already been executed and we don't need to continue
       // with this one.
-      if ($this->getStatus()->code != $status_item->code) {
+      if ($this->getStatus()->status != $status_item->status) {
         return;
       }
     }
@@ -367,7 +367,7 @@ class PaymentEntityController extends EntityAPIController {
     while ($amount_data = $result->fetchAssoc('name', PDO::FETCH_ASSOC)) {
       $amount_data['description_arguments'] = unserialize($amount_data['description_arguments']);
       $amount_data['amount'] = (float) $amount_data['amount'];
-      $amounts[$amount_data['pid']][$amount_data['name']] = new PaymentAmount($amount_data);
+      $amounts[$amount_data['pid']][$amount_data['name']] = new PaymentAmountItem($amount_data);
     }
 
     // Load the payments's status logs.
@@ -378,7 +378,7 @@ class PaymentEntityController extends EntityAPIController {
       ->execute();
     $status_items = array();
     while ($data = $result->fetchObject()) {
-      $status_item = new PaymentStatusItem($data->code, $data->created, $data->pid, $data->psiid);
+      $status_item = new PaymentStatusItem($data->status, $data->created, $data->pid, $data->psiid);
       $status_items[$status_item->pid][] = $status_item;
     }
 
@@ -465,10 +465,10 @@ class PaymentEntityController extends EntityAPIController {
       );
 
       // Status history.
-      $status = payment_status_info($payment->getStatus()->code, TRUE);
+      $status = payment_status_info($payment->getStatus()->status, TRUE);
       $rows = array();
       foreach (array_reverse($payment->getStatuses()) as $status_item) {
-        $status = payment_status_info($status_item->code);
+        $status = payment_status_info($status_item->status);
         $rows[] = array($status->title, format_date($status_item->created));
       }
       $header = array(t('Status'), t('Date'));
@@ -744,9 +744,9 @@ function payment_form_payment_method_controller(array $form, array &$form_state)
 }
 
 /**
- * A payment status.
+ * Payment status information.
  */
-class PaymentStatus extends PaymentCommon {
+class PaymentStatusInfo extends PaymentCommon {
 
   /**
    * A US English human-readable description.
@@ -794,11 +794,11 @@ class PaymentStatus extends PaymentCommon {
 }
 
 /**
- * A payment amount 'line item'.
+ * A payment amount line item.
  *
  * @see Payment::setAmount()
  */
-class PaymentAmount extends PaymentCommon {
+class PaymentAmountItem extends PaymentCommon {
 
   /**
    * The payment amount. The number of decimals depends on the ISO 4217
@@ -830,7 +830,7 @@ class PaymentAmount extends PaymentCommon {
   public $name = '';
 }
 /**
- * A payment status log item.
+ * A payment status line item.
  */
 class PaymentStatusItem {
 
@@ -863,7 +863,7 @@ class PaymentStatusItem {
   public $psiid = 0;
 
   function __construct($code, $created = 0, $pid = 0, $psiid = 0) {
-    $this->code = $code;
+    $this->status = $code;
     $this->created = $created ? $created : time();
     $this->pid = $pid;
     $this->psiid = $psiid;
@@ -880,8 +880,8 @@ class PaymentAmountInfo extends PaymentCommon {
    *
    * The function accepts the machine name of the amount to extract and the
    * Payment object to extract the amount from as parameters. It should return
-   * an array with PaymentAmount objects or FALSE if the Payment object does
-   * not contain any matching amounts.
+   * an array with PaymentAmountItem objects or FALSE if the Payment object
+   * does not contain any matching amount items.
    *
    * @see payment_amount_extract()
    * @see payment_amount_extract_total()

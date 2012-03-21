@@ -1,3 +1,56 @@
+PROCESSING A PAYMENT
+--------------------
+The payment workflow consists of objects of several classes, and constants. The
+API-related classes are located in payment/payment.classes.inc and constants
+are defined in payment/payment.module.
+
+To process a payment, you will need to create a Payment object and set the
+necessary properties, such as:
+- A PaymentMethod object in Payment::method, which in turn has a
+  PaymentMethodController object in PaymentMethod::controller.
+- One or more PaymentAmountItem objects in Payment::amounts, keyed by
+  PaymentAmountItem::name. See Payment::setAmount().
+- One or more PaymentStatusItem objects in Payment::statuses, which can be set
+  through Payment::setStatus() or Payment::_setStatuses()
+Once this is completed, call $payment->execute(). If the payment and its
+payment are valid (they can work together), the payment will be executed. You
+should do nothing important after payment execution, because the payment method
+is allowed to redirect the user off-site. Instead, payment post-processing
+should happen in Payment::finish_callback. In case execution fails, however, or
+if it doesn't, but the user is not redirect, you will need to call
+Payment::finish() yourself.
+
+PAYMENT STATUSES
+----------------
+Payment statuses are strings and are exposed in hook_payment_status_info() as
+PaymentStatusInfo objects that contain metadata such as relationships with
+other payment statuses and human-readable information.
+
+For payments they are used as PaymentStatusItem objects, which contain extra
+information with respect to the particular payment they belong to, such as the
+datetime at which they were set.
+
+PAYMENT AMOUNTS
+--------------
+Payment amount types are exposed in hook_payment_amount_info() as
+PaymentAmountInfo objects that contain metadata such as human-readable
+information and settings needed to extract the amounts form Payment objects.
+Using a custom callback, multiple amounts can be extracted from a payment using
+the same machine name. See payment_payment_amount_info(), the amount
+"payment_total" defined there and its callback payment_amount_extract_total()
+for an example.
+
+For payments you'll have to use PaymentAmountItem objects, which contain extra
+information with respect to the particular payment they belong to, such as a
+human-readable description.
+
+Note that there does not have to be a 1:1 relationship between
+PaymentAmountItem and PaymentAmountInfo objects. A machine name used for a
+PaymentAmountItem object does not necessarily have to be defined in
+hook_payment_amount_info(), either because it can be extracted by another
+payment amount type defined there, or because it should not be extracted at
+all.
+
 TESTING
 -------
 

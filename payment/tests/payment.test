@@ -113,7 +113,7 @@ class PaymentInfoHookTest extends DrupalWebTestCase {
    * Test hook_payment_method_controller_info().
    */
   function testHookPaymentStatusInfo() {
-    $this->hookThatReturnsObjects('payment_status_info', 'PaymentStatus');
+    $this->hookThatReturnsObjects('payment_status_info', 'PaymentStatusInfo');
   }
 
   /**
@@ -148,7 +148,7 @@ class PaymentAmountHandlingTest extends DrupalWebTestCase {
 
     // Test Payment::setAmount();
     $payment->setAmount('foo', 19.11);
-    $this->assertTrue($payment->amounts['foo']->name == 'foo', t('Payment::setAmount() adds a PaymentAmount object to Payment::amounts.'));
+    $this->assertTrue($payment->amounts['foo']->name == 'foo', t('Payment::setAmount() adds a PaymentAmountItem object to Payment::amounts.'));
 
     // Test Payment::totalAmount() without passed on amounts.
     $payment->setAmount('bar', 19.78);

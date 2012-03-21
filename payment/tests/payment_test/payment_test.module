@@ -47,7 +47,7 @@ function payment_test_payment_pre_execute(Payment $payment) {
 function payment_test_finish_callback() {}
 
 /**
- * Implements PaymentAmount::callback.
+ * Implements PaymentAmountInfo::callback.
  */
 function payment_test_amount_extract($name, Payment $payment) {
   return(array($payment->amounts['foo'], $payment->amounts['bar']));

@@ -9,11 +9,11 @@
  * Defines payment statuses.
  *
  * @return array
- *   An array with PaymentStatus objects.
+ *   An array with PaymentStatusInfo objects.
  */
 function hook_payment_status_info() {
   return array(
-    new PaymentStatus(array(
+    new PaymentStatusInfo(array(
       'description' => t('Foo payments are still being processed by Bar to guarantee their authenticity.'),
       'status' => PAYMENT_STATUS_FOO,
       'parents' => array(PAYMENT_STATUS_PENDING),
@@ -26,7 +26,7 @@ function hook_payment_status_info() {
  * Alters payment statuses.
  *
  * @param $statuses_info array
- *   An array with PaymentStatus objects.
+ *   An array with PaymentStatusInfo objects.
  *
  * @return NULL
  */
