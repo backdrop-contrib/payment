@@ -255,7 +255,9 @@ function payment_entity_info() {
     'entity keys' => array(
       'id' => 'pmid',
       'label' => 'title_specific',
+      'name' => 'name',
     ),
+    'exportable' => TRUE,
     // @todo Enable static cache once http://drupal.org/node/1273756 is fixed.
     'static cache' => FALSE,
   );

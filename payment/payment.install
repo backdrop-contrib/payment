@@ -147,8 +147,22 @@ function payment_schema() {
         'length' => 255,
         'not null' => TRUE,
       ),
+      'module' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'name' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
       'pmid' => array(
         'type' => 'serial',
+      ),
+      'status' => array(
+        'type' => 'int',
+        'size' => 'tiny',
       ),
       'title_generic' => array(
         'type' => 'varchar',

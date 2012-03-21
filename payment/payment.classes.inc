@@ -509,11 +509,34 @@ class PaymentMethod extends PaymentCommon {
   public $controller_data = array();
 
   /**
+   * The entity's unique machine name.
+   *
+   * @var string
+   */
+  public $name = '';
+
+  /**
+   * The machine name of the module that created this payment method.
+   *
+   * @var string
+   */
+  public $module = 'payment';
+
+  /**
    * The unique internal ID.
    *
    * @var integer
    */
   public $pmid = 0;
+
+  /**
+   * One of Entity API's ENTITY_* constants for exportable entities.
+   *
+   * @see entity_has_status()
+   *
+   * @var integer
+   */
+  public $status = '';
 
   /**
    * The specific human-readable title, e.g. "Paypal WPS".
@@ -554,7 +577,7 @@ class PaymentMethod extends PaymentCommon {
 /**
  * Entity API controller for payment_method entities.
  */
-class PaymentMethodEntityController extends EntityAPIController {
+class PaymentMethodEntityController extends EntityAPIControllerExportable {
 
   /**
    * Implements EntityAPIController::load().
@@ -593,6 +616,34 @@ class PaymentMethodEntityController extends EntityAPIController {
     unset($entity->controller_class_name);
 
     return $return;
+  }
+
+  /**
+   * Implements EntityAPIController::export().
+   */
+  function export($entity, $prefix = '') {
+    // The payment method controller should not be exported. Instead, we
+    // temporarily replace it with a property that only stores its class name.
+    $controller = $entity->controller;
+    $entity->controller_class_name = $controller->name;
+    unset($entity->controller);
+    $export = parent::export($entity, $prefix);
+    $entity->controller = $controller;
+    unset($entity->controller_class_name);
+
+    return $export;
+  }
+
+  /**
+   * Implements EntityAPIController::import().
+   */
+  function import($export) {
+    if ($payment = parent::import($export)) {
+      $payment->controller = payment_method_controller_load($payment->controller_class_name);
+      unset($payment->controller_class_name);
+      return $payment;
+    }
+    return FALSE;
   }
 }
 

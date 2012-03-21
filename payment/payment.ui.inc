@@ -131,6 +131,17 @@ function payment_form_payment_method(array $form, array &$form_state, PaymentMet
     '#maxlength' => 255,
     '#required' => TRUE,
   );
+  $form['name'] = array(
+    '#type' => 'machine_name',
+    // '#title' => t('Machine name'),
+    '#default_value' => $payment_method->name,
+    '#maxlength' => 255,
+    '#required' => TRUE,
+    '#machine_name' => array(
+      'source' => array('title_specific'),
+      'exists' => 'payment_method_name_exists',
+    ),
+  );
   $form['title_generic'] = array(
     '#type' => 'textfield',
     '#title' => t('Title (generic)'),
@@ -255,3 +266,6 @@ function payment_payment_status_sort_title(PaymentStatusInfo $status_a, PaymentS
   return strcmp($status_a->title, $status_b->title);
 }
 
+function payment_method_name_exists($name) {
+  return (bool) entity_load_single('payment_method', $name);
+}
