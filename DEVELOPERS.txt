@@ -16,9 +16,10 @@ Once this is completed, call $payment->execute(). If the payment and its
 payment are valid (they can work together), the payment will be executed. You
 should do nothing important after payment execution, because the payment method
 is allowed to redirect the user off-site. Instead, payment post-processing
-should happen in Payment::finish_callback. In case execution fails, however, or
-if it doesn't, but the user is not redirect, you will need to call
-Payment::finish() yourself.
+should happen in Payment::finish_callback. Right after you call
+Payment::execute() you can, for instance, rebuild your payment form if
+execution failed and the user was not redirected. If the payment method did
+redirect the user, your finish callback will need to take care of this.
 
 PAYMENT STATUSES
 ----------------
