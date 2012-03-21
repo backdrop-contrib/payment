@@ -52,6 +52,55 @@ function payment_page_payment_view(Payment $payment) {
 }
 
 /**
+ * Implements form build callback: the payment edit form.
+ */
+function payment_form(array $form, array &$form_state, Payment $payment) {
+  $form['pid'] = array(
+    '#type' => 'value',
+    '#value' => $payment->pid,
+  );
+  $form['warning'] = array(
+    '#type' => 'markup',
+    '#markup' => t('Updating a payment status manually can disrupt automatic payment processing.'),
+    '#options' => array(),
+    '#required' => TRUE,
+  );
+  $options = array();
+  foreach (payment_statuses_info() as $status_info) {
+    $options[$status_info->status] = $status_info->title;
+  }
+  asort($options);
+  $form['status'] = array(
+    '#type' => 'select',
+    '#title' => t('New payment status'),
+    '#options' => $options,
+    '#required' => TRUE,
+    '#description' => user_access('payment.status.view') ? l(t('Payment status overview'), 'admin/config/services/payment/status') : '',
+  );
+  $form['actions']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Update status'),
+  );
+
+  return $form;
+}
+
+/**
+ * Implements form submit callback for payment_form().
+ */
+function payment_form_submit(array $form, array &$form_state) {
+  $payment = entity_load_single('payment', $form_state['values']['pid']);
+  $old_status_item = $payment->getStatus();
+  $payment->setStatus(new PaymentStatusItem($form_state['values']['status']));
+  entity_save('payment', $payment);
+  drupal_set_message(t('The payment status has been changed from %old_status to %new_status.', array(
+    '%old_status' => payment_status_info($old_status_item->status)->title,
+    '%new_status' => payment_status_info($form_state['values']['status'])->title,
+  )));
+  $form_state['redirect'] = 'payment/' . $form_state['values']['pid'];
+}
+
+/**
  * Shows a page with controllers payment methods can be added for.
  *
  * @return string

@@ -64,6 +64,17 @@ function payment_menu() {
     'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
     'weight' => -10,
   );
+  $items['payment/%payment_menu_entity/edit'] = array(
+    'load arguments' => array('payment'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('payment_form', 1),
+    'access arguments' => array('payment.administer'),
+    'title' => 'Edit',
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+    'weight' => -9,
+    'file' => 'payment.ui.inc',
+  );
   
 
   // Payment method configuration.
@@ -153,6 +164,9 @@ function payment_menu() {
  */
 function payment_permission() {
   return array(
+    'payment.administer' => array(
+      'title' => t('Administer payments'),
+    ),
     'payment.rules.administer' => array(
       'title' => t('Administer rule configurations'),
       'restrict access' => TRUE,
