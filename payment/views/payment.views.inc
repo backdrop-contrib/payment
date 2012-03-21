@@ -202,7 +202,7 @@ function payment_views_data_alter(&$data) {
         'handler' => 'views_handler_argument_date',
       ),
     ),
-    'code' => array(
+    'status' => array(
       'title' => t('Status code'),
       'field' => array(
         'handler' => 'views_handler_field',
@@ -258,7 +258,7 @@ function payment_views_data_alter(&$data) {
     ),
     'title' => array(
       'title' => t('Status title'),
-      'real field' => 'code',
+      'real field' => 'status',
       'field' => array(
         'handler' => 'PaymentViewsHandlerFieldPaymentStatusTitle',
       ),

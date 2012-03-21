@@ -409,10 +409,10 @@ function payment_statuses_info() {
  * @return mixed
  *   A PaymentStatusInfo object or FALSE if the status does not exist.
  */
-function payment_status_info($code, $unknown = FALSE) {
-  $statuses = payment_statuses_info();
+function payment_status_info($status, $unknown = FALSE) {
+  $statuses_info = payment_statuses_info();
 
-  return isset($statuses[$code]) ? $statuses[$code] : ($unknown ? $statuses[PAYMENT_STATUS_UNKNOWN] : FALSE);
+  return isset($statuses_info[$status]) ? $statuses_info[$status] : ($unknown ? $statuses_info[PAYMENT_STATUS_UNKNOWN] : FALSE);
 }
 
 /**
@@ -456,30 +456,30 @@ function payment_amount_info($name) {
 /**
  * Check if a payment status has a given other status as one of its ancestors.
  *
- * @param $code string
- *   The payment status' code.
- * @param $ancestor_code string
- *   The code of the ancestor status to check for.
+ * @param $status string
+ *   The payment status.
+ * @param $ancestor_status string
+ *   The ancestor status to check for.
  *
  * @return boolean
  */
-function payment_status_has_ancestor($code, $ancestor_code) {
-  return in_array($ancestor_code, payment_status_info($code, TRUE)->ancestors());
+function payment_status_has_ancestor($status, $ancestor_status) {
+  return in_array($ancestor_status, payment_status_info($status, TRUE)->ancestors());
 }
 
 /**
  * Check if a payment status is equal to a given other status or has it one of
  * its ancestors.
  *
- * @param $code string
- *   The payment status' code.
- * @param $ancestor_code string
- *   The code of the ancestor status to check for.
+ * @param $status string
+ *   The payment status.
+ * @param $ancestor_status string
+ *   The ancestor status to check for.
  *
  * @return boolean
  */
-function payment_status_is_or_has_ancestor($code, $ancestor_code) {
-  return $code == $ancestor_code || in_array($ancestor_code, payment_status_info($code, TRUE)->ancestors());
+function payment_status_is_or_has_ancestor($status, $ancestor_status) {
+  return $status == $ancestor_status || in_array($ancestor_status, payment_status_info($status, TRUE)->ancestors());
 }
 
 /**

@@ -370,7 +370,7 @@ class PaymentEntityController extends EntityAPIController {
       $amounts[$amount_data['pid']][$amount_data['name']] = new PaymentAmountItem($amount_data);
     }
 
-    // Load the payments's status logs.
+    // Load the payments's status items.
     $result = db_select('payment_status_item')
       ->fields('payment_status_item')
       ->condition('pid', $pids)
@@ -814,11 +814,11 @@ class PaymentStatusInfo extends PaymentCommon {
   public $parents = array();
 
   /**
-   * The status code (machine name).
+   * The status itself.
    *
    * @var string
    */
-  public $code = '';
+  public $status = '';
 
   /**
    * A US English human-readable title.
@@ -835,8 +835,8 @@ class PaymentStatusInfo extends PaymentCommon {
    */
   function ancestors() {
     $ancestors = $this->parents;
-    foreach ($this->parents as $code) {
-      $parent = payment_status_info($code);
+    foreach ($this->parents as $status) {
+      $parent = payment_status_info($status);
       $ancestors += $parent->ancestors();
     }
 
@@ -886,11 +886,11 @@ class PaymentAmountItem extends PaymentCommon {
 class PaymentStatusItem {
 
   /**
-   * The status's machine name.
+   * The status itself.
    *
    * @var string
    */
-  public $code = '';
+  public $status = '';
 
   /**
    * The Unix datetime this status was set.
@@ -913,8 +913,8 @@ class PaymentStatusItem {
    */
   public $psiid = 0;
 
-  function __construct($code, $created = 0, $pid = 0, $psiid = 0) {
-    $this->status = $code;
+  function __construct($status, $created = 0, $pid = 0, $psiid = 0) {
+    $this->status = $status;
     $this->created = $created ? $created : time();
     $this->pid = $pid;
     $this->psiid = $psiid;
