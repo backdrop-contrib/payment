@@ -196,7 +196,7 @@ class Payment extends PaymentCommon {
    * @param $description_arguments array
    *   Arguments to pass on to t() when translating $description.
    *
-   * @return NULL
+   * @return Payment
    */
   function setAmount($name, $amount, $description = '', $description_arguments = array()) {
     $this->amounts[$name] = new PaymentAmountItem(array(
@@ -205,6 +205,8 @@ class Payment extends PaymentCommon {
       'description' => $description,
       'description_arguments' => $description_arguments,
     ));
+
+    return $this;
   }
 
   /**
@@ -233,7 +235,7 @@ class Payment extends PaymentCommon {
    *
    * @param $status_item PaymentStatusItem
    *
-   * @return NULL
+   * @return Payment
    */
   function setStatus(PaymentStatusItem $status_item) {
     // A fail-safe to ensure hook implementations are only called if the status
@@ -257,6 +259,8 @@ class Payment extends PaymentCommon {
     if (module_exists('rules')) {
       rules_invoke_event('payment_status_change', $this, $previous_status_item);
     }
+
+    return $this;
   }
 
   /**
@@ -274,6 +278,8 @@ class Payment extends PaymentCommon {
     if ($status_items) {
       $this->statuses = $status_items;
     }
+
+    return $this;
   }
 
   /**

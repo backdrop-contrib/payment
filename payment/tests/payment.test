@@ -126,7 +126,7 @@ class PaymentInfoHookTest extends DrupalWebTestCase {
 }
 
 /**
- * Test payment amount handling.
+ * Test payment amount item handling.
  */
 class PaymentAmountItemHandlingTest extends DrupalWebTestCase {
 
