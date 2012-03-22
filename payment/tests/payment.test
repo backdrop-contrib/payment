@@ -24,7 +24,7 @@ class PaymentActionHookAndCallbackTest extends DrupalWebTestCase {
   /**
    * Test whether hook_payment_validate() is invoked.
    */
-  function testHookPaymentValidate() {
+  function testActionHooksAndCallbacks() {
     $payment_method = new PaymentMethod(array(
       'controller' => payment_method_controller_load('PaymentMethodBasicController'),
     ));
