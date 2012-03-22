@@ -299,13 +299,30 @@ function payment_page_status() {
  */
 function _payment_page_status_rows(array $statuses, array $children, array &$rows, $depth = 0) {
   foreach ($statuses as $status) {
-    $rows[] = array(theme('indentation', array(
-    'size' => $depth,
-  )) . payment_status_info($status)->title);
+    $rows[] = array(theme('payment_page_status_row', array(
+      'status' => $status,
+      'depth' => $depth,
+    )));
     if (isset($children[$status])) {
       _payment_page_status_rows($children[$status], $children, $rows, $depth + 1);
     }
   }
+}
+
+/**
+ * Implements theme callback: a payment status for the overview page.
+ *
+ * @param $variables array
+ *   An associative array containing:
+ *   - status_info: the PaymentStatusInfo object to theme.
+ *   - depth: the status' depth within the status hierarchy.
+ */
+function theme_payment_page_status_row(array $variables) {
+  $status_info = payment_status_info($variables['status']);
+
+  return theme('indentation', array(
+    'size' => $variables['depth'],
+  )) . '<div style="float: left;">' . $status_info->title . '<div class="description">' . $status_info->description . '</div></div>';
 }
 
 /**
