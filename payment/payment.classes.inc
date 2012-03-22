@@ -35,19 +35,12 @@ class Payment extends PaymentCommon {
   public $amounts = array();
 
   /**
-   * The name of a function to call when the payment has been completed. It
-   * receives two arguments:
-   * - $payment Payment
-   *   The Payment object.
-   * - $redirect boolean
-   *   Whether the user was redirected offsite during payment execution.
-   * The callback does not need to return anything and is free to redirect the
-   * user or display something.
-   * Use $caller_data to pass on arbitrary data to the finish callback.
+   * Information about this payment that is specific to the 'context' that
+   * created it, such as the webshop.
    *
-   * @var string
+   * @var array
    */
-  public $finish_callback = '';
+  public $caller_data = array();
 
   /**
    * The Unix datetime the payment was created.
@@ -71,12 +64,17 @@ class Payment extends PaymentCommon {
   public $expired = 0;
 
   /**
-   * Information about this payment that is specific to the 'context' that
-   * created it, such as the webshop.
+   * The name of a function to call when payment execution is completed,
+   * regardless of the payment status. It receives one argument:
+   * - $payment Payment
+   *   The Payment object.
+   * The callback does not need to return anything and is free to redirect the
+   * user or display something.
+   * Use Payment::caller_data to pass on arbitrary data to the finish callback.
    *
-   * @var array
+   * @var string
    */
-  public $caller_data = array();
+  public $finish_callback = '';
 
   /**
    * The payment method used for this payment.
