@@ -648,6 +648,32 @@ class PaymentMethodEntityController extends EntityAPIControllerExportable {
 }
 
 /**
+ * Features controller for payment_method entities.
+ */
+class PaymentMethodFeaturesController extends EntityDefaultFeaturesController {
+
+  function export($data, &$export, $module_name = '') {
+    $pipe = parent::export($data, $export, $module_name);
+
+    // Add dependencies for the payment method controller classes.
+    $controller_class_names = array();
+    foreach (entity_load_multiple_by_name($this->type, $data) as $method) {
+      $controller_class_names[] = $method->controller->name;
+    }
+    $result = db_select('registry')
+      ->fields('registry', array('module'))
+      ->condition('name', $controller_class_names)
+      ->condition('type', 'class')
+      ->execute();
+    while ($module = $result->fetchField()) {
+      $export['dependencies'][$module] = $module;
+    }
+
+    return $pipe;
+  }
+}
+
+/**
  * A payment method controller, e.g. the logic behind a payment method.
  *
  * @see payment_method_controller_load()
