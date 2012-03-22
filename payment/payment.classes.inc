@@ -484,6 +484,19 @@ class PaymentEntityController extends EntityAPIController {
 
     return $build;
   }
+
+  /**
+   * Implements EntityAPIController::delete().
+   */
+  function delete($ids, DatabaseTransaction $transaction = NULL) {
+    parent::delete($ids, $transaction);
+    db_delete('payment_amount')
+      ->condition('pid', $ids)
+      ->execute();
+    db_delete('payment_status_item')
+      ->condition('pid', $ids)
+      ->execute();
+  }
 }
 
 /**
