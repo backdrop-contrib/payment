@@ -6,13 +6,13 @@
  */
 
 /**
- * Tests action hook invocations.
+ * Tests action hook and callback invocations.
  */
-class PaymentActionHookTest extends DrupalWebTestCase {
+class PaymentActionHookAndCallbackTest extends DrupalWebTestCase {
 
   static function getInfo() {
     return array(
-      'name' => 'Action hook invocations',
+      'name' => 'Action hook and callback invocations',
       'group' => 'Payment',
     );
   }
@@ -37,6 +37,7 @@ class PaymentActionHookTest extends DrupalWebTestCase {
     $this->assertTrue(isset($payment->payment_test_payment_validate), t('hook_payment_validate() is invoked when validating a payment before execution.'));
     $this->assertTrue(isset($payment->payment_test_payment_pre_execute), t('hook_payment_pre_execute() is invoked before executing a payment.'));
     $this->assertTrue(isset($payment->payment_test_payment_status_change), t('hook_payment_status_change() is invoked before executing a payment.'));
+    $this->assertTrue(isset($payment->payment_test_finish_callback), t('The finish callback is invoked after executing a payment.'));
   }
 }
 
