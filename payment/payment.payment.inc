@@ -19,6 +19,7 @@ function payment_payment_status_info() {
       'title' => t('No money has been transferred'),
     )),
     new PaymentStatusInfo(array(
+      'description' => t('The payment status could not be automatically verified.'),
       'status' => PAYMENT_STATUS_UNKNOWN,
       'title' => t('Unknown'),
     )),
