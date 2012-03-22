@@ -128,11 +128,11 @@ class PaymentInfoHookTest extends DrupalWebTestCase {
 /**
  * Test payment amount handling.
  */
-class PaymentAmountHandlingTest extends DrupalWebTestCase {
+class PaymentAmountItemHandlingTest extends DrupalWebTestCase {
 
   static function getInfo() {
     return array(
-      'name' => 'Payment amount handling',
+      'name' => 'Payment amount item handling',
       'group' => 'Payment',
     );
   }
@@ -142,9 +142,9 @@ class PaymentAmountHandlingTest extends DrupalWebTestCase {
   }
 
   /**
-   * Test payment amount handling.
+   * Test payment amount item handling.
    */
-  function testPaymentAmountHandling() {
+  function testPaymentAmountItemHandling() {
     $payment = new Payment;
 
     // Test Payment::setAmount();
