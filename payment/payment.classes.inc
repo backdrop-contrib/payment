@@ -98,13 +98,14 @@ class Payment extends PaymentCommon {
   public $pid = 0;
 
   /**
-   * The status log. Contains PaymentStatusItem objects ordered by datetime.
+   * The status log. Contains PaymentStatusItem objects ordered by datetime. Do
+   * not set directly, but use Payment::setStatus() instead.
    *
    * @see Payment::setStatus()
    *
    * @var array
    */
-  protected $statuses = array();
+  public $statuses = array();
 
   /**
    * The UID of the user this payment belongs to.
@@ -264,40 +265,12 @@ class Payment extends PaymentCommon {
   }
 
   /**
-   * Set this payment's statuses. hook_payment_status_change() and the
-   * corresponding Rules event are NOT fired. This is an internal workaround
-   * for PaymentEntityController::attachLoad().
-   *
-   * @see Payment::setStatus()
-   *
-   * @param $status_items array
-   *
-   * @return NULL
-   */
-  function _setStatuses(array $status_items) {
-    if ($status_items) {
-      $this->statuses = $status_items;
-    }
-
-    return $this;
-  }
-
-  /**
    * Get the current payment status.
    *
    * @return PaymentStatusItem
    */
   function getStatus() {
     return end($this->statuses);
-  }
-
-  /**
-   * Get all this payment's statuses.
-   *
-   * @var array
-   */
-  function getStatuses() {
-    return $this->statuses;
   }
 
   /**
@@ -388,7 +361,7 @@ class PaymentEntityController extends EntityAPIController {
 
     // Add all data to the payments.
     foreach ($queried_entities as $payment) {
-      $payment->_setStatuses($status_items[$payment->pid]);
+      $payment->statuses = $status_items[$payment->pid];
       $payment->amounts = $amounts[$payment->pid];
       $payment->method = $methods[$payment->pmid];
       unset($payment->pmid);
@@ -427,7 +400,7 @@ class PaymentEntityController extends EntityAPIController {
     }
 
     // Save the payment's status items.
-    foreach ($payment->getStatuses() as $status_item) {
+    foreach ($payment->statuses as $status_item) {
       // Statuses cannot be edited, so only save the ones without a PSIID set.
       if (!$status_item->psiid) {
         $status_item->pid = $payment->pid;
@@ -471,7 +444,7 @@ class PaymentEntityController extends EntityAPIController {
       // Status history.
       $status = payment_status_info($payment->getStatus()->status, TRUE);
       $rows = array();
-      foreach (array_reverse($payment->getStatuses()) as $status_item) {
+      foreach (array_reverse($payment->statuses) as $status_item) {
         $status = payment_status_info($status_item->status);
         $rows[] = array($status->title, format_date($status_item->created));
       }

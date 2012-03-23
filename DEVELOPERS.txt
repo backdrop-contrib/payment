@@ -11,7 +11,7 @@ necessary properties, such as:
 - One or more PaymentAmountItem objects in Payment::amounts, keyed by
   PaymentAmountItem::name. See Payment::setAmount().
 - One or more PaymentStatusItem objects in Payment::statuses, which can be set
-  through Payment::setStatus() or Payment::_setStatuses()
+  through Payment::setStatus().
 Once this is completed, call $payment->execute(). If the payment and its
 payment are valid (they can work together), the payment will be executed. You
 should do nothing important after payment execution, because the payment method

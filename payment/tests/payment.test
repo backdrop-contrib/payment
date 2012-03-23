@@ -128,7 +128,7 @@ class PaymentInfoHookTest extends DrupalWebTestCase {
 /**
  * Test payment amount item handling.
  */
-class PaymentAmountItemHandlingTest extends DrupalWebTestCase {
+class PaymentAmountItemTest extends DrupalWebTestCase {
 
   static function getInfo() {
     return array(
@@ -169,5 +169,30 @@ class PaymentAmountItemHandlingTest extends DrupalWebTestCase {
     // Test payment_amount_extract_total().
     $amounts = payment_amount_extract('payment_total', $payment);
     $this->assertTrue($payment->totalAmount($amounts) == 86, t('payment_amount_extract_total() returns all amounts.'));
+  }
+}
+
+/**
+ * Test payment status item handling.
+ */
+class PaymentStatusItemTest extends DrupalUnitTestCase {
+
+  static function getInfo() {
+    return array(
+      'name' => 'Payment status item handling',
+      'group' => 'Payment',
+    );
+  }
+
+  /**
+   * Test payment amount item handling.
+   */
+  function testPaymentStatusItem() {
+    $payment = new Payment;
+    $status_pending = new PaymentStatusItem(PAYMENT_STATUS_PENDING);
+    $status_success = new PaymentStatusItem(PAYMENT_STATUS_SUCCESS);
+    $payment->setStatus($status_pending);
+    $payment->setStatus($status_success);
+    $this->assertTrue($payment->getStatus() === $status_success, t('Payment::setStatus() sets status items in the right order and Payment::getStatus() retrieves them.'));
   }
 }
