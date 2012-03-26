@@ -159,7 +159,7 @@ function paymentform_form(array $form, array &$form_state, Payment $payment = NU
     $form['amount_human_readable'] = array(
       '#type' => 'item',
       '#title' => t('Amount'),
-      '#markup' => payment_amount_human_readable($payment->amount),
+      '#markup' => payment_amount_human_readable($payment->amount, $payment->currency_code),
     );
     $form['payment_method'] = array(
       '#type' => 'payment_method',
