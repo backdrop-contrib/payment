@@ -175,7 +175,7 @@ class PaymentAmountItemTest extends DrupalWebTestCase {
 /**
  * Test payment status item handling.
  */
-class PaymentStatusItemTest extends DrupalUnitTestCase {
+class PaymentStatusItemTest extends DrupalWebTestCase {
 
   static function getInfo() {
     return array(
