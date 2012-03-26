@@ -673,11 +673,10 @@ function payment_form_method_change_submit(array $form, array &$form_state) {
  *   Either a PaymentMethod object or NULL.
  */
 function payment_form_method_controller_settings($payment_method = NULL) {
-  $elements['wrapper_prefix'] = array(
-    '#type' => 'markup',
-    '#markup' => '<div id="payment-controller-settings">',
+  $elements['controller_settings'] = array(
+    '#prefix' => '<div id="payment-controller-settings">',
+    '#suffix' => '</div>',
   );
-  $elements['controller_settings'] = array();
   if ($payment_method) {
     $elements['change'] = array(
       '#type' => 'submit',
@@ -689,13 +688,9 @@ function payment_form_method_controller_settings($payment_method = NULL) {
       ),
     );
     if ($payment_method->controller->payment_form_elements_callback) {
-      $elements['controller_settings'] = call_user_func($payment_method->controller->payment_form_elements_callback, $payment_method);
+      $elements['controller_settings'] += call_user_func($payment_method->controller->payment_form_elements_callback, $payment_method);
     }
   }
-  $elements['wrapper_suffix'] = array(
-    '#type' => 'markup',
-    '#markup' => '</div>',
-  );
 
   return $elements;
 }
