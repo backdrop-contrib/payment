@@ -188,7 +188,7 @@ function paymentform_form_validate(array $form, array &$form_state) {
     $form_state['payment_step']++;
     $form_state['rebuild'] = TRUE;
   }
-  else {
+  elseif (!empty($form_state['values']['payment_method']['pmid'])) {
     $payment->method = entity_load_single('payment_method', $form_state['values']['payment_method']['pmid']);
   }
 }
