@@ -47,7 +47,7 @@ class PaymentBillingCRUDTest extends DrupalWebTestCase {
       ->condition('pid', $payment->pid)
       ->execute()
       ->fetchfield();
-    $this->assertTrue($first_name === 'Blue', t('Billing information is saved together with a payment.'));
+    $this->assertTrue($first_name === 'Blue', 'Billing information is saved together with a payment.');
 
     // Test update.
     $payment->billing->first_name = 'Smurf';
@@ -57,7 +57,7 @@ class PaymentBillingCRUDTest extends DrupalWebTestCase {
       ->condition('pid', $payment->pid)
       ->execute()
       ->fetchfield();
-    $this->assertTrue($first_name === 'Smurf', t('Billing information is updated together with a payment.'));
+    $this->assertTrue($first_name === 'Smurf', 'Billing information is updated together with a payment.');
     
     // Test load.
     db_update('paymentbilling')
@@ -67,7 +67,7 @@ class PaymentBillingCRUDTest extends DrupalWebTestCase {
       ->condition('pid', $payment->pid)
       ->execute();
     $payment = entity_load_single('payment', $payment->pid);
-    $this->assertTrue($payment->billing->first_name === 'Druplicon', t('Billing information is loaded together with a payment.'));
+    $this->assertTrue($payment->billing->first_name === 'Druplicon', 'Billing information is loaded together with a payment.');
 
     // Test delete.
     entity_delete('payment', $payment->pid);
@@ -76,6 +76,6 @@ class PaymentBillingCRUDTest extends DrupalWebTestCase {
       ->countQuery()
       ->execute()
       ->fetchfield();
-    $this->assertTrue($count == 0, t('Billing information is deleted together with a payment.'));
+    $this->assertTrue($count == 0, 'Billing information is deleted together with a payment.');
   }
 }
