@@ -145,11 +145,12 @@ function paymentmethodbasic_form_payment_method_submit(array $form, array &$form
 /**
  * Implements PaymentMethodController payment_form_elements_callback.
  */
-function paymentmethodbasic_payment_form_elements(PaymentMethod $payment_method) {
+function paymentmethodbasic_payment_form_elements(Payment $payment, array $form_state) {
+  return paymentbilling_payment_form_elements($payment, $form_state);
   $elements = array();
   $elements['message'] = array(
     '#type' => 'markup',
-    '#markup' => check_markup($payment_method->controller_data['message'], $payment_method->controller_data['text_format']),
+    '#markup' => check_markup($payment->method->controller_data['message'], $payment->method->controller_data['text_format']),
   );
 
   return $elements;

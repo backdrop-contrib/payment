@@ -1,0 +1,8 @@
+CLASS EXTENSIONS
+----------------
+- Payment::billing should contain a PaymentBilling object if it is to have
+  billing information associated with it.
+- PaymentMethodController::billing should be an array of which keys are the
+  names of any of PaymentBilling's properties if the controller requires
+  payments to have them filled in. Values are booleans indicating whether the
+  property is required.

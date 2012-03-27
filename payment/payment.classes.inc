@@ -290,7 +290,7 @@ class Payment extends PaymentCommon {
     }
     $available = array();
     foreach ($payment_methods as $payment_method) {
-      if ($payment_method->validate($this)) {
+      if ($payment_method->validate($this, FALSE)) {
         $available[$payment_method->pmid] = $payment_method;
       }
     }
@@ -546,16 +546,21 @@ class PaymentMethod extends PaymentCommon {
    * Validate a payment against this payment method.
    *
    * @param $payment Payment
+   * @param $strict boolean
+   *   Whether to validate everything a payment method needs or to validate the
+   *   most important things only. Useful when finding available payment methods,
+   *   for instance, which does not require unimportant things to be a 100%
+   *   valid.
    *
    * @return boolean
    *   Whether the payment can work with the this payment method.
    */
-  function validate(Payment $payment) {
-    if ($this->controller->validate($payment, $this) !== TRUE) {
+  function validate(Payment $payment, $strict = TRUE) {
+    if ($this->controller->validate($payment, $this, $strict) !== TRUE) {
       return FALSE;
     }
     foreach(module_implements('payment_validate') as $module) {
-      if (module_invoke($module, 'payment_validate', $payment, $this) !== TRUE) {
+      if (module_invoke($module, 'payment_validate', $payment, $this, $strict) !== TRUE) {
         return FALSE;
       }
     }
@@ -708,7 +713,9 @@ class PaymentMethodController {
   /**
    * The name of the function that returns form elements to configure this
    * payment method for a specific payment. Using #element_validate callbacks,
-   * input can be added to the Payment object in $form_state['payment'].
+   * input can be added to the Payment object in $form_state['payment']. The
+   * function accepts a Payment object and the $form_state (not by reference)
+   * array as arguments.
    *
    * @var string
    */
@@ -750,16 +757,21 @@ class PaymentMethodController {
    *
    * @param $payment Payment
    * @param $payment_method PaymentMethod
+   * @param $strict boolean
+   *   Whether to validate everything a payment method needs or to validate the
+   *   most important things only. Useful when finding available payment methods,
+   *   for instance, which does not require unimportant things to be a 100%
+   *   valid.
    *
    * @return boolean
    *   Whether the payment, the provided payment method and its controller can
    *   work together.
    */
-  function validate(Payment $payment, PaymentMethod $payment_method) {
+  function validate(Payment $payment, PaymentMethod $payment_method, $strict) {
     $valid = TRUE;
 
     // Confirm the payment amount is higher than 0.
-    if ($payment->amount <= 0) {
+    if ($payment->totalAmount() <= 0) {
       $valid = FALSE;
     }
 
@@ -795,7 +807,7 @@ class PaymentMethodControllerUnavailable extends PaymentMethodController {
   /**
    * Implements PaymentMethodController::validate().
    */
-  function validate(Payment $payment, PaymentMethod $payment_method) {
+  function validate(Payment $payment, PaymentMethod $payment_method, $strict) {
     return FALSE;
   }
 }

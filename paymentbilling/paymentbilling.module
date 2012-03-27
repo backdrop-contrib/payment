@@ -1,0 +1,375 @@
+<?php
+
+/**
+ * @file
+ * Hook implementations and general functions.
+ */
+
+/**
+ * Implements hook_entity_load().
+ */
+function paymentbilling_entity_load(array $entities, $entity_type) {
+  if ($entity_type == 'payment') {
+    $result = db_select('paymentbilling')
+      ->fields('paymentbilling')
+      ->condition('pid', array_keys($entities))
+      ->execute();
+    while ($data = $result->fetchAssoc()) {
+      $pid = $data['pid'];
+      unset($data['pid']);
+      $payment = $entities[$pid]->billing = new PaymentBilling($data);
+    }
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_ACTION().
+ */
+function paymentbilling_payment_insert(Payment $payment) {
+  if (!empty($payment->billing)) {
+    $values = array_merge((array) $payment->billing, array(
+      'pid' => $payment->pid,
+    ));
+    db_insert('paymentbilling')
+      ->fields($values)
+      ->execute();
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_ACTION().
+ */
+function paymentbilling_payment_update(Payment $payment) {
+  if (!empty($payment->billing)) {
+    $values = array_merge((array) $payment->billing, array(
+      'pid' => $payment->pid,
+    ));
+    db_update('paymentbilling')
+      ->fields($values)
+      ->condition('pid', $payment->pid)
+      ->execute();
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_ACTION().
+ */
+function paymentbilling_payment_delete(Payment $payment) {
+  if (!empty($payment->billing)) {
+    db_delete('paymentbilling')
+      ->condition('pid', $payment->pid)
+      ->execute();
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_ACTION_alter().
+ */
+function paymentbilling_payment_view_alter(array &$build, $entity_type) {
+  $payment = $build['#entity'];
+  $build['billing'] = array(
+    '#weight' => 1,
+  );
+  if (!empty($payment->billing)) {
+    if ($payment->billing->organization) {
+      $build['billing']['organization'] = array(
+        '#type' => 'item',
+        '#title' => t('Organization'),
+        '#markup' => check_plain($payment->billing->organization),
+      );
+    }
+    if ($payment->billing->first_name || $payment->billing->last_name) {
+      $build['billing']['name'] = array(
+        '#type' => 'item',
+        '#title' => t('Name'),
+        '#markup' => t('@first_name @last_name', array(
+          '@first_name' => $payment->billing->first_name,
+          '@last_name' => $payment->billing->last_name,
+        )),
+      );
+    }
+    if ($payment->billing->address) {
+      $build['billing']['address'] = array(
+        '#type' => 'item',
+        '#title' => t('Address'),
+        '#markup' => check_plain($payment->billing->address),
+      );
+    }
+    if ($payment->billing->postal_code) {
+      $build['billing']['postal_code'] = array(
+        '#type' => 'item',
+        '#title' => t('Postal code'),
+        '#markup' => check_plain($payment->billing->postal_code),
+      );
+    }
+    if ($payment->billing->city) {
+      $build['billing']['city'] = array(
+        '#type' => 'item',
+        '#title' => t('City'),
+        '#markup' => check_plain($payment->billing->city),
+      );
+    }
+    if ($payment->billing->country) {
+      require_once('includes/iso.inc');
+      $countries = _country_get_predefined_list();
+      $build['billing']['country'] = array(
+        '#type' => 'item',
+        '#title' => t('Country'),
+        '#markup' => $countries[$payment->billing->country],
+      );
+    }
+    if ($payment->billing->phone_number) {
+      $build['billing']['phone_number'] = array(
+        '#type' => 'item',
+        '#title' => t('Phone number'),
+        '#markup' => check_plain($payment->billing->phone_number),
+      );
+    }
+    if ($payment->billing->email_address) {
+      $build['billing']['email_address'] = array(
+        '#type' => 'item',
+        '#title' => t('Email address'),
+        '#markup' => $payment->billing->email_address,
+      );
+    }
+  }
+  if ($build['billing']) {
+    $build['billing']['#type'] = 'fieldset';
+    $build['billing']['#title'] = t('Billing information');
+  }
+}
+
+/**
+ * Implements hook_payment_validate().
+ */
+function paymentbilling_payment_validate(Payment $payment, PaymentMethod $payment_method, $strict) {
+  if ($strict) {
+    // See if this controller requires billing information.
+    if (!empty($payment_method->controller->billing)) {
+      // See if the payment has any billing information set.
+      if (empty($payment->billing)) {
+        return FALSE;
+      }
+      else {
+        // Invalidate if at least one property is not present.
+        foreach (array_keys(array_filter($payment_method->controller->billing)) as $property) {
+          if (empty($payment->billing->$property)) {
+            return FALSE;
+          }
+        }
+      }
+    }
+  }
+  // If it's still not marked invalid at this point, it's valid.
+  return TRUE;
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function paymentbilling_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'paymentbilling') . '/views',
+  );
+}
+
+/**
+ * Billing payment controller settings.
+ */
+function paymentbilling_payment_form_elements(Payment $payment, $form_state) {
+  if (empty($payment->billing)) {
+    $payment->billing = new PaymentBilling;
+  }
+  if (!isset($form_state['paymentbilling'])) {
+    $form_state['paymentbilling'] = array();
+    if (isset($payment->method->controller->billing)) {
+      foreach ($payment->method->controller->billing as $property => $required) {
+        if (empty($payment->billing->$property)) {
+          $form_state['paymentbilling'][$property] = $required;
+        }
+      }
+    }
+  }
+  $properties = &$form_state['paymentbilling'];
+  $elements = array();
+  if (isset($properties['organization'])) {
+    $elements['organization'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Organization'),
+      '#default_value' => $payment->billing->organization,
+      '#required' => $properties['organization'],
+      '#element_validate' => array('paymentbilling_payment_form_elements_validate'),
+    );
+  }
+  if (isset($properties['first_name'])) {
+    $elements['first_name'] = array(
+      '#type' => 'textfield',
+      '#title' => t('First name'),
+      '#default_value' => $payment->billing->first_name,
+      '#required' => $properties['first_name'],
+      '#element_validate' => array('paymentbilling_payment_form_elements_validate'),
+    );
+  }
+  if (isset($properties['last_name'])) {
+    $elements['last_name'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Last name'),
+      '#default_value' => $payment->billing->last_name,
+      '#required' => $properties['last_name'],
+      '#element_validate' => array('paymentbilling_payment_form_elements_validate'),
+    );
+  }
+  if (isset($properties['address'])) {
+    $elements['address'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Address'),
+      '#default_value' => $payment->billing->address,
+      '#required' => $properties['address'],
+      '#element_validate' => array('paymentbilling_payment_form_elements_validate'),
+    );
+  }
+  if (isset($properties['postal_code'])) {
+    $elements['postal_code'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Postal_code'),
+      '#default_value' => $payment->billing->postal_code,
+      '#required' => $properties['postal_code'],
+      '#element_validate' => array('paymentbilling_payment_form_elements_validate'),
+    );
+  }
+  if (isset($properties['city'])) {
+    $elements['city'] = array(
+      '#type' => 'textfield',
+      '#title' => t('City'),
+      '#default_value' => $payment->billing->city,
+      '#required' => $properties['city'],
+      '#element_validate' => array('paymentbilling_payment_form_elements_validate'),
+    );
+  }
+  if (isset($properties['country'])) {
+    require_once('includes/iso.inc');
+    $elements['country'] = array(
+      '#type' => 'select',
+      '#title' => t('Country'),
+      '#default_value' => $payment->billing->country,
+      '#options' => _country_get_predefined_list(),
+      '#required' => TRUE,
+      '#element_validate' => array('paymentbilling_payment_form_elements_validate'),
+    );
+  }
+  if (isset($properties['email_address'])) {
+    $elements['email_address'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Email address'),
+      '#default_value' => $payment->billing->email_address,
+      '#required' => $properties['email_address'],
+      '#element_validate' => array('paymentbilling_form_validate_email_address'),
+    );
+  }
+  if (isset($properties['phone_number'])) {
+    $elements['phone_number'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Phone number'),
+      '#default_value' => $payment->billing->phone_number,
+      '#required' => $properties['phone_number'],
+      '#element_validate' => array('paymentbilling_payment_form_elements_validate'),
+    );
+  }
+  if ($elements) {
+    $elements['#title'] = t('Billing information');
+    $elements['#type'] = 'fieldset';
+  }
+
+  return $elements;
+}
+
+/**
+ * Implements form validate callback.
+ */
+function paymentbilling_form_validate_email_address(array $element, array &$form_state, array $form) {
+  $email_address = drupal_array_get_nested_value($form_state['values'], $element['#parents']);
+  if ($email_address && !valid_email_address($email_address)) {
+    form_error($element, t('The email address is invalid.'));
+  }
+  else {
+    paymentbilling_payment_form_elements_validate($element, $form_state, $form);
+  }
+}
+
+/**
+ * Implements form validate callback: add the value to the PaymentBilling
+ * object.
+ */
+function paymentbilling_payment_form_elements_validate(array $element, array &$form_state, array $form) {
+  $form_state['payment']->billing->{end($element['#parents'])} = drupal_array_get_nested_value($form_state['values'], $element['#parents']);
+}
+
+/**
+ * Payment billing information.
+ */
+class PaymentBilling extends PaymentCommon {
+
+  /**
+   * Address.
+   *
+   * @var string
+   */
+  public $address = '';
+
+  /**
+   * City.
+   *
+   * @var string
+   */
+  public $city = '';
+
+  /**
+   * An ISO 3166-1 alpha-2 country code.
+   *
+   * @var string
+   */
+  public $country = '';
+
+  /**
+   * Email address.
+   *
+   * @var string
+   */
+  public $email_address = '';
+
+  /**
+   * First name.
+   *
+   * @var string
+   */
+  public $first_name = '';
+
+  /**
+   * Last name.
+   *
+   * @var string
+   */
+  public $last_name = '';
+
+  /**
+   * Organization.
+   *
+   * @var string
+   */
+  public $organization = '';
+
+  /**
+   * Phone number.
+   *
+   * @var string
+   */
+  public $phone_number = '';
+
+  /**
+   * Postal code.
+   *
+   * @var string
+   */
+  public $postal_code = '';
+}

@@ -1,0 +1,8 @@
+name = Billing
+description = "Adds billing information to payments."
+core = 7.x
+dependencies[] = payment
+package = Payment
+files[] = paymentbilling.module
+files[] = tests/paymentbilling.test
+files[] = views/PaymentViewsHandlerFieldPaymentBillingCountryHumanReadable.inc

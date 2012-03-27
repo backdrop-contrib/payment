@@ -21,7 +21,7 @@ function payment_test_payment_amount_info() {
 /**
  * Implements hook_payment_validate().
  */
-function payment_test_payment_validate(Payment $payment, PaymentMethod $payment_method) {
+function payment_test_payment_validate(Payment $payment, PaymentMethod $payment_method, $strict) {
   $payment->payment_test_payment_validate = TRUE;
 
   return TRUE;

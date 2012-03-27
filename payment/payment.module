@@ -622,7 +622,7 @@ function payment_form_method_process(array $element, array &$form_state, array &
     '#type' => 'select',
     '#title' => isset($element['#title']) ? $element['#title'] : NULL,
     '#options' => $pmid_options,
-    '#default_value' => $payment->method ? $payment->method->pmid : NULL,
+    '#default_value' => isset($payment->method) ? $payment->method->pmid : NULL,
     '#empty_value' => 'select',
     '#required' => $element['#required'],
     '#ajax' => array(
@@ -640,7 +640,7 @@ function payment_form_method_process(array $element, array &$form_state, array &
     ),
     '#id' => 'payment-method-pmid',
   );
-  $element += payment_form_method_controller_settings($payment->method);
+  $element += payment_form_method_controller_settings($payment, $form_state);
 
   // The element itself has no input, only its children, so mark it not
   // required to prevent validation errors.
@@ -655,6 +655,7 @@ function payment_form_method_validate(array $element, array &$form_state) {
     $payment = $form_state['payment'];
     if (!$payment->method || $payment->method->pmid != $pmid) {
       $form_state['rebuild'] = TRUE;
+      $payment->method = entity_load_single('payment_method', $pmid);
     }
   }
 }
@@ -667,17 +668,20 @@ function payment_form_method_change_submit(array $form, array &$form_state) {
 }
 
 /**
- * Return a payment method controller's form elements to configure a payment.
+ * Return a payment's method controller's form elements to configure a payment.
  *
- * @param $payment_method mixed
- *   Either a PaymentMethod object or NULL.
+ * @param $payment Payment
+ * @param $form_state array
+ *
+ * @return array
  */
-function payment_form_method_controller_settings($payment_method = NULL) {
+function payment_form_method_controller_settings(Payment $payment, array &$form_state) {
   $elements['controller_settings'] = array(
     '#prefix' => '<div id="payment-controller-settings">',
     '#suffix' => '</div>',
+    '#weight' => 1,
   );
-  if ($payment_method) {
+  if ($payment->method) {
     $elements['change'] = array(
       '#type' => 'submit',
       '#value' => t('Change payment method'),
@@ -687,8 +691,8 @@ function payment_form_method_controller_settings($payment_method = NULL) {
         'class' => array('js-hide')
       ),
     );
-    if ($payment_method->controller->payment_form_elements_callback) {
-      $elements['controller_settings'] += call_user_func($payment_method->controller->payment_form_elements_callback, $payment_method);
+    if ($payment->method->controller->payment_form_elements_callback) {
+      $elements['controller_settings'] += call_user_func($payment->method->controller->payment_form_elements_callback, $payment, $form_state);
     }
   }
 

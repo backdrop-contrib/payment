@@ -143,9 +143,16 @@ function hook_payment_pre_execute(Payment $payment) {
  * are capable of processing a payment.
  *
  * @param $payment Payment
+ *   $payment->method contains the method currently configured, but NOT the
+ *   method that $payment should be tested against, which is $payment_method.
  * @param $payment_method PaymentMethod
+ * @param $strict boolean
+ *   Whether to validate everything a payment method needs or to validate the
+ *   most important things only. Useful when finding available payment methods,
+ *   for instance, which does not require unimportant things to be a 100%
+ *   valid.
  *
  * @return boolean
  *   Whether the payment and/or the payment method are valid.
  */
-function hook_payment_validate(Payment $payment, PaymentMethod $payment_method) {}
+function hook_payment_validate(Payment $payment, PaymentMethod $payment_method, $strict) {}
