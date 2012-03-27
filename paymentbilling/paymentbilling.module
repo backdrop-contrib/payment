@@ -67,19 +67,17 @@ function paymentbilling_payment_delete(Payment $payment) {
  */
 function paymentbilling_payment_view_alter(array &$build, $entity_type) {
   $payment = $build['#entity'];
-  $build['billing'] = array(
-    '#weight' => 1,
-  );
+  $elements = array();
   if (!empty($payment->billing)) {
     if ($payment->billing->organization) {
-      $build['billing']['organization'] = array(
+      $elements['organization'] = array(
         '#type' => 'item',
         '#title' => t('Organization'),
         '#markup' => check_plain($payment->billing->organization),
       );
     }
     if ($payment->billing->first_name || $payment->billing->last_name) {
-      $build['billing']['name'] = array(
+      $elements['name'] = array(
         '#type' => 'item',
         '#title' => t('Name'),
         '#markup' => t('@first_name @last_name', array(
@@ -89,21 +87,21 @@ function paymentbilling_payment_view_alter(array &$build, $entity_type) {
       );
     }
     if ($payment->billing->address) {
-      $build['billing']['address'] = array(
+      $elements['address'] = array(
         '#type' => 'item',
         '#title' => t('Address'),
         '#markup' => check_plain($payment->billing->address),
       );
     }
     if ($payment->billing->postal_code) {
-      $build['billing']['postal_code'] = array(
+      $elements['postal_code'] = array(
         '#type' => 'item',
         '#title' => t('Postal code'),
         '#markup' => check_plain($payment->billing->postal_code),
       );
     }
     if ($payment->billing->city) {
-      $build['billing']['city'] = array(
+      $elements['city'] = array(
         '#type' => 'item',
         '#title' => t('City'),
         '#markup' => check_plain($payment->billing->city),
@@ -112,30 +110,33 @@ function paymentbilling_payment_view_alter(array &$build, $entity_type) {
     if ($payment->billing->country) {
       require_once('includes/iso.inc');
       $countries = _country_get_predefined_list();
-      $build['billing']['country'] = array(
+      $elements['country'] = array(
         '#type' => 'item',
         '#title' => t('Country'),
         '#markup' => $countries[$payment->billing->country],
       );
     }
     if ($payment->billing->phone_number) {
-      $build['billing']['phone_number'] = array(
+      $elements['phone_number'] = array(
         '#type' => 'item',
         '#title' => t('Phone number'),
         '#markup' => check_plain($payment->billing->phone_number),
       );
     }
     if ($payment->billing->email_address) {
-      $build['billing']['email_address'] = array(
+      $elements['email_address'] = array(
         '#type' => 'item',
         '#title' => t('Email address'),
         '#markup' => $payment->billing->email_address,
       );
     }
   }
-  if ($build['billing']) {
-    $build['billing']['#type'] = 'fieldset';
-    $build['billing']['#title'] = t('Billing information');
+  if ($elements) {
+    $build['billing'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Billing information'),
+      '#weight' => 1,
+    ) + $elements;
   }
 }
 
