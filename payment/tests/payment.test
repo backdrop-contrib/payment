@@ -185,6 +185,13 @@ class PaymentStatusItemTest extends DrupalWebTestCase {
   }
 
   /**
+   * Implements DrupalWebTestCase::setUp().
+   */
+  function setUp() {
+    parent::setUp('payment');
+  }
+
+  /**
    * Test payment amount item handling.
    */
   function testPaymentStatusItem() {
