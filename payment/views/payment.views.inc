@@ -23,15 +23,15 @@ function payment_views_data_alter(&$data) {
     'handler' => 'views_handler_relationship',
     'label' => t('Payment status item'),
   );
-  $data['payment']['pid_amount'] = array(
-    'title' => t('Payment amounts'),
+  $data['payment']['pid_line_item'] = array(
+    'title' => t('Line items'),
     'real field' => 'pid',
     'relationship' => array(
-      'title' => t('Payment amounts'),
-      'base' => 'payment_amount',
+      'title' => t('Line items'),
+      'base' => 'payment_line_item',
       'base field' => 'pid',
       'handler' => 'views_handler_relationship',
-      'label' => t('Payment amounts'),
+      'label' => t('Line items'),
     ),
   );
   $data['payment']['pmid']['relationship'] = array(
@@ -47,15 +47,15 @@ function payment_views_data_alter(&$data) {
     'label' => t('User'),
   );
 
-  // Payment amounts. This is not an alteration, but implementing
+  // Payment line items. This is not an alteration, but implementing
   // hook_views_data() prevents Entity API from exposing our entities to Views
   // automatically. See http://drupal.org/node/1377364.
-  $data['payment_amount'] = array(
+  $data['payment_line_item'] = array(
     'table' => array(
       'base' => array(
-        'title' => t('Payment amount'),
+        'title' => t('Payment line item'),
       ),
-      'group' => t('Payment amount'),
+      'group' => t('Payment line item'),
     ),
     // Field configuration.
     'amount' => array(
@@ -74,10 +74,26 @@ function payment_views_data_alter(&$data) {
         'handler' => 'views_handler_argument_numeric',
       ),
     ),
+    'amount_total' => array(
+      'title' => t('Total amount'),
+      'field' => array(
+        'handler' => 'PaymentViewsHandlerFieldPaymentLineItemAmountTotal',
+        'click sortable' => TRUE,
+      ),
+      'sort' => array(
+        'handler' => 'views_handler_sort',
+      ),
+      'filter' => array(
+        'handler' => 'views_handler_filter_numeric',
+      ),
+      'argument' => array(
+        'handler' => 'views_handler_argument_numeric',
+      ),
+    ),
     'description' => array(
       'title' => t('Description'),
       'field' => array(
-        'handler' => 'PaymentViewsHandlerFieldPaymentAmountDescription',
+        'handler' => 'PaymentViewsHandlerFieldPaymentLineItemDescription',
         'click sortable' => TRUE,
       ),
       'sort' => array(
@@ -127,6 +143,38 @@ function payment_views_data_alter(&$data) {
         'field' => 'pid',
         'handler' => 'views_handler_relationship',
         'label' => t('Payment'),
+      ),
+    ),
+    'quantity' => array(
+      'title' => t('Quantity'),
+      'field' => array(
+        'handler' => 'views_handler_field',
+        'click sortable' => TRUE,
+      ),
+      'sort' => array(
+        'handler' => 'views_handler_sort',
+      ),
+      'filter' => array(
+        'handler' => 'views_handler_filter_numeric',
+      ),
+      'argument' => array(
+        'handler' => 'views_handler_argument_numeric',
+      ),
+    ),
+    'tax_rate' => array(
+      'title' => t('Tax rate'),
+      'field' => array(
+        'handler' => 'views_handler_field',
+        'click sortable' => TRUE,
+      ),
+      'sort' => array(
+        'handler' => 'views_handler_sort',
+      ),
+      'filter' => array(
+        'handler' => 'views_handler_filter_numeric',
+      ),
+      'argument' => array(
+        'handler' => 'views_handler_argument_numeric',
       ),
     ),
   );

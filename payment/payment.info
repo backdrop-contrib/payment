@@ -5,6 +5,7 @@ dependencies[] = entity
 package = Payment
 files[] = payment.classes.inc
 files[] = tests/payment.test
+files[] = views/PaymentViewsHandlerFieldPaymentLineItemAmountTotal.inc
 files[] = views/PaymentViewsHandlerFieldPaymentMethodControllerTitle.inc
 files[] = views/PaymentViewsHandlerFieldPaymentMethodControllerDescription.inc
 files[] = views/PaymentViewsHandlerFieldPaymentMethodOperations.inc

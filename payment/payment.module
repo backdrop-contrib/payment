@@ -227,7 +227,7 @@ function payment_hook_info() {
   $hooks['payment_method_controller_info'] = array(
     'group' => 'payment',
   );
-  $hooks['payment_amount_info'] = array(
+  $hooks['payment_line_item_info'] = array(
     'group' => 'payment',
   );
   $hooks['payment_status_change'] = array(
@@ -445,41 +445,41 @@ function payment_status_info($status, $unknown = FALSE) {
 }
 
 /**
- * Returns information about all payment amount types.
+ * Returns information about all line item types.
  *
- * @see hook_payment_amount_info()
+ * @see hook_payment_line_item_type_info()
  *
  * @return array
- *   An array with PaymentAmountInfo objects, keyed by PaymentAmountInfo::name.
+ *   An array with PaymentLineItemInfo objects, keyed by PaymentLineItemInfo::name.
  */
-function payment_amounts_info() {
-  static $amounts = NULL;
+function payment_line_items_info() {
+  static $line_items_info = NULL;
 
-  if (is_null($amounts)) {
-    $amounts = array();
-    foreach (module_invoke_all('payment_amount_info') as $amount) {
-      $amounts[$amount->name] = $amount;
+  if (is_null($line_items_info)) {
+    $line_items_info = array();
+    foreach (module_invoke_all('payment_line_item_info') as $line_item_info) {
+      $line_items_info[$line_item_info->name] = $line_item_info;
     }
-    drupal_alter('payment_amount_info', $amounts);
+    drupal_alter('payment_line_item_info', $line_items_info);
   }
 
-  return $amounts;
+  return $line_items_info;
 }
 
 /**
- * Returns information about a specific payment amount type.
+ * Returns information about a specific line item type.
  *
  * @param $name string
- *   The payment amount type's machine name.
+ *   The line item type's machine name.
  *
  * @return mixed
- *   A PaymentAmountInfo object or FALSE if the requested info could not be
+ *   A PaymentLineItemInfo object or FALSE if the requested info could not be
  *   found.
  */
-function payment_amount_info($name) {
-  $amounts = payment_amounts_info();
+function payment_line_item_info($name) {
+  $line_items_info = payment_line_items_info();
 
-  return isset($amounts[$name]) ? $amounts[$name] : FALSE;
+  return isset($line_items_info[$name]) ? $line_items_info[$name] : FALSE;
 }
 
 /**
@@ -745,38 +745,17 @@ function payment_access(Payment $payment) {
 }
 
 /**
- * Extract a payment amount from a payment.
- *
- * @param $name string
- *   The requested amount(s)'s machine name, as possibly defined in
- *   hook_payment_amount_info().
- * @param $payment Payment
- *
- * @return mixed
- *   Either an array with PaymentAmountItem objects or FALSE if nothing could
- *   be extracted.
+ * Implements PaymentLineItemInfo::callback.
  */
-function payment_amount_extract($name, Payment $payment) {
-  if ($amount_info = payment_amount_info($name)) {
-    return call_user_func($amount_info->callback, $name, $payment);
-  }
-  else {
-    return payment_amount_extract_specific($name, $payment);
-  }
+function payment_line_item_get_specific($name, Payment $payment) {
+  return isset($payment->line_items[$name]) ? array($payment->line_items[$name]) : array();
 }
 
 /**
- * Implements PaymentAmountInfo::callback.
+ * Implements PaymentLineItemInfo::callback.
  */
-function payment_amount_extract_specific($name, Payment $payment) {
-  return isset($payment->amounts[$name]) ? array($payment->amounts[$name]) : FALSE;
-}
-
-/**
- * Implements PaymentAmountInfo::callback.
- */
-function payment_amount_extract_total($name, Payment $payment) {
-  return $payment->amounts;
+function payment_line_item_get_all($name, Payment $payment) {
+  return $payment->line_items;
 }
 /**
  * Implements Rules access callback.

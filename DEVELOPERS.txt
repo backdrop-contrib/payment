@@ -8,8 +8,8 @@ To process a payment, you will need to create a Payment object and set the
 necessary properties, such as:
 - A PaymentMethod object in Payment::method, which in turn has a
   PaymentMethodController object in PaymentMethod::controller.
-- One or more PaymentAmountItem objects in Payment::amounts, keyed by
-  PaymentAmountItem::name. See Payment::setAmount().
+- One or more PaymentLineItem objects in Payment::line_items, keyed by
+  PaymentLineItem::name. See Payment::setLineItem().
 - One or more PaymentStatusItem objects in Payment::statuses, which can be set
   through Payment::setStatus().
 Once this is completed, call $payment->execute(). If the payment and its
@@ -31,25 +31,25 @@ For payments they are used as PaymentStatusItem objects, which contain extra
 information with respect to the particular payment they belong to, such as the
 datetime at which they were set.
 
-PAYMENT AMOUNTS
+PAYMENT LINE ITEMS
 --------------
-Payment amount types are exposed in hook_payment_amount_info() as
-PaymentAmountInfo objects that contain metadata such as human-readable
-information and settings needed to extract the amounts form Payment objects.
-Using a custom callback, multiple amounts can be extracted from a payment using
-the same machine name. See payment_payment_amount_info(), the amount
-"payment_total" defined there and its callback payment_amount_extract_total()
-for an example.
+Payment line item types are exposed in hook_payment_line_item_info() as
+PaymentLineItemInfo objects that contain metadata such as human-readable
+information and settings needed to get line items from Payment objects.
+Using a custom callback, multiple line items can be retrieved from a payment
+using the same machine name. See payment_payment_line_item_info(), the line
+item type "payment_all" defined there and its callback
+payment_line_item_get_all() for an example.
 
-For payments you'll have to use PaymentAmountItem objects, which contain extra
+For payments you'll have to use PaymentLineItem objects, which contain extra
 information with respect to the particular payment they belong to, such as a
 human-readable description.
 
 Note that there does not have to be a 1:1 relationship between
-PaymentAmountItem and PaymentAmountInfo objects. A machine name used for a
-PaymentAmountItem object does not necessarily have to be defined in
-hook_payment_amount_info(), either because it can be extracted by another
-payment amount type defined there, or because it should not be extracted at
+PaymentLineItem and PaymentLineItemInfo objects. A machine name used for a
+PaymentLineItem object does not necessarily have to be defined in
+hook_payment_line_item_info(), either because it can be retrieved by another
+line item type defined there, or because it should not be retrieved at
 all.
 
 TESTING

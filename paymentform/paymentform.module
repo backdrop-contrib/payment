@@ -81,11 +81,11 @@ function paymentform_block_view($delta = '') {
 }
 
 /**
- * Implements hook_payment_amount_info().
+ * Implements hook_payment_line_item_info().
  */
-function paymentform_payment_amount_info() {
+function paymentform_payment_line_item_info() {
   return array(
-    new PaymentAmountInfo(array(
+    new PaymentLineItemInfo(array(
       'name' => 'paymentform',
       'title' => t('Payment Form amount'),
     )),
@@ -149,7 +149,7 @@ function paymentform_form(array $form, array &$form_state, Payment $payment = NU
     $form['amount'] = array(
       '#type' => 'paymentform_amount',
       '#title' => t('Amount'),
-      '#amount' => $payment->totalAmount(),
+      '#amount' => $payment->totalAmount(TRUE),
       '#minimum_amount' => variable_get('paymentform_amount', 0),
       '#currency_code' => $payment->currency_code,
     );
@@ -159,7 +159,7 @@ function paymentform_form(array $form, array &$form_state, Payment $payment = NU
     $form['amount_human_readable'] = array(
       '#type' => 'item',
       '#title' => t('Amount'),
-      '#markup' => payment_amount_human_readable($payment->amount, $payment->currency_code),
+      '#markup' => payment_amount_human_readable($payment->totalAmount(TRUE), $payment->currency_code),
     );
     $form['payment_method'] = array(
       '#type' => 'payment_method',
@@ -179,12 +179,15 @@ function paymentform_form_validate(array $form, array &$form_state) {
   $payment = $form_state['payment'];
 
   if ($form_state['payment_step'] == 0) {
-    $payment->amount = $form_state['values']['amount'];
     // @todo Submitted amount is a string and should be a float.
     // @todo $description should be US English, but can be anything.
-    // Remove any possible previous amounts.
-    $payment->amounts = array();
-    $payment->setAmount('paymentform', $form_state['values']['amount'], paymentform_description());
+    // Remove any possible previous line items.
+    $payment->line_items = array();
+    $payment->setLineItem(new PaymentLineItem(array(
+      'name' => 'paymentform',
+      'amount' => $form_state['values']['amount'],
+      'description' => paymentform_description(),
+    )));
     $form_state['payment_step']++;
     $form_state['rebuild'] = TRUE;
   }

@@ -59,8 +59,8 @@ function payment_rules_action_info() {
     ),
     'group' => t('Payment'),
   );
-  $actions['payment_rules_action_payment_amount_delete'] = array(
-    'label' => t('Delete a payment amount'),
+  $actions['payment_rules_action_payment_line_item_delete'] = array(
+    'label' => t('Delete a payment line item'),
     'access callback' => 'payment_rules_access',
     'group' => t('Payment'),
     'parameter' => array(
@@ -74,8 +74,8 @@ function payment_rules_action_info() {
       ),
     ),
   );
-  $actions['payment_rules_action_payment_amount_set_fixed'] = array(
-    'label' => t('Set a fixed payment amount'),
+  $actions['payment_rules_action_payment_line_item_set_fixed'] = array(
+    'label' => t('Set line item with a fixed amount of money'),
     'access callback' => 'payment_rules_access',
     'group' => t('Payment'),
     'parameter' => array(
@@ -91,14 +91,23 @@ function payment_rules_action_info() {
         'type' => 'text',
         'label' => t('Description'),
       ),
+      'tax_rate' => array(
+        'type' => 'decimal',
+        'label' => t('Tax rate'),
+        'description' => t('Enter a factor between 0 and 1. Defaults to 0.'),
+      ),
+      'quantity' => array(
+        'type' => 'integer',
+        'label' => t('Quantity'),
+      ),
       'amount' => array(
         'type' => 'decimal',
         'label' => t('Amount'),
       ),
     ),
   );
-  $actions['payment_rules_action_payment_amount_set_calculated'] = array(
-    'label' => t('Set a calculated payment amount'),
+  $actions['payment_rules_action_payment_line_item_set_calculated'] = array(
+    'label' => t('Set a line item with a calculated amount of money'),
     'access callback' => 'payment_rules_access',
     'group' => t('Payment'),
     'parameter' => array(
@@ -115,19 +124,32 @@ function payment_rules_action_info() {
         'label' => t('Description'),
         'optional' => TRUE,
       ),
+      'tax_rate' => array(
+        'type' => 'decimal',
+        'label' => t('Tax rate'),
+        'description' => t('Enter a factor between 0 and 1. Defaults to 0.'),
+      ),
+      'quantity' => array(
+        'type' => 'integer',
+        'label' => t('Quantity'),
+      ),
+      'tax' => array(
+        'type' => 'boolean',
+        'label' => t('Include taxes for source amount'),
+      ),
       'source_name' => array(
         'type' => 'text',
-        'label' => t("Source amount"),
-        'options list' => 'payment_rules_options_list_payment_amount_name',
+        'label' => t('Source line item'),
+        'options list' => 'payment_rules_options_list_payment_line_item_name',
       ),
       'calculation' => array(
         'type' => 'text',
-        'label' => t("Calculation"),
+        'label' => t('Calculation'),
         'options list' => 'payment_rules_options_list_calculations',
       ),
       'factor' => array(
         'type' => 'decimal',
-        'label' => 'Amount',
+        'label' => t('Amount'),
       ),
     ),
   );
@@ -305,36 +327,53 @@ function payment_rules_action_payment_set_status(Payment $payment, $status_data)
 }
 
 /**
- * Implements Rules action callback: set a fixed payment amount.
- *
- * @param $payment Payment
- * @param $amount integer
- *   The amount to add to the payment amount.
- */
-function payment_rules_action_payment_amount_set_fixed(Payment $payment, $name, $description, $amount) {
-  $payment->setAmount($name, $amount, $description);
-}
-
-/**
- * Implements Rules action callback: set a calculated payment amount.
- *
- * @see PaymentAmountItem
+ * Implements Rules action callback: set a line item with a fixed amount.
  *
  * @param $payment Payment
  * @param $name string
- *   The machine name of the new amount.
+ *   The line item's unique machine name.
  * @param $description string
- *   The amount's human-readable description.
+ * @param $tax_rate
+ * The tax rate that applies to the amount. Should be a float between 0 and 1.
+ * @param $quantity integer
+ * @param $amount integer
+ *   The amount of money.
+ */
+function payment_rules_action_payment_line_item_set_fixed(Payment $payment, $name, $description, $tax_rate, $quantity, $amount) {
+  $payment->setLineItem(new PaymentLineItem(array(
+    'name' => $name,
+    'amount' => $amount,
+    'description'=> $description,
+    'tax_rate' => $tax_rate,
+    'quantity' => $quantity,
+  )));
+}
+
+/**
+ * Implements Rules action callback: set a calculated line item.
+ *
+ * @see PaymentLineItem
+ *
+ * @param $payment Payment
+ * @param $name string
+ *   The machine name of the new line item.
+ * @param $description string
+ *   The line item's human-readable description.
+ * @param $tax_rate
+ * The tax rate that applies to the amount. Should be a float between 0 and 1.
+ * @param $quantity integer
+ * @param $tax boolean
+ *   Whether to use source amounts including tax.
  * @param $source_name string
- *   The machine name of the payment amount to use for the calculation.
+ *   The machine name of the payment line item to use for the calculation.
  * @param $calculation string
  *   One of the keys returned by payment_rules_options_list_calculations().
  * @param $factor float
  *   The factor to use for the calculation.
  */
-function payment_rules_action_payment_amount_set_calculated($payment, $name, $description, $source_name, $calculation, $factor) {
-  if ($source_amounts = payment_amount_extract($source_name, $payment)) {
-    $source_amount = $payment->totalAmount($source_amounts);
+function payment_rules_action_payment_line_item_set_calculated($payment, $name, $description, $tax_rate, $quantity, $tax, $source_name, $calculation, $factor) {
+  if ($source_line_items = $payment->getLineItems($source_name)) {
+    $source_amount = $payment->totalAmount($tax, $source_line_items);
     switch ($calculation) {
       case 'add':
         $amount = $source_amount + $factor;
@@ -349,18 +388,18 @@ function payment_rules_action_payment_amount_set_calculated($payment, $name, $de
         $amount = $source_amount / $factor;
         break;
     }
-    $payment->setAmount($name, $amount, $description);
+    payment_rules_action_payment_line_item_set_fixed($payment, $Name, $description, $tax_rate, $quantity, $amount);
   }
 }
 
 /**
  * Implements Rules options list callback for
- * payment_rules_action_payment_amount_set_calculated().
+ * payment_rules_action_payment_line_item_set_calculated().
  */
-function payment_rules_options_list_payment_amount_name() {
+function payment_rules_options_list_payment_list_item_name() {
   $options = array();
-  foreach (payment_amounts_info() as $amount_info) {
-    $options[$amount_info->name] = $amount_info->title;
+  foreach (payment_line_items_info() as $line_item_info) {
+    $options[$line_item_info->name] = $line_item_info->title;
   }
 
   return $options;
@@ -368,7 +407,7 @@ function payment_rules_options_list_payment_amount_name() {
 
 /**
  * Implements Rules options list callback for
- * payment_rules_action_payment_amount_set_calculated().
+ * payment_rules_action_payment_line_item_set_calculated().
  */
 function payment_rules_options_list_calculations() {
   return array(
@@ -380,14 +419,14 @@ function payment_rules_options_list_calculations() {
 }
 
 /**
- * Implements Rules action callback: delete a payment amount.
+ * Implements Rules action callback: delete a line item.
  *
  * @param $payment Payment
  * @param $name string
- *   The machine name of the payment amount to delete.
+ *   The machine name of the line item to delete.
  */
-function payment_rules_action_payment_amount_delete(Payment $payment, $name) {
-  unset($payment->amounts[$name]);
+function payment_rules_action_payment_line_item_delete(Payment $payment, $name) {
+  unset($payment->line_items[$name]);
 }
 
 /**

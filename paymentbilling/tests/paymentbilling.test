@@ -35,7 +35,10 @@ class PaymentBillingCRUDTest extends DrupalWebTestCase {
         'first_name' => 'Blue',
       )),
     ));
-    $payment->setAmount('paymentbilling', 1);
+    $payment->setLineItem(new PaymentLineItem(array(
+      'name' => 'paymentbilling',
+      'amount' => 1,
+    )));
     entity_save('payment', $payment);
 
     // Test save.

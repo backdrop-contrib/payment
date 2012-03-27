@@ -9,7 +9,7 @@
  * Implements hook_schema().
  */
 function payment_schema() {
-  $schema['payment_amount'] = array(
+  $schema['payment_line_item'] = array(
     'fields' => array(
       'amount' => array(
         'type' => 'float',
@@ -30,10 +30,17 @@ function payment_schema() {
         'length' => '255',
       ),
       'pid' => array(
-        'description' => 'The {payment}.pid this amount belongs to.',
+        'description' => 'The {payment}.pid this line item belongs to.',
         'type' => 'int',
         'not null' => TRUE,
         'default' => 0,
+      ),
+      'quantity' => array(
+        'type' => 'int',
+      ),
+      'tax_rate' => array(
+        'type' => 'float',
+        'size' => 'big',
       ),
     ),
     'primary key' => array('name', 'pid'),

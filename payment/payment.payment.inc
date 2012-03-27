@@ -54,14 +54,14 @@ function payment_payment_method_controller_info() {
 }
 
 /**
- * Implements hook_payment_amount_info().
+ * Implements hook_payment_line_item_info().
  */
-function payment_payment_amount_info() {
+function payment_payment_line_item_info() {
   return array(
-    new PaymentAmountInfo(array(
-      'callback' => 'payment_amount_extract_total',
-      'name' => 'payment_total',
-      'title' => t('Total amount'),
+    new PaymentLineItemInfo(array(
+      'callback' => 'payment_line_item_get_all',
+      'name' => 'payment_all',
+      'title' => t('All items'),
     )),
   );
 }

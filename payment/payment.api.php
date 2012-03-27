@@ -68,27 +68,27 @@ function hook_payment_method_controller_info_alter(&$controllers_info) {
 }
 
 /**
- * Defines payment amount types.
+ * Defines line item types.
  *
- * @see payment_amount_extract()
+ * @see Payment::getLineItems()
  *
  * @return array
- *   An array with PaymentAmountInfo objects.
+ *   An array with PaymentLineItemInfo objects.
  */
-function hook_payment_amount_info() {
+function hook_payment_line_item_info() {
   return array(
-    new PaymentAmountInfo(array(
+    new PaymentLineItemInfo(array(
       'name' => 'foo_fee_credit_card',
       'title' => t('Credit card fee'),
     )),
-    new PaymentAmountInfo(array(
+    new PaymentLineItemInfo(array(
       'name' => 'foo_fee_wire_transfer',
       'title' => t('Wire transfer fee'),
     )),
-    new PaymentAmountInfo(array(
-      // Use a custom callback, so we can extract any/all payment amounts we
-      // need simultaneously.
-      'callback' => 'foo_payment_extract_amount_fee',
+    new PaymentLineItemInfo(array(
+      // Use a custom callback, so we can get any/all line items we need
+      // simultaneously.
+      'callback' => 'foo_payment_line_item_get_fee',
       'name' => 'foo_fee',
       'title' => t('Any payment method fee'),
     )),
@@ -96,14 +96,14 @@ function hook_payment_amount_info() {
 }
 
 /**
- * Alters payment amount types.
+ * Alters line item types.
  *
  * @param array
- *   An array with PaymentAmountInfo objects, keyed by PaymentAmountInfo::name.
+ *   An array with PaymentLineItemInfo objects, keyed by PaymentLineItemInfo::name.
  */
-function hook_payment_amount_info_alter(&$amounts_info) {
-  // Set an extraction callback for an amount.
-  $amounts_info['foo_fee_credit_card']['callback'] = 'foo_payment_extract_amount';
+function hook_payment_line_item_info_alter(&$line_items_info) {
+  // Set a callback for a line item.
+  $line_items_info['foo_fee_credit_card']['callback'] = 'foo_payment_line_item_get';
 }
 
 /**
@@ -133,7 +133,12 @@ function hook_payment_status_change(Payment $payment, $old_status) {
  */
 function hook_payment_pre_execute(Payment $payment) {
   // Add a payment method processing fee.
-  $payment->setAmount('foo_fee', 5.50, 'Credit card fee');
+  $payment->setLineItem(new PaymentLineItem(array(
+    'name' => 'foo_fee',
+    'amount' => 5.50,
+    'description' => 'Credit card fee',
+    'tax_rate' => 0.19,
+  )));
 }
 /**
  * Validate a payment against a payment method.

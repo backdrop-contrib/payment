@@ -32,7 +32,10 @@ class PaymentActionHookAndCallbackTest extends DrupalWebTestCase {
       'method' => $payment_method,
       'finish_callback' => 'payment_test_finish_callback',
     ));
-    $payment->setAmount('payment_test', 1);
+    $payment->setLineItem(new PaymentLineItem(array(
+      'name' => 'payment_test',
+      'amount' => 1,
+    )));
     $payment->execute();
     $this->assertTrue(isset($payment->payment_test_payment_validate), t('hook_payment_validate() is invoked when validating a payment before execution.'));
     $this->assertTrue(isset($payment->payment_test_payment_pre_execute), t('hook_payment_pre_execute() is invoked before executing a payment.'));
@@ -120,19 +123,19 @@ class PaymentInfoHookTest extends DrupalWebTestCase {
   /**
    * Test hook_payment_method_controller_info().
    */
-  function testHookPaymentAmountInfo() {
-    $this->hookThatReturnsObjects('payment_amount_info', 'PaymentAmountInfo');
+  function testHookPaymentLineItemInfo() {
+    $this->hookThatReturnsObjects('payment_line_item_info', 'PaymentLineItemInfo');
   }
 }
 
 /**
- * Test payment amount item handling.
+ * Test line item handling.
  */
-class PaymentAmountItemTest extends DrupalWebTestCase {
+class PaymentLineItemTest extends DrupalWebTestCase {
 
   static function getInfo() {
     return array(
-      'name' => 'Payment amount item handling',
+      'name' => 'Payment line item handling',
       'group' => 'Payment',
     );
   }
@@ -142,33 +145,54 @@ class PaymentAmountItemTest extends DrupalWebTestCase {
   }
 
   /**
-   * Test payment amount item handling.
+   * Test line item handling.
    */
-  function testPaymentAmountItemHandling() {
+  function testPaymentLineItemHandling() {
     $payment = new Payment;
+    $payment->setLineItem(new PaymentLineItem(array(
+      'name' => 'foo',
+      'amount' => 19.11,
+      'tax_rate' => 0.1,
+    )));
 
-    // Test Payment::setAmount();
-    $payment->setAmount('foo', 19.11);
-    $this->assertTrue($payment->amounts['foo']->name == 'foo', t('Payment::setAmount() adds a PaymentAmountItem object to Payment::amounts.'));
+    // Test Payment::setLineItem();
+    $this->assertTrue($payment->line_items['foo']->name == 'foo', t('Payment::setLineItem() adds a PaymentLineItem object to Payment::line_items.'));
+
+    // Test Payment::unitAmount() without tax.
+    $this->assertTrue($payment->line_items['foo']->unitAmount(FALSE) == 19.11, t('Payment::unitAmount() returns amount excluding tax.'));
+
+    // Test Payment::unitAmount() with tax.
+    $this->assertTrue($payment->line_items['foo']->unitAmount(TRUE) == 21.021, t('Payment::unitAmount() returns amount including tax.'));
+
+    // Test Payment::totalAmount() without tax.
+    $this->assertTrue($payment->totalAmount(FALSE) == 19.11, t('Payment::totalAmount() returns amount excluding tax.'));
+
+    $payment->setLineItem(new PaymentLineItem(array(
+      'name' => 'bar',
+      'amount' => 19.78,
+    )));
 
     // Test Payment::totalAmount() without passed on amounts.
-    $payment->setAmount('bar', 19.78);
-    $this->assertTrue($payment->totalAmount() == 38.89, t('Payment::totalAmount() adds up all payment amounts.'));
+    $this->assertTrue($payment->totalAmount(TRUE) == 40.801, t('Payment::totalAmount() adds up Payment::line_items.'));
+
+    $payment->setLineItem(new PaymentLineItem(array(
+      'name' => 'beer',
+      'amount' => 47.11,
+    )));
 
     // Test Payment::totalAmount() with passed on amounts.
-    $payment->setAmount('beer', 47.11);
-    $amounts = payment_amount_extract('payment_test', $payment);
-    $this->assertTrue($payment->totalAmount($amounts) == 38.89, t('Payment::totalAmount() adds up only passed on payment amounts.'));
+    $line_items = $payment->getLineItems('payment_test');
+    $this->assertTrue($payment->totalAmount(TRUE, $line_items) == 40.801, t('Payment::totalAmount() adds up only passed on line items.'));
 
-    // Test payment_amount_extract_specific() and whether
-    // payment_amount_extract() can extract amounts that are not exposed
-    // through hook_payment_amount_info()..
-    $amounts = payment_amount_extract('beer', $payment);
-    $this->assertTrue($payment->totalAmount($amounts) == 47.11, t('payment_amount_extract_specific() only returns the requested amount.'));
+    // Test payment_line_item_get_specific() and whether
+    // Payment::getLineItems() can get line items that are not exposed
+    // through hook_payment_line_item_info().
+    $line_items = $payment->getLineItems('beer');
+    $this->assertTrue($payment->totalAmount(TRUE, $line_items) == 47.11, t('payment_line_item_get_specific() only returns the requested line item.'));
 
-    // Test payment_amount_extract_total().
-    $amounts = payment_amount_extract('payment_total', $payment);
-    $this->assertTrue($payment->totalAmount($amounts) == 86, t('payment_amount_extract_total() returns all amounts.'));
+    // Test payment_line_item_get_all().
+    $line_items = $payment->getLineItems('payment_all');
+    $this->assertTrue(count($line_items) == 3, t('payment_line_item_get_all() returns all line items.'));
   }
 }
 
@@ -192,7 +216,7 @@ class PaymentStatusItemTest extends DrupalWebTestCase {
   }
 
   /**
-   * Test payment amount item handling.
+   * Test payment status item handling.
    */
   function testPaymentStatusItem() {
     $payment = new Payment;
