@@ -473,7 +473,7 @@ class PaymentEntityController extends EntityAPIController {
         $rows[] = array($status->title, format_date($status_item->created));
       }
       $header = array(t('Status'), t('Date'));
-      $payment_build['history'] = array(
+      $payment_build['status_history'] = array(
         '#type' => 'markup',
         '#markup' => theme('table', array(
           'header' => $header,

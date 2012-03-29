@@ -54,7 +54,7 @@ function payment_menu() {
     'page callback' => 'payment_page_payment_view',
     'page arguments' => array(1),
     'access callback' => 'payment_access',
-    'access arguments' => array(1),
+    'access arguments' => array('view', 1),
     'file' => 'payment.ui.inc',
   );
   $items['payment/%payment_menu_entity/view'] = array(
@@ -68,21 +68,25 @@ function payment_menu() {
     'load arguments' => array('payment'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('payment_form', 1),
-    'access arguments' => array('payment.administer'),
+    'access callback' => 'payment_access',
+    'access arguments' => array('update', 1),
     'title' => 'Edit',
     'type' => MENU_LOCAL_TASK,
     'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
     'weight' => -9,
     'file' => 'payment.ui.inc',
   );
-  
 
-  // Payment method configuration.
-  $items['admin/config/services/payment/method'] = array(
-    'title' => 'Payment methods',
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-    // 'weight' => 1,
+  // Administration section.
+  $items['admin/config/services/payment'] = array(
+    'title' => 'Payment',
+    'page callback' => 'system_admin_menu_block_page',
+    'access arguments' => array('access administration pages'),
+    'file' => 'system.admin.inc',
+    'file path' => drupal_get_path('module', 'system'),
   );
+
+  // Payment method administration.
   $items['admin/config/services/payment/method/add'] = array(
     'title' => 'Add payment method',
     'page callback' => 'payment_page_payment_method_add_select_controller',
@@ -132,7 +136,6 @@ function payment_menu() {
     'page callback' => 'payment_page_status',
     'access arguments' => array('payment.status.view'),
     'file' => 'payment.ui.inc',
-    'type' => MENU_LOCAL_TASK,
     'weight' => 1,
   );
 
@@ -148,9 +151,9 @@ function payment_menu() {
   if (!module_exists('views')) {
     $items['admin/content/payment'] = array(
       'title' => 'Payments',
-      'access arguments' => array('payment.view.all'),
+      'access arguments' => array('payment.view.any'),
     ) + $base;
-    $items['admin/config/services/payment'] = array(
+    $items['admin/config/services/payment/method'] = array(
       'title' => 'Payment',
       'access arguments' => array('payment.method.administer'),
     ) + $base;
@@ -160,22 +163,47 @@ function payment_menu() {
 }
 
 /**
+ * Implement hook_menu_alter().
+ */
+function payment_menu_alter(&$items) {
+  // Make "Manage fields" the default local task.
+  $items['admin/config/services/payment/payment'] = array(
+    'title' => 'Payments',
+    'weight' => -1,
+    'type' => MENU_NORMAL_ITEM,
+  ) + $items['admin/config/services/payment/payment/fields'];
+  $items['admin/config/services/payment/payment/fields'] = array(
+    'title' => 'Manage fields',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+}
+
+/**
  * Implements hook_permission().
  */
 function payment_permission() {
   return array(
-    'payment.administer' => array(
-      'title' => t('Administer payments'),
-    ),
     'payment.rules.administer' => array(
       'title' => t('Administer rule configurations'),
       'restrict access' => TRUE,
     ),
+    'payment.administer' => array(
+      'title' => t('Administer payment configuration'),
+    ),
+    'payment.create' => array(
+      'title' => t('Create payments'),
+    ),
+    'payment.view.any' => array(
+      'title' => t('View any payment'),
+    ),
     'payment.view.own' => array(
       'title' => t('View own payments'),
     ),
-    'payment.view.all' => array(
-      'title' => t('View all payments'),
+    'payment.update.any' => array(
+      'title' => t('Update any payment'),
+    ),
+    'payment.update.own' => array(
+      'title' => t('Update own payments'),
     ),
     'payment.method.administer' => array(
       'title' => t('Administer payment methods'),
@@ -258,6 +286,32 @@ function payment_theme() {
 }
 
 /**
+ * Implements hook_field_extra_fields().
+ */
+function payment_field_extra_fields() {
+  $field['payment']['payment'] = array(
+    'form' => array(
+      'status' => array(
+        'label' => t('Status'),
+        'weight' => 0,
+      ),
+    ),
+    'display' => array(
+      'line_items' => array(
+        'label' => t('Line items'),
+        'weight' => 0,
+      ),
+      'status_history' => array(
+        'label' => t('Status history'),
+        'weight' => 0,
+      ),
+    ),
+  );
+
+  return $field;
+}
+
+/**
  * Implements hook_entity_info().
  */
 function payment_entity_info() {
@@ -273,6 +327,16 @@ function payment_entity_info() {
     ),
     // @todo Enable static cache once http://drupal.org/node/1273756 is fixed.
     'static cache' => FALSE,
+    'fieldable' => TRUE,
+    'bundles' => array(
+      'payment' => array(
+        'label' => t('Payment'),
+        'admin' => array(
+          'path' => 'admin/config/services/payment/payment',
+          'access arguments' => array('payment.administer'),
+        ),
+      ),
+    ),
   );
   $entity_info['payment_method'] = array(
     'label' => t('Payment method'),
@@ -732,14 +796,26 @@ function payment_menu_entity_load($id, $entity_type) {
  *
  * @return string
  */
-function payment_access(Payment $payment) {
+function payment_access($op, Payment $payment, $account = NULL) {
   global $user;
 
-  if (user_access('payment.view.all')) {
+  if (!$account) {
+    $account = $user;
+  }
+
+  if ($account->uid = 1) {
     return TRUE;
   }
-  elseif (user_access('payment.view.own') && $user->uid == $payment->uid) {
-    return TRUE;
+
+  switch ($op) {
+    case 'view':
+    case 'update';
+      return user_access('payment.' . $op . '.any') || user_access('payment.' . $op . '.own') && $account->uid = $payment->uid;
+      break;
+    case 'create':
+    case 'delete':
+      return user_access('payment.' . $op);
+      break;
   }
   return FALSE;
 }

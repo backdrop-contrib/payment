@@ -235,7 +235,7 @@ function payment_view_payments() {
   $handler = $view->new_display('page', 'Administration page', 'page_1');
   $handler->display->display_options['defaults']['access'] = FALSE;
   $handler->display->display_options['access']['type'] = 'perm';
-  $handler->display->display_options['access']['perm'] = 'payment.view.all';
+  $handler->display->display_options['access']['perm'] = 'payment.view.any';
   $handler->display->display_options['defaults']['fields'] = FALSE;
   /* Field: Payment: Last updated date and time */
   $handler->display->display_options['fields']['updated']['id'] = 'updated';
@@ -700,9 +700,9 @@ function payment_view_payment_methods() {
 
   /* Display: Administration page */
   $handler = $view->new_display('page', 'Administration page', 'page_1');
-  $handler->display->display_options['path'] = 'admin/config/services/payment';
+  $handler->display->display_options['path'] = 'admin/config/services/payment/method';
   $handler->display->display_options['menu']['type'] = 'normal';
-  $handler->display->display_options['menu']['title'] = 'Payment';
+  $handler->display->display_options['menu']['title'] = 'Payment methods';
   $handler->display->display_options['menu']['weight'] = '0';
   $handler->display->display_options['menu']['name'] = 'management';
   $handler->display->display_options['tab_options']['type'] = 'normal';

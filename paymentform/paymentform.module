@@ -15,13 +15,13 @@ function paymentform_menu() {
     'page arguments' => array('paymentform_form'),
     'access arguments' => array('paymentform.page.access'),
   );
-  $items['admin/config/services/paymentform'] = array(
+  $items['admin/config/services/payment/paymentform'] = array(
     'title' => 'Payment Form',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('paymentform_form_configuration'),
     'access arguments' => array('paymentform.administer'),
   );
-  $items['admin/config/services/paymentform/configure'] = array(
+  $items['admin/config/services/payment/paymentform/configure'] = array(
     'title' => 'Configure Payment Form',
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'context' => MENU_CONTEXT_INLINE,
@@ -106,7 +106,7 @@ function paymentform_form(array $form, array &$form_state, Payment $payment = NU
   }
   if (!variable_get('paymentform_currency_code', FALSE)) {
     $form['#access'] = FALSE;
-    drupal_set_message(t('Payment Form has not been configured.') . ' ' . l(t('Configure Payment Form'), 'admin/config/services/paymentform') . '.', 'warning');
+    drupal_set_message(t('Payment Form has not been configured.') . ' ' . l(t('Configure Payment Form'), 'admin/config/services/payment/paymentform') . '.', 'warning');
   }
 
   // Multistep information.
@@ -132,7 +132,7 @@ function paymentform_form(array $form, array &$form_state, Payment $payment = NU
   }
 
   // Build the form.
-  $form['#contextual_links']['paymentform'] = array('admin/config/services/paymentform', array());
+  $form['#contextual_links']['paymentform'] = array('admin/config/services/payment/paymentform', array());
   $form['actions'] = array(
     '#type' => 'actions',
     '#weight' => 1,
@@ -211,7 +211,7 @@ function paymentform_form_submit(array $form, array &$form_state) {
  * Implements Payment finish callback.
  */
 function paymentform_payment_finish(Payment $payment) {
-  if (user_access('payment.view.own') || user_access('payment.view.all')) {
+  if (payment_access('view', $payment)) {
     $view = ' ' . l(t('View payment'), 'payment/' . $payment->pid) . '.';
   }
   if (payment_status_is_or_has_ancestor($payment->getStatus()->status, PAYMENT_STATUS_PENDING)) {

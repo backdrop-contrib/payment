@@ -146,7 +146,6 @@ function paymentmethodbasic_form_payment_method_submit(array $form, array &$form
  * Implements PaymentMethodController payment_form_elements_callback.
  */
 function paymentmethodbasic_payment_form_elements(Payment $payment, array $form_state) {
-  return paymentbilling_payment_form_elements($payment, $form_state);
   $elements = array();
   $elements['message'] = array(
     '#type' => 'markup',
