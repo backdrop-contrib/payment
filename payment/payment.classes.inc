@@ -429,57 +429,12 @@ class PaymentEntityController extends EntityAPIController {
     $build = parent::view($entities, $view_mode, $langcode, $page);
     foreach ($build['payment'] as &$payment_build) {
       $payment = $payment_build['#entity'];
-
-      // Line items.
-      $header = array(t('Description'), t('Quantity'), t('Amount'), t('Total'), t('Tax'));
-      $rows = array();
-      foreach ($payment->line_items as $name => $line_item) {
-        $rows[] = array(
-          'data' => array(
-            t($line_item->description, $line_item->description_arguments),
-            $line_item->quantity,
-            payment_amount_human_readable($line_item->unitAmount(TRUE), $payment->currency_code),
-            payment_amount_human_readable($line_item->totalAmount(TRUE), $payment->currency_code),
-            t('!amount (!percentage%)', array(
-              '!amount' => payment_amount_human_readable($line_item->amount * $line_item->tax_rate, $payment->currency_code),
-              '!percentage' => $line_item->tax_rate * 100,
-            )),
-          ),
-          'class' => array('payment-line_item-' . $name),
-        );
-      }
-      $rows[] = array(
-        'data' => array(array(
-          'data' => t('Total amount'),
-          'colspan' => 3,
-          ), payment_amount_human_readable($payment->totalAmount(TRUE), $payment->currency_code), '',
-        ),
-        'class' => array('payment-line_item-total'),
-      );
-      $payment_build['line_items'] = array(
-        '#type' => 'markup',
-        '#markup' => theme('table', array(
-          'header' => $header,
-          'rows' => $rows,
-          'caption' => t('Payment amount'),
-        )),
-      );
-
-      // Status history.
-      $status = payment_status_info($payment->getStatus()->status, TRUE);
-      $rows = array();
-      foreach (array_reverse($payment->statuses) as $status_item) {
-        $status = payment_status_info($status_item->status);
-        $rows[] = array($status->title, format_date($status_item->created));
-      }
-      $header = array(t('Status'), t('Date'));
-      $payment_build['status_history'] = array(
-        '#type' => 'markup',
-        '#markup' => theme('table', array(
-          'header' => $header,
-          'rows' => $rows,
-          'caption' => t('Status history'),
-        )),
+      $payment_build['line_items'] = payment_line_items($payment);
+      $payment_build['status_items'] = payment_status_items($payment);
+      $payment_build['payment_method'] = array(
+        '#type' => 'item',
+        '#title' => t('Payment method'),
+        '#markup' => $payment->method->title_generic,
       );
     }
 

@@ -9,12 +9,18 @@
  * Implements hook_menu().
  */
 function paymentform_menu() {
-  $items['paymentform'] = array(
+  $base = array(
     'title' => 'Payment form',
+    'access callback' => TRUE,
+  );
+  $items['paymentform'] = array(
     'page callback' => 'drupal_get_form',
     'page arguments' => array('paymentform_form'),
-    'access arguments' => array('paymentform.page.access'),
-  );
+  ) + $base;
+  $items['paymentform/%'] = array(
+    'page callback' => 'paymentform_page_payment_form',
+    'page arguments' => array(1),
+  ) + $base;
   $items['admin/config/services/payment/paymentform'] = array(
     'title' => 'Payment Form',
     'page callback' => 'drupal_get_form',
@@ -54,11 +60,6 @@ function paymentform_permission() {
     'paymentform.administer' => array(
       'title' => t('Administer Payment Form'),
     ),
-    'paymentform.page.access' => array(
-      'title' => t('Access the <a href="@url">payment form page</a>', array(
-        '@url' => url('paymentform'),
-      )),
-    ),
   );
 }
 
@@ -93,12 +94,57 @@ function paymentform_payment_line_item_info() {
 }
 
 /**
+ * Return paymentform_payment_form().
+ *
+ * @param $amount mixed
+ *   This is the same parameter as accepted by paymentform_payment_form().
+ *   However, that function accepts a float value only, while this function
+ *   accepts anything and converts and validates it.
+ *
+ * @return array
+ */
+function paymentform_page_payment_form($amount) {
+  $amount = (float) $amount;
+  if ($amount > 0) {
+    return paymentform_payment_form((float) $amount);
+  }
+  else {
+    drupal_not_found();
+  }
+}
+
+/**
+ * Build and return payment_form() after a paymentform_form() submission.
+ *
+ * @see paymentform_page_payment_form()
+ *
+ * @param $amount float
+ *
+ * @return array
+ */
+function paymentform_payment_form($amount) {
+  $payment = new Payment(array(
+    'currency_code' => variable_get('paymentform_currency_code', 'XXX'),
+    'finish_callback' => 'paymentform_payment_finish',
+  ));
+  // @todo Description should be US English, but can be anything.
+  $payment->setLineItem(new PaymentLineItem(array(
+    'amount' => $amount,
+    'description' => variable_get('paymentform_description'),
+    'name' => 'paymentform',
+  )));
+  module_load_include('inc', 'payment', 'payment.ui');
+
+  return drupal_get_form('payment_form', $payment);
+}
+
+/**
  * Form build callback: render the donation form.
  *
  * @return array
  *  The form build array.
  */
-function paymentform_form(array $form, array &$form_state, Payment $payment = NULL) {
+function paymentform_form(array $form, array &$form_state) {
   // Conditions that need to be met in order to show the form.
   if (!entity_load('payment_method')) {
     $form['#access'] = FALSE;
@@ -109,28 +155,6 @@ function paymentform_form(array $form, array &$form_state, Payment $payment = NU
     drupal_set_message(t('Payment Form has not been configured.') . ' ' . l(t('Configure Payment Form'), 'admin/config/services/payment/paymentform') . '.', 'warning');
   }
 
-  // Multistep information.
-  $form_state += array(
-    'payment_step' => 0,
-  );
-
-  // Create/set the payment.
-  if (!isset($form_state['payment'])) {
-    if (!$payment) {
-      $payment = new Payment(array(
-        'currency_code' => variable_get('paymentform_currency_code', 'XXX'),
-        'finish_callback' => 'paymentform_payment_finish',
-        'caller_data' => array(
-          'location' => $_GET['q'],
-        ),
-      ));
-    }
-    $form_state['payment'] = $payment;
-  }
-  else {
-    $payment = $form_state['payment'];
-  }
-
   // Build the form.
   $form['#contextual_links']['paymentform'] = array('admin/config/services/payment/paymentform', array());
   $form['actions'] = array(
@@ -139,72 +163,27 @@ function paymentform_form(array $form, array &$form_state, Payment $payment = NU
   );
   $form['actions']['submit'] = array(
     '#type' => 'submit',
+    '#value' => t('Continue'),
   );
   $message = paymentform_form_message();
   $form['message'] = array(
     '#markup' => check_markup($message['value'], $message['format']),
   );
-  if ($form_state['payment_step'] == 0) {
-    $form['actions']['submit']['#value'] = t('Select payment method');
-    $form['amount'] = array(
-      '#type' => 'paymentform_amount',
-      '#title' => t('Amount'),
-      '#amount' => $payment->totalAmount(TRUE),
-      '#minimum_amount' => variable_get('paymentform_amount', 0),
-      '#currency_code' => $payment->currency_code,
-    );
-  }
-  else {
-    $form['actions']['submit']['#value'] = t('Pay');
-    $form['amount_human_readable'] = array(
-      '#type' => 'item',
-      '#title' => t('Amount'),
-      '#markup' => payment_amount_human_readable($payment->totalAmount(TRUE), $payment->currency_code),
-    );
-    $form['payment_method'] = array(
-      '#type' => 'payment_method',
-      '#title' => t('Payment method'),
-      '#payment' => $payment,
-      '#required' => TRUE,
-    );
-  }
+  $form['amount'] = array(
+    '#type' => 'paymentform_amount',
+    '#title' => t('Amount'),
+    '#minimum_amount' => variable_get('paymentform_amount', 0),
+    '#currency_code' => variable_get('paymentform_currency_code', 'XXX'),
+  );
 
   return $form;
-}
-
-/**
- * Implements form validate callback for paymentform_form().
- */
-function paymentform_form_validate(array $form, array &$form_state) {
-  $payment = $form_state['payment'];
-
-  if ($form_state['payment_step'] == 0) {
-    // @todo Submitted amount is a string and should be a float.
-    // @todo $description should be US English, but can be anything.
-    // Remove any possible previous line items.
-    $payment->line_items = array();
-    $payment->setLineItem(new PaymentLineItem(array(
-      'name' => 'paymentform',
-      'amount' => $form_state['values']['amount'],
-      'description' => paymentform_description(),
-    )));
-    $form_state['payment_step']++;
-    $form_state['rebuild'] = TRUE;
-  }
 }
 
 /**
  * Implements form submit callback for paymentform_form().
  */
 function paymentform_form_submit(array $form, array &$form_state) {
-  $payment = $form_state['payment'];
-
-  if ($form_state['payment_step'] == 1) {
-    $payment->execute();
-    if (payment_status_has_ancestor($payment->getStatus()->status, PAYMENT_STATUS_FAILED)) {
-      $form_state['rebuild'] = TRUE;
-    }
-  }
+  drupal_goto('paymentform/' . $form_state['values']['amount']);
 }
 
 /**
@@ -222,11 +201,6 @@ function paymentform_payment_finish(Payment $payment) {
   }
   elseif (payment_status_is_or_has_ancestor($payment->getStatus()->status, PAYMENT_STATUS_FAILED)) {
     drupal_set_message(t('Your payment failed.') . $view);
-  }
-
-  // Make sure the user ends up where he came from.
-  if ($_GET['q'] != $payment->caller_data['location']) {
-    drupal_goto($payment->caller_data['location']);
   }
 }
 

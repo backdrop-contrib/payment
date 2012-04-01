@@ -53,18 +53,23 @@ function payment_page_payment_view(Payment $payment) {
 
 /**
  * Implements form build callback: the payment add/edit form.
+ *
+ * @param $form array
+ * @param $form_state array
+ * @param $payment Payment
+ *
+ * @return array
+ *   A render array.
  */
 function payment_form(array $form, array &$form_state, Payment $payment) {
-  $form['pid'] = array(
-    '#type' => 'value',
-    '#value' => $payment->pid,
-  );
+  $form_state['payment'] = $payment;
   $options = array();
   foreach (payment_statuses_info() as $status_info) {
     $options[$status_info->status] = $status_info->title;
   }
   asort($options);
   $form['status'] = array(
+    '#access' => !empty($payment->pid),
     '#type' => 'select',
     '#title' => t('Status'),
     '#options' => $options,
@@ -72,12 +77,19 @@ function payment_form(array $form, array &$form_state, Payment $payment) {
     '#required' => TRUE,
     '#description' => t('Updating a payment status manually can disrupt automatic payment processing.') . (user_access('payment.status.view') ? ' ' . l(t('Payment status overview.'), 'admin/config/services/payment/status') : ''),
   );
+  $form['line_items'] = payment_line_items($payment);
+  $form['payment_method'] = array(
+    '#access' => empty($payment->pid),
+    '#type' => 'payment_method',
+    '#title' => t('Payment method'),
+    '#required' => TRUE,
+  );
   $form['actions'] = array(
     '#type' => 'actions',
   );
   $form['actions']['save'] = array(
     '#type' => 'submit',
-    '#value' => t('Save'),
+    '#value' => $payment->pid ? t('Save') : t('Pay'),
   );
   field_attach_form('payment', $payment, $form, $form_state);
 
@@ -88,18 +100,27 @@ function payment_form(array $form, array &$form_state, Payment $payment) {
  * Implements form validate callback for payment_form().
  */
 function payment_form_validate(array $form, array &$form_state) {
-  field_attach_form_validate('payment', entity_load_single('payment', $form_state['values']['pid']), $form, $form_state);
+  field_attach_form_validate('payment', $form_state['payment'], $form, $form_state);
 }
 
 /**
  * Implements form submit callback for payment_form().
  */
 function payment_form_submit(array $form, array &$form_state) {
-  $payment = entity_load_single('payment', $form_state['values']['pid']);
+  $payment = $form_state['payment'];
   $payment->setStatus(new PaymentStatusItem($form_state['values']['status']));
-  field_attach_submit('payment', $payment, $form, $form_state);
+  $new = empty($payment->pid);
   entity_save('payment', $payment);
-  $form_state['redirect'] = 'payment/' . $form_state['values']['pid'];
+  field_attach_submit('payment', $payment, $form, $form_state);
+  if ($new) {
+    $payment->execute();
+    if (payment_status_has_ancestor($payment->getStatus()->status, PAYMENT_STATUS_FAILED)) {
+      $form_state['rebuild'] = TRUE;
+    }
+  }
+  if (payment_access('view', $payment)) {
+    $form_state['redirect'] = 'payment/' . $payment->pid;
+  }
 }
 
 /**
@@ -336,4 +357,72 @@ function payment_payment_status_sort_title(PaymentStatusInfo $status_a, PaymentS
 
 function payment_method_name_exists($name) {
   return (bool) entity_load_single('payment_method', $name);
+}
+
+/**
+ * Return a render array containing a Payment's line items.
+ *
+ * @param $payment Payment
+ *
+ * @return array
+ */
+function payment_line_items(Payment $payment) {
+  $rows = array();
+  foreach ($payment->line_items as $name => $line_item) {
+    $rows[] = array(
+      'data' => array(
+        t($line_item->description, $line_item->description_arguments),
+        $line_item->quantity,
+        payment_amount_human_readable($line_item->unitAmount(TRUE), $payment->currency_code),
+        payment_amount_human_readable($line_item->totalAmount(TRUE), $payment->currency_code),
+        t('!amount (!percentage%)', array(
+          '!amount' => payment_amount_human_readable($line_item->amount * $line_item->tax_rate, $payment->currency_code),
+          '!percentage' => $line_item->tax_rate * 100,
+        )),
+      ),
+      'class' => array('payment-line_item-' . $name),
+    );
+  }
+  $rows[] = array(
+    'data' => array(array(
+      'data' => t('Total amount'),
+      'colspan' => 3,
+      ), payment_amount_human_readable($payment->totalAmount(TRUE), $payment->currency_code), '',
+    ),
+    'class' => array('payment-line_item-total'),
+  );
+  $build = array(
+    '#type' => 'markup',
+    '#markup' => theme('table', array(
+      'header' => array(t('Description'), t('Quantity'), t('Amount'), t('Total'), t('Tax')),
+      'rows' => $rows,
+    )),
+  );
+
+  return $build;
+}
+
+/**
+ * Return a render array containing a Payment's status items.
+ *
+ * @param $payment Payment
+ *
+ * @return array
+ */
+function payment_status_items(Payment $payment) {
+  $status = payment_status_info($payment->getStatus()->status, TRUE);
+  $rows = array();
+  foreach (array_reverse($payment->statuses) as $status_item) {
+    $status = payment_status_info($status_item->status);
+    $rows[] = array($status->title, format_date($status_item->created));
+  }
+  $build['status_items'] = array(
+    '#type' => 'markup',
+    '#markup' => theme('table', array(
+      'header' => array(t('Status'), t('Date')),
+      'rows' => $rows,
+    )),
+  );
+
+  return $build;
 }

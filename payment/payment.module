@@ -41,6 +41,14 @@ define('PAYMENT_STATUS_SUCCESS', 'payment_status_success');
 define('PAYMENT_STATUS_FAILED', 'payment_status_failed');
 
 /**
+ * Implements hook_init().
+ */
+function payment_init() {
+  // Load include files that contain hooks or callback code.
+  module_load_include('inc', 'payment', 'payment.ui');
+}
+
+/**
  * Implements hook_menu().
  *
  * @see payment_views_default_views()
@@ -291,6 +299,14 @@ function payment_theme() {
 function payment_field_extra_fields() {
   $field['payment']['payment'] = array(
     'form' => array(
+      'line_items' => array(
+        'label' => t('Line items'),
+        'weight' => 0,
+      ),
+      'payment_method' => array(
+        'label' => t('Payment method selection and configuration'),
+        'weight' => 0,
+      ),
       'status' => array(
         'label' => t('Status'),
         'weight' => 0,
@@ -301,8 +317,12 @@ function payment_field_extra_fields() {
         'label' => t('Line items'),
         'weight' => 0,
       ),
-      'status_history' => array(
-        'label' => t('Status history'),
+      'payment_method' => array(
+        'label' => t('Payment method (generic title)'),
+        'weight' => 0,
+      ),
+      'status_items' => array(
+        'label' => t('Status items'),
         'weight' => 0,
       ),
     ),
