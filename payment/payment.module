@@ -47,7 +47,7 @@ define('PAYMENT_STATUS_FAILED', 'payment_status_failed');
  */
 function payment_menu() {
   // Payment pages.
-  $items['payment/%payment_menu_entity'] = array(
+  $items['payment/%entity_object'] = array(
     'load arguments' => array('payment'),
     'title callback' => 'payment_title',
     'title arguments' => array(1),
@@ -57,14 +57,14 @@ function payment_menu() {
     'access arguments' => array('view', 1),
     'file' => 'payment.ui.inc',
   );
-  $items['payment/%payment_menu_entity/view'] = array(
+  $items['payment/%entity_object/view'] = array(
     'load arguments' => array('payment'),
     'title' => 'View',
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
     'weight' => -10,
   );
-  $items['payment/%payment_menu_entity/edit'] = array(
+  $items['payment/%entity_object/edit'] = array(
     'load arguments' => array('payment'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('payment_form', 1),
@@ -103,7 +103,7 @@ function payment_menu() {
     'file' => 'payment.ui.inc',
     'type' => MENU_CALLBACK,
   );
-  $items['admin/config/services/payment/method/%payment_menu_entity'] = array(
+  $items['admin/config/services/payment/method/%entity_object'] = array(
     'load arguments' => array('payment_method'),
     'page callback' => 'payment_method_form',
     'page arguments' => array(5),
@@ -112,13 +112,13 @@ function payment_menu() {
     'title arguments' => array(5),
     'file' => 'payment.ui.inc',
   );
-  $items['admin/config/services/payment/method/%payment_menu_entity/edit'] = array(
+  $items['admin/config/services/payment/method/%entity_object/edit'] = array(
     'load arguments' => array('payment_method'),
     'title' => 'Edit',
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'context' => MENU_CONTEXT_INLINE,
   );
-  $items['admin/config/services/payment/method/%payment_menu_entity/delete'] = array(
+  $items['admin/config/services/payment/method/%entity_object/delete'] = array(
     'load arguments' => array('payment_method'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('payment_form_payment_method_delete', 5),
@@ -773,20 +773,6 @@ function payment_form_method_controller_settings_ajax_callback(array $form, arra
   }
 
   return $element['controller_settings'] ? $element['controller_settings'] : array();
-}
-
-/**
- * Menu wildcard loader to load an entity
- *
- * @param $id integer
- *   The entity's ID.
- * @param $entity_type string
- *   The type of the entity to load.
- *
- * @see entity_load_single()
- */
-function payment_menu_entity_load($id, $entity_type) {
-  return entity_load_single($entity_type, $id);
 }
 
 /**
