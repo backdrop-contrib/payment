@@ -100,7 +100,11 @@ function payment_form(array $form, array &$form_state, Payment $payment) {
  * Implements form validate callback for payment_form().
  */
 function payment_form_validate(array $form, array &$form_state) {
-  field_attach_form_validate('payment', $form_state['payment'], $form, $form_state);
+  $payment = $form_state['payment'];
+  field_attach_form_validate('payment', $payment, $form, $form_state);
+  if (!$payment->method->validate($payment)) {
+    form_set_error('payment_method', t("The payment did not pass its method's controller's validation."));
+  }
 }
 
 /**
@@ -108,18 +112,22 @@ function payment_form_validate(array $form, array &$form_state) {
  */
 function payment_form_submit(array $form, array &$form_state) {
   $payment = $form_state['payment'];
-  $payment->setStatus(new PaymentStatusItem($form_state['values']['status']));
   $new = empty($payment->pid);
-  entity_save('payment', $payment);
+
+  // Process submitted values.
+  $payment->setStatus(new PaymentStatusItem($form_state['values']['status']));
   field_attach_submit('payment', $payment, $form, $form_state);
+
+  entity_save('payment', $payment);
+  if (payment_access('view', $payment)) {
+    $form_state['redirect'] = 'payment/' . $payment->pid;
+  }
+
   if ($new) {
     $payment->execute();
     if (payment_status_has_ancestor($payment->getStatus()->status, PAYMENT_STATUS_FAILED)) {
       $form_state['rebuild'] = TRUE;
     }
-  }
-  if (payment_access('view', $payment)) {
-    $form_state['redirect'] = 'payment/' . $payment->pid;
   }
 }
 
