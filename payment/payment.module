@@ -177,7 +177,6 @@ function payment_menu_alter(&$items) {
   // Make "Manage fields" the default local task.
   $items['admin/config/services/payment/payment'] = array(
     'title' => 'Payments',
-    'weight' => -1,
     'type' => MENU_NORMAL_ITEM,
   ) + $items['admin/config/services/payment/payment/fields'];
   $items['admin/config/services/payment/payment/fields'] = array(
@@ -702,6 +701,8 @@ function payment_form_method_process(array $element, array &$form_state, array &
     // Cast the PMID to a string or the AJAX callback won't work.
     $pmid_options[(string) $payment_method->pmid] = $payment_method->title_generic;
   }
+  $form['#prefix'] = '<div id="payment-method-wrapper">';
+  $form['#suffix'] = '</div>';
   $element['pmid'] = array(
     '#type' => 'select',
     '#title' => isset($element['#title']) ? $element['#title'] : NULL,
@@ -713,7 +714,7 @@ function payment_form_method_process(array $element, array &$form_state, array &
       'callback' => 'payment_form_method_controller_settings_ajax_callback',
       'effect' => 'fade',
       'event' => 'change',
-      'wrapper' => 'payment-controller-settings',
+      'wrapper' => 'payment-method-wrapper',
     ),
     // Disable the selector for non-JS pages. This means that if we're
     // executing an AJAX callback, _triggering_element_name is set and we leave
@@ -724,7 +725,7 @@ function payment_form_method_process(array $element, array &$form_state, array &
     ),
     '#id' => 'payment-method-pmid',
   );
-  $element += payment_form_method_controller_settings($payment, $form_state);
+  $element += payment_form_method_controller_settings($form, $form_state);
 
   // The element itself has no input, only its children, so mark it not
   // required to prevent validation errors.
@@ -754,17 +755,15 @@ function payment_form_method_change_submit(array $form, array &$form_state) {
 /**
  * Return a payment's method controller's form elements to configure a payment.
  *
- * @param $payment Payment
- * @param $form_state array
+ * @param array $form
+ * @param array $form_state
  *
  * @return array
  */
-function payment_form_method_controller_settings(Payment $payment, array &$form_state) {
-  $elements['controller_settings'] = array(
-    '#prefix' => '<div id="payment-controller-settings">',
-    '#suffix' => '</div>',
-    '#weight' => 1,
-  );
+function payment_form_method_controller_settings(array &$form, array &$form_state) {
+  $payment = $form_state['payment'];
+
+  $elements = array();
   if ($payment->method) {
     $elements['change'] = array(
       '#type' => 'submit',
@@ -775,8 +774,8 @@ function payment_form_method_controller_settings(Payment $payment, array &$form_
         'class' => array('js-hide')
       ),
     );
-    if ($payment->method->controller->payment_form_elements_callback) {
-      $elements['controller_settings'] += call_user_func($payment->method->controller->payment_form_elements_callback, $payment, $form_state);
+    if ($function = $payment->method->controller->payment_form_elements_callback) {
+      $elements['controller_settings'] = $function($form, $form_state);
     }
   }
 
@@ -787,12 +786,7 @@ function payment_form_method_controller_settings(Payment $payment, array &$form_
  * Return a payment method controller's form elements to configure a payment.
  */
 function payment_form_method_controller_settings_ajax_callback(array $form, array &$form_state) {
-  $element = $form;
-  foreach ($form_state['payment_parents'] as $parent) {
-    $element = $element[$parent];
-  }
-
-  return $element['controller_settings'] ? $element['controller_settings'] : array();
+  return $form;
 }
 
 /**
