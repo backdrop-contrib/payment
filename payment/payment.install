@@ -154,6 +154,10 @@ function payment_schema() {
         'length' => 255,
         'not null' => TRUE,
       ),
+      'enabled' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+      ),
       'module' => array(
         'type' => 'varchar',
         'length' => 255,

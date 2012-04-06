@@ -204,6 +204,11 @@ function payment_form_payment_method(array $form, array &$form_state, PaymentMet
     '#title' => t('Type'),
     '#markup' => check_plain($payment_method->controller->title),
   );
+  $form['enabled'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enabled'),
+    '#default_value' => $payment_method->enabled,
+  );
   $form['title_specific'] = array(
     '#type' => 'textfield',
     '#title' => t('Title (specific)'),
@@ -254,6 +259,7 @@ function payment_form_payment_method(array $form, array &$form_state, PaymentMet
 function payment_form_payment_method_submit(array $form, array &$form_state) {
   $values = $form_state['values'];
   $payment_method = $form_state['payment_method'];
+  $payment_method->enabled = $values['enabled'];
   $payment_method->title_specific = $values['title_specific'];
   // The generic title defaults to the specific one.
   $payment_method->title_generic = $values['title_generic'] ? $values['title_generic'] : $values['title_specific'];

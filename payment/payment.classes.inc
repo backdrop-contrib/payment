@@ -297,7 +297,7 @@ class Payment extends PaymentCommon {
     }
     $available = array();
     foreach ($payment_methods as $payment_method) {
-      if ($payment_method->validate($this, FALSE)) {
+      if ($payment_method->enabled && $payment_method->validate($this, FALSE)) {
         $available[$payment_method->pmid] = $payment_method;
       }
     }
@@ -476,6 +476,13 @@ class PaymentMethod extends PaymentCommon {
    * @var array
    */
   public $controller_data = array();
+
+  /**
+   * Whether this payment method is enabled and can be used.
+   *
+   * @var boolean
+   */
+  public $enabled = TRUE;
 
   /**
    * The entity's unique machine name.
