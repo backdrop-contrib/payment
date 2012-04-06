@@ -12,7 +12,13 @@ class PaymentViewsHandlerFieldPaymentMethodOperations extends views_handler_fiel
     $pmid = $this->get_value($values);
     $links = menu_contextual_links('payment', 'admin/config/services/payment/method', array($pmid));
 
-    return theme('links', array(
+    foreach (array('enable', 'disable') as $op) {
+      if (isset($links['payment-' . $op])) {
+        $links['payment-' . $op]['href'] .= '/' . drupal_get_token('payment_method_enable_disable');
+      }
+    }
+
+    return theme('links__ctools_dropbutton', array(
       'links' => $links,
       'attributes' => array(
         'class' => array('links', 'inline', 'operations'),

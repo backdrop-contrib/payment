@@ -441,3 +441,30 @@ function payment_status_items(Payment $payment) {
 
   return $build;
 }
+
+/**
+ * Toggle a payment method's enabled status.
+ *
+ * @param string $op
+ *   Either 'enable' or 'disable'.
+ * @param PaymentMethod $payment_method
+ *
+ * @return NULL
+ */
+function payment_page_method_enable_disable($op, PaymentMethod $payment_method, $token) {
+  if ($token == drupal_get_token('payment_method_enable_disable')) {
+    switch($op) {
+      case 'enable':
+        $payment_method->enabled = TRUE;
+        break;
+      case 'disable':
+        $payment_method->enabled = FALSE;
+        break;
+    }
+    entity_save('payment_method', $payment_method);
+    drupal_goto('admin/config/services/payment/method');
+  }
+  else {
+    drupal_access_denied();
+  }
+}

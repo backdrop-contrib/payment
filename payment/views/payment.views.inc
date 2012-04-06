@@ -197,6 +197,23 @@ function payment_views_data_alter(&$data) {
       'handler' => 'views_handler_argument_string',
     ),
   );
+  $data['payment_method']['enabled_machine_name'] = array(
+    'title' => t('Enabled (machine name)'),
+    'real field' => 'enabled',
+    'field' => array(
+      'handler' => 'PaymentViewsHandlerFieldPaymentMethodEnabledMachineName',
+      'click sortable' => TRUE,
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_string',
+    ),
+  );
   $data['payment_method']['controller_title'] = array(
     'title' => t('Payment method type title'),
     'real field' => 'controller_class_name',

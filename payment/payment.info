@@ -8,6 +8,7 @@ files[] = tests/payment.test
 files[] = views/PaymentViewsHandlerFieldPaymentLineItemAmountTotal.inc
 files[] = views/PaymentViewsHandlerFieldPaymentMethodControllerTitle.inc
 files[] = views/PaymentViewsHandlerFieldPaymentMethodControllerDescription.inc
+files[] = views/PaymentViewsHandlerFieldPaymentMethodEnabledMachineName.inc
 files[] = views/PaymentViewsHandlerFieldPaymentMethodOperations.inc
 files[] = views/PaymentViewsHandlerFieldPaymentStatusTitle.inc
 files[] = views/PaymentViewsHandlerFieldPaymentOperations.inc

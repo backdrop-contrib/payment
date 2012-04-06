@@ -46,6 +46,11 @@ define('PAYMENT_STATUS_FAILED', 'payment_status_failed');
 function payment_init() {
   // Load include files that contain hooks or callback code.
   module_load_include('inc', 'payment', 'payment.ui');
+
+  // Add administration CSS.
+  if (preg_match('#^admin/config/services/payment/method#', $_GET['q'])) {
+    drupal_add_css(drupal_get_path('module', 'payment') . '/css/payment.admin.css');
+  }
 }
 
 /**
@@ -126,6 +131,30 @@ function payment_menu() {
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'context' => MENU_CONTEXT_INLINE,
   );
+  $items['admin/config/services/payment/method/%entity_object/enable'] = array(
+    'load arguments' => array('payment_method'),
+    'page callback' => 'payment_page_method_enable_disable',
+    'page arguments' => array('enable', 5),
+    'access callback' => 'payment_access_method_enable_disable',
+    'access arguments' => array('enable', 5),
+    'title' => 'Enable',
+    'file' => 'payment.ui.inc',
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_INLINE,
+    'weight' => 1,
+  );
+  $items['admin/config/services/payment/method/%entity_object/disable'] = array(
+    'load arguments' => array('payment_method'),
+    'page callback' => 'payment_page_method_enable_disable',
+    'page arguments' => array('disable', 5),
+    'access callback' => 'payment_access_method_enable_disable',
+    'access arguments' => array('disable', 5),
+    'title' => 'Disable',
+    'file' => 'payment.ui.inc',
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_INLINE,
+    'weight' => 1,
+  );
   $items['admin/config/services/payment/method/%entity_object/delete'] = array(
     'load arguments' => array('payment_method'),
     'page callback' => 'drupal_get_form',
@@ -135,7 +164,7 @@ function payment_menu() {
     'file' => 'payment.ui.inc',
     'type' => MENU_LOCAL_TASK,
     'context' => MENU_CONTEXT_INLINE,
-    'weight' => 1,
+    'weight' => 2,
   );
 
   // Payment status overview.
@@ -844,4 +873,23 @@ function payment_line_item_get_all($name, Payment $payment) {
  */
 function payment_rules_access($type, $name) {
   return user_access('payment.rules.administer');
+}
+
+/**
+ * Implements menu access callback.
+ *
+ * @param string $op
+ *   Either 'enable' or 'disable'.
+ * @param PaymentMethod $payment_method
+ *
+ * @return boolean
+ */
+function payment_access_method_enable_disable($op, PaymentMethod $payment_method) {
+  switch($op) {
+    case 'enable':
+      return $payment_method->enabled == FALSE;
+    case 'disable':
+      return $payment_method->enabled == TRUE;
+  }
+  return FALSE;
 }
