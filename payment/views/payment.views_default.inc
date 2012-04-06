@@ -557,12 +557,13 @@ function payment_view_payment_methods() {
   $handler->display->display_options['pager']['type'] = 'none';
   $handler->display->display_options['pager']['options']['offset'] = '0';
   $handler->display->display_options['style_plugin'] = 'table';
+  $handler->display->display_options['style_options']['row_class'] = 'payment-method-[enabled_machine_name]';
   $handler->display->display_options['style_options']['columns'] = array(
     'pmid' => 'pmid',
-    'title_generic' => 'title_generic',
+    'title_specific' => 'title_specific',
     'controller_title' => 'controller_title',
-    'nothing' => 'nothing',
-    'nothing_1' => 'nothing',
+    'operations' => 'operations',
+    'enabled_machine_name' => 'enabled_machine_name',
   );
   $handler->display->display_options['style_options']['default'] = '-1';
   $handler->display->display_options['style_options']['info'] = array(
@@ -571,26 +572,33 @@ function payment_view_payment_methods() {
       'default_sort_order' => 'asc',
       'align' => '',
       'separator' => '',
+      'empty_column' => 0,
     ),
-    'title_generic' => array(
+    'title_specific' => array(
       'sortable' => 0,
       'default_sort_order' => 'asc',
       'align' => '',
       'separator' => '',
+      'empty_column' => 0,
     ),
     'controller_title' => array(
       'sortable' => 0,
       'default_sort_order' => 'asc',
       'align' => '',
       'separator' => '',
+      'empty_column' => 0,
     ),
-    'nothing' => array(
-      'align' => '',
-      'separator' => '<<>>',
-    ),
-    'nothing_1' => array(
+    'operations' => array(
       'align' => '',
       'separator' => '',
+      'empty_column' => 0,
+    ),
+    'enabled_machine_name' => array(
+      'sortable' => 0,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
     ),
   );
   $handler->display->display_options['style_options']['override'] = 1;
@@ -693,13 +701,41 @@ function payment_view_payment_methods() {
   $handler->display->display_options['fields']['operations']['hide_empty'] = 0;
   $handler->display->display_options['fields']['operations']['empty_zero'] = 0;
   $handler->display->display_options['fields']['operations']['hide_alter_empty'] = 0;
+  /* Field: Payment method: Enabled (machine name) */
+  $handler->display->display_options['fields']['enabled_machine_name']['id'] = 'enabled_machine_name';
+  $handler->display->display_options['fields']['enabled_machine_name']['table'] = 'payment_method';
+  $handler->display->display_options['fields']['enabled_machine_name']['field'] = 'enabled_machine_name';
+  $handler->display->display_options['fields']['enabled_machine_name']['exclude'] = TRUE;
+  $handler->display->display_options['fields']['enabled_machine_name']['alter']['alter_text'] = 0;
+  $handler->display->display_options['fields']['enabled_machine_name']['alter']['make_link'] = 0;
+  $handler->display->display_options['fields']['enabled_machine_name']['alter']['absolute'] = 0;
+  $handler->display->display_options['fields']['enabled_machine_name']['alter']['external'] = 0;
+  $handler->display->display_options['fields']['enabled_machine_name']['alter']['replace_spaces'] = 0;
+  $handler->display->display_options['fields']['enabled_machine_name']['alter']['trim_whitespace'] = 0;
+  $handler->display->display_options['fields']['enabled_machine_name']['alter']['nl2br'] = 0;
+  $handler->display->display_options['fields']['enabled_machine_name']['alter']['word_boundary'] = 1;
+  $handler->display->display_options['fields']['enabled_machine_name']['alter']['ellipsis'] = 1;
+  $handler->display->display_options['fields']['enabled_machine_name']['alter']['more_link'] = 0;
+  $handler->display->display_options['fields']['enabled_machine_name']['alter']['strip_tags'] = 0;
+  $handler->display->display_options['fields']['enabled_machine_name']['alter']['trim'] = 0;
+  $handler->display->display_options['fields']['enabled_machine_name']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['enabled_machine_name']['element_label_colon'] = 1;
+  $handler->display->display_options['fields']['enabled_machine_name']['element_default_classes'] = 1;
+  $handler->display->display_options['fields']['enabled_machine_name']['hide_empty'] = 0;
+  $handler->display->display_options['fields']['enabled_machine_name']['empty_zero'] = 0;
+  $handler->display->display_options['fields']['enabled_machine_name']['hide_alter_empty'] = 1;
+  /* Sort criterion: Payment method: Enabled */
+  $handler->display->display_options['sorts']['enabled']['id'] = 'enabled';
+  $handler->display->display_options['sorts']['enabled']['table'] = 'payment_method';
+  $handler->display->display_options['sorts']['enabled']['field'] = 'enabled';
+  $handler->display->display_options['sorts']['enabled']['order'] = 'DESC';
   /* Sort criterion: Payment method: Title (specific) */
   $handler->display->display_options['sorts']['title_specific']['id'] = 'title_specific';
   $handler->display->display_options['sorts']['title_specific']['table'] = 'payment_method';
   $handler->display->display_options['sorts']['title_specific']['field'] = 'title_specific';
 
   /* Display: Administration page */
-  $handler = $view->new_display('page', 'Administration page', 'page_1');
+  $handler = $view->new_display('page', 'Administration page', 'administration_page');
   $handler->display->display_options['path'] = 'admin/config/services/payment/method';
   $handler->display->display_options['menu']['type'] = 'normal';
   $handler->display->display_options['menu']['title'] = 'Payment methods';
