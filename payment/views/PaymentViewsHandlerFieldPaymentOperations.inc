@@ -12,7 +12,7 @@ class PaymentViewsHandlerFieldPaymentOperations extends views_handler_field {
     $pid = $this->get_value($values);
     $links = menu_contextual_links('payment', 'payment', array($pid));
 
-    return theme('links', array(
+    return theme('links__ctools_dropbutton', array(
       'links' => $links,
       'attributes' => array(
         'class' => array('links', 'inline', 'operations'),

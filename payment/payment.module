@@ -48,7 +48,7 @@ function payment_init() {
   module_load_include('inc', 'payment', 'payment.ui');
 
   // Add administration CSS.
-  if (preg_match('#^admin/config/services/payment/method#', $_GET['q'])) {
+  if (preg_match('#^admin/config/services/payment/method#', $_GET['q']) || preg_match('#^admin/content/payment#', $_GET['q'])) {
     drupal_add_css(drupal_get_path('module', 'payment') . '/css/payment.admin.css');
   }
 }
