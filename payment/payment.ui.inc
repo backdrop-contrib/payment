@@ -260,6 +260,7 @@ function payment_form_payment_method_submit(array $form, array &$form_state) {
   $values = $form_state['values'];
   $payment_method = $form_state['payment_method'];
   $payment_method->enabled = $values['enabled'];
+  $payment_method->name = $values['name'];
   $payment_method->title_specific = $values['title_specific'];
   // The generic title defaults to the specific one.
   $payment_method->title_generic = $values['title_generic'] ? $values['title_generic'] : $values['title_specific'];
@@ -477,6 +478,7 @@ function payment_page_method_clone(PaymentMethod $payment_method, $token) {
 
   $payment_method = clone $payment_method;
   $payment_method->pmid = 0;
+  $payment_method->name = '';
 
   return payment_method_form($payment_method);
 }
