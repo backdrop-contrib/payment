@@ -155,6 +155,17 @@ function payment_menu() {
     'context' => MENU_CONTEXT_INLINE,
     'weight' => 1,
   );
+  $items['admin/config/services/payment/method/%entity_object/clone'] = array(
+    'load arguments' => array('payment_method'),
+    'page callback' => 'payment_page_method_clone',
+    'page arguments' => array(5),
+    'access arguments' => array('payment.method.administer'),
+    'title' => 'Clone',
+    'file' => 'payment.ui.inc',
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_INLINE,
+    'weight' => 2,
+  );
   $items['admin/config/services/payment/method/%entity_object/delete'] = array(
     'load arguments' => array('payment_method'),
     'page callback' => 'drupal_get_form',
@@ -164,7 +175,7 @@ function payment_menu() {
     'file' => 'payment.ui.inc',
     'type' => MENU_LOCAL_TASK,
     'context' => MENU_CONTEXT_INLINE,
-    'weight' => 2,
+    'weight' => 3,
   );
 
   // Payment status overview.
@@ -887,9 +898,9 @@ function payment_rules_access($type, $name) {
 function payment_access_method_enable_disable($op, PaymentMethod $payment_method) {
   switch($op) {
     case 'enable':
-      return $payment_method->enabled == FALSE;
+      return $payment_method->enabled == FALSE && user_access('payment.method.administer');
     case 'disable':
-      return $payment_method->enabled == TRUE;
+      return $payment_method->enabled == TRUE && user_access('payment.method.administer');
   }
   return FALSE;
 }
