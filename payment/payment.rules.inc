@@ -74,8 +74,11 @@ function payment_rules_action_info() {
       ),
     ),
   );
-  $actions['payment_rules_action_payment_line_item_set_fixed'] = array(
-    'label' => t('Set line item with a fixed amount of money'),
+  $description = array(t('If the evaluated amount does not return a whole or fractional number, this action will do nothing.'));
+  $description[] = module_exists('ctools') ? t('You can use mathematical expressions.') : t('Enable <a href="http://drupal.org/project/ctools">Chaos tool suite</a> in order to use mathematical expressions.');
+  $description = implode(' ', $description);
+  $actions['payment_rules_action_payment_line_item_add'] = array(
+    'label' => t('Add a line item'),
     'access callback' => 'payment_rules_access',
     'group' => t('Payment'),
     'parameter' => array(
@@ -90,66 +93,23 @@ function payment_rules_action_info() {
       'description' => array(
         'type' => 'text',
         'label' => t('Description'),
+        'translatable' => TRUE,
       ),
       'tax_rate' => array(
         'type' => 'decimal',
         'label' => t('Tax rate'),
-        'description' => t('Enter a factor between 0 and 1. Defaults to 0.'),
+        'description' => t('Enter a (fractional) number between 0 and 1.'),
+        'default value' => 0,
       ),
       'quantity' => array(
         'type' => 'integer',
         'label' => t('Quantity'),
+        'default value' => 1,
       ),
       'amount' => array(
-        'type' => 'decimal',
+        'type' => 'text',
         'label' => t('Amount'),
-      ),
-    ),
-  );
-  $actions['payment_rules_action_payment_line_item_set_calculated'] = array(
-    'label' => t('Set a line item with a calculated amount of money'),
-    'access callback' => 'payment_rules_access',
-    'group' => t('Payment'),
-    'parameter' => array(
-      'payment' => array(
-        'type' => 'payment',
-        'label' => t('Payment'),
-      ),
-      'name' => array(
-        'type' => 'text',
-        'label' => t('Machine name'),
-      ),
-      'description' => array(
-        'type' => 'text',
-        'label' => t('Description'),
-        'optional' => TRUE,
-      ),
-      'tax_rate' => array(
-        'type' => 'decimal',
-        'label' => t('Tax rate'),
-        'description' => t('Enter a factor between 0 and 1. Defaults to 0.'),
-      ),
-      'quantity' => array(
-        'type' => 'integer',
-        'label' => t('Quantity'),
-      ),
-      'tax' => array(
-        'type' => 'boolean',
-        'label' => t('Include taxes for source amount'),
-      ),
-      'source_name' => array(
-        'type' => 'text',
-        'label' => t('Source line item'),
-        'options list' => 'payment_rules_options_list_payment_line_item_name',
-      ),
-      'calculation' => array(
-        'type' => 'text',
-        'label' => t('Calculation'),
-        'options list' => 'payment_rules_options_list_calculations',
-      ),
-      'factor' => array(
-        'type' => 'decimal',
-        'label' => t('Amount'),
+        'description' => $description . theme('payment_line_item_tokens'),
       ),
     ),
   );
@@ -327,68 +287,40 @@ function payment_rules_action_payment_set_status(Payment $payment, $status_data)
 }
 
 /**
- * Implements Rules action callback: set a line item with a fixed amount.
+ * Implements Rules action callback: add a line item.
  *
- * @param $payment Payment
- * @param $name string
+ * @param Payment $payment
+ * @param string $name
  *   The line item's unique machine name.
- * @param $description string
- * @param $tax_rate
+ * @param string $description
+ * @param float $tax_rate
  * The tax rate that applies to the amount. Should be a float between 0 and 1.
- * @param $quantity integer
- * @param $amount integer
- *   The amount of money.
+ * @param integer $quantity
+ * @param integer|string $amount
+ *   The amount of money, either as an integer or string that contains
+ *   placeholders or a Ctools math expression.
  */
-function payment_rules_action_payment_line_item_set_fixed(Payment $payment, $name, $description, $tax_rate, $quantity, $amount) {
-  $payment->setLineItem(new PaymentLineItem(array(
-    'name' => $name,
-    'amount' => $amount,
-    'description'=> $description,
-    'tax_rate' => $tax_rate,
-    'quantity' => $quantity,
-  )));
-}
+function payment_rules_action_payment_line_item_add(Payment $payment, $name, $description, $tax_rate, $quantity, $amount) {
+  if (!is_numeric($amount)) {
+    // Replace placeholders.
+    $amount = token_replace($amount, array(
+      'payment' => $payment,
+    ));
 
-/**
- * Implements Rules action callback: set a calculated line item.
- *
- * @see PaymentLineItem
- *
- * @param $payment Payment
- * @param $name string
- *   The machine name of the new line item.
- * @param $description string
- *   The line item's human-readable description.
- * @param $tax_rate
- * The tax rate that applies to the amount. Should be a float between 0 and 1.
- * @param $quantity integer
- * @param $tax boolean
- *   Whether to use source amounts including tax.
- * @param $source_name string
- *   The machine name of the payment line item to use for the calculation.
- * @param $calculation string
- *   One of the keys returned by payment_rules_options_list_calculations().
- * @param $factor float
- *   The factor to use for the calculation.
- */
-function payment_rules_action_payment_line_item_set_calculated($payment, $name, $description, $tax_rate, $quantity, $tax, $source_name, $calculation, $factor) {
-  if ($source_line_items = $payment->getLineItems($source_name)) {
-    $source_amount = $payment->totalAmount($tax, $source_line_items);
-    switch ($calculation) {
-      case 'add':
-        $amount = $source_amount + $factor;
-        break;
-      case 'subtract':
-        $amount = $source_amount - $factor;
-        break;
-      case 'multiply':
-        $amount = $source_amount * $factor;
-        break;
-      case 'divide':
-        $amount = $source_amount / $factor;
-        break;
+    // Evaluate Ctools math expression.
+    if (module_exists('ctools')) {
+      $math = new ctools_math_expr;
+      $amount = $math->evaluate($amount);
     }
-    payment_rules_action_payment_line_item_set_fixed($payment, $Name, $description, $tax_rate, $quantity, $amount);
+  }
+  if (is_numeric($amount)) {
+    $payment->setLineItem(new PaymentLineItem(array(
+      'name' => $name,
+      'amount' => $amount,
+      'description'=> $description,
+      'tax_rate' => $tax_rate,
+      'quantity' => $quantity,
+    )));
   }
 }
 
@@ -396,7 +328,7 @@ function payment_rules_action_payment_line_item_set_calculated($payment, $name, 
  * Implements Rules options list callback for
  * payment_rules_action_payment_line_item_set_calculated().
  */
-function payment_rules_options_list_payment_list_item_name() {
+function payment_rules_options_list_payment_line_item_name() {
   $options = array();
   foreach (payment_line_items_info() as $line_item_info) {
     $options[$line_item_info->name] = $line_item_info->title;

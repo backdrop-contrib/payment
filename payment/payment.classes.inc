@@ -226,9 +226,9 @@ class Payment extends PaymentCommon {
    *
    * @return float
    */
-  function totalAmount($tax, array $line_items = array()) {
+  function totalAmount($tax, array $line_items = NULl) {
     $total = 0;
-    if (!$line_items) {
+    if (is_null($line_items)) {
       $line_items = $this->line_items;
     }
     foreach ($line_items as $line_item) {

@@ -41,6 +41,11 @@ define('PAYMENT_STATUS_SUCCESS', 'payment_status_success');
 define('PAYMENT_STATUS_FAILED', 'payment_status_failed');
 
 /**
+ * The prefix for payment line item tokens.
+ */
+define('PAYMENT_LINE_ITEM_TOKEN_PREFIX', 'line_item-');
+
+/**
  * Implements hook_init().
  */
 function payment_init() {
