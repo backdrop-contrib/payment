@@ -159,10 +159,18 @@ class Payment extends PaymentCommon {
       rules_invoke_event('payment_pre_execute', $this);
     }
     // Execute the payment.
-    if ($this->method && $this->method->validate($this)) {
-      $this->setStatus(new PaymentStatusItem(PAYMENT_STATUS_PENDING));
-      $this->method->controller->execute($this);
+    if ($this->method) {
+      try {
+        $this->method->validate($this);
+        $this->setStatus(new PaymentStatusItem(PAYMENT_STATUS_PENDING));
+        $this->method->controller->execute($this);
+      }
+      // An exception was thrown during validation.
+      catch (PaymentValidationException $e) {
+        $this->setStatus(new PaymentStatusItem(PAYMENT_STATUS_FAILED));
+      }
     }
+    // There is no payment method.
     else {
       $this->setStatus(new PaymentStatusItem(PAYMENT_STATUS_FAILED));
     }
@@ -297,8 +305,12 @@ class Payment extends PaymentCommon {
     }
     $available = array();
     foreach ($payment_methods as $payment_method) {
-      if ($payment_method->enabled && $payment_method->validate($this, FALSE)) {
-        $available[$payment_method->pmid] = $payment_method;
+      if ($payment_method->enabled) {
+        try {
+          $payment_method->validate($this, FALSE);
+          $available[$payment_method->pmid] = $payment_method;
+        }
+        catch (PaymentValidationException $e) {}
       }
     }
 
@@ -538,20 +550,11 @@ class PaymentMethod extends PaymentCommon {
    *   for instance, which does not require unimportant things to be a 100%
    *   valid.
    *
-   * @return boolean
-   *   Whether the payment can work with the this payment method.
+   * @throws PaymentValidationException
    */
   function validate(Payment $payment, $strict = TRUE) {
-    if ($this->controller->validate($payment, $this, $strict) !== TRUE) {
-      return FALSE;
-    }
-    foreach(module_implements('payment_validate') as $module) {
-      if (module_invoke($module, 'payment_validate', $payment, $this, $strict) !== TRUE) {
-        return FALSE;
-      }
-    }
-    // No validator returned FALSE, so the payment is valid.
-    return TRUE;
+    $this->controller->validate($payment, $this, $strict);
+    module_invoke_all('payment_validate', $payment, $this, $strict);
   }
 }
 
@@ -749,24 +752,18 @@ class PaymentMethodController {
    *   for instance, which does not require unimportant things to be a 100%
    *   valid.
    *
-   * @return boolean
-   *   Whether the payment, the provided payment method and its controller can
-   *   work together.
+   * @throws PaymentValidationException
    */
   function validate(Payment $payment, PaymentMethod $payment_method, $strict) {
-    $valid = TRUE;
-
     // Confirm the payment amount is higher than 0.
     if ($payment->totalAmount(TRUE) <= 0) {
-      $valid = FALSE;
+      throw new PaymentValidationAmountBelowMinimumException(t('The amount should be higher than 0.'));
     }
 
     // Confirm the payment's currency is supported.
     if (!empty($this->currencies) && !in_array($payment->currency_code, $this->currencies)) {
-      $valid = FALSE;
+      throw new PaymentValidationUnsupportedCurrencyException(t(t('The currency is not supported by this payment method.')));
     }
-
-    return $valid;
   }
 }
 
@@ -794,7 +791,7 @@ class PaymentMethodControllerUnavailable extends PaymentMethodController {
    * Implements PaymentMethodController::validate().
    */
   function validate(Payment $payment, PaymentMethod $payment_method, $strict) {
-    return FALSE;
+    throw new PaymentValidationException;
   }
 }
 
@@ -1008,3 +1005,19 @@ class PaymentLineItemInfo extends PaymentCommon {
    */
   public $title = '';
 }
+
+/**
+ * Exception thrown if a payment is not valid.
+ */
+class PaymentValidationException extends Exception {}
+
+/**
+ * Exception thrown if a payment's total amount is below the required minimum.
+ */
+class PaymentValidationAmountBelowMinimumException extends PaymentValidationException {}
+
+/**
+ * Exception thrown if a payment uses a currency that is unsupported by a
+ * payment method.
+ */
+class PaymentValidationUnsupportedCurrencyException extends PaymentValidationException {}

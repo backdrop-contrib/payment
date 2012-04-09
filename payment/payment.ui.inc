@@ -103,8 +103,13 @@ function payment_form_validate(array $form, array &$form_state) {
   $payment = $form_state['payment'];
   field_attach_form_validate('payment', $payment, $form, $form_state);
 
-  if (empty($form_state['rebuild']) && $payment->method && !$payment->method->validate($payment)) {
-    form_set_error('payment_method', t('The payment did not pass validation.'));
+  if (empty($form_state['rebuild']) && $payment->method) {  
+    try {
+      $payment->method->validate($payment);
+    }
+    catch (PaymentValidationException $e) {
+      form_set_error('payment_method', $e->getMessage());
+    }
   }
 }
 

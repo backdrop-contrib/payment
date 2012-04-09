@@ -83,13 +83,14 @@ function paymentbilling_payment_validate(Payment $payment, PaymentMethod $paymen
       $information = paymentbilling_extract($payment);
       foreach ($payment_method->controller->billing as $property) {
         if ($information[$property] === FALSE) {
-          return FALSE;
+          $dependencies = paymentbilling_field_dependencies();
+          throw new PaymentBillingValidationMissingInformationException(t('Missing %information billing information.', array(
+            '%information' => $dependencies[$property]['title'],
+          )));
         }
       }
     }
   }
-  // If it's still not marked invalid at this point, it's valid.
-  return TRUE;
 }
 
 /**
@@ -224,3 +225,8 @@ function paymentbilling_extract(Payment $payment) {
 
   return $information;
 }
+
+/**
+ * Exception thrown if a payment misses required billing information.
+ */
+class PaymentBillingValidationMissingInformationException extends PaymentValidationException {}
