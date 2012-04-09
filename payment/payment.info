@@ -1,6 +1,7 @@
 name = Payment
 description = "Allows other modules to let their users make payments using the payment methods connected to Payment."
 core = 7.x
+configure = admin/config/services/payment
 dependencies[] = entity
 package = Payment
 files[] = payment.classes.inc
