@@ -109,7 +109,7 @@ function payment_rules_action_info() {
       'amount' => array(
         'type' => 'text',
         'label' => t('Amount'),
-        'description' => $description . theme('payment_line_item_tokens'),
+        'description' => $description,
       ),
     ),
   );
