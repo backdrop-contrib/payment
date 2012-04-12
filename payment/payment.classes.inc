@@ -674,7 +674,9 @@ class PaymentMethodController {
   /**
    * An array with ISO 4217 currency codes that this controller supports.
    *
-   * Leave empty to allow all currencies.
+   * Keys are ISO 4217 currency codes. Values are associative arrays with keys
+   * "minimum" and "maximum", whose values are the minimum and maximum amount
+   * supported for the specified currency. Leave empty to allow all currencies.
    *
    * @var array
    */
