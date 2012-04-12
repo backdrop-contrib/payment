@@ -762,7 +762,7 @@ class PaymentMethodController {
 
     // Confirm the payment's currency is supported.
     if (!empty($this->currencies) && !in_array($payment->currency_code, $this->currencies)) {
-      throw new PaymentValidationUnsupportedCurrencyException(t(t('The currency is not supported by this payment method.')));
+      throw new PaymentValidationUnsupportedCurrencyException(t('The currency is not supported by this payment method.'));
     }
   }
 }
