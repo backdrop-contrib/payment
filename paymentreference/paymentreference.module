@@ -11,7 +11,6 @@
 function paymentreference_menu() {
   $item['paymentreference/finish'] = array(
     'load arguments' => array('payment'),
-    'title' => 'paymentreference_instance_title',
     'page callback' => 'paymentreference_page_finish',
     'access callback' => TRUE,
     'type' => MENU_CALLBACK,
