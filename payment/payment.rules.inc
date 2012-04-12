@@ -338,19 +338,6 @@ function payment_rules_options_list_payment_line_item_name() {
 }
 
 /**
- * Implements Rules options list callback for
- * payment_rules_action_payment_line_item_set_calculated().
- */
-function payment_rules_options_list_calculations() {
-  return array(
-    'add' => t('Add'),
-    'subtract' => t('Subtract'),
-    'multiply' => t('Multiply by'),
-    'divide' => t('Divide by'),
-  );
-}
-
-/**
  * Implements Rules action callback: delete a line item.
  *
  * @param $payment Payment
