@@ -46,6 +46,11 @@ define('PAYMENT_STATUS_FAILED', 'payment_status_failed');
 define('PAYMENT_LINE_ITEM_TOKEN_PREFIX', 'line_item-');
 
 /**
+ * The absolute minimum payment amount.
+ */
+define('PAYMENT_MINIMUM_AMOUNT', 0.001);
+
+/**
  * Implements hook_init().
  */
 function payment_init() {

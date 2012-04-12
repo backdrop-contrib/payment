@@ -755,13 +755,25 @@ class PaymentMethodController {
    * @throws PaymentValidationException
    */
   function validate(Payment $payment, PaymentMethod $payment_method, $strict) {
-    // Confirm the payment amount is higher than 0.
-    if ($payment->totalAmount(TRUE) <= 0) {
-      throw new PaymentValidationAmountBelowMinimumException(t('The amount should be higher than 0.'));
+    $currencies = $payment_method->controller->currencies;
+
+    // Confirm the payment amount is higher than the supported minimum.
+    $minimum = isset($currencies[$payment->currency_code]['minimum']) ? $currencies[$payment->currency_code]['minimum'] : PAYMENT_MINIMUM_AMOUNT;
+    if ($payment->totalAmount(TRUE) < $minimum) {
+      throw new PaymentValidationAmountBelowMinimumException(t('The amount should be higher than !minimum.', array(
+        '!minumum' => payment_amount_human_readable($minimum, $payment->currency_code),
+      )));
+    }
+
+    // Confirm the payment amount does not exceed the maximum.
+    if (isset($currencies[$payment->currency_code]['maximum']) && $payment->totalAmount(TRUE) > $currencies[$payment->currency_code]['maximum']) {
+      throw new PaymentValidationAmountExceedsMaximumException(t('The amount should be lower than !maximum.', array(
+        '!maximum' => payment_amount_human_readable($currencies[$payment->currency_code]['maximum'], $payment->currency_code),
+      )));
     }
 
     // Confirm the payment's currency is supported.
-    if (!empty($this->currencies) && !in_array($payment->currency_code, $this->currencies)) {
+    if (!empty($this->currencies) && !isset($this->currencies[$payment->currency_code])) {
       throw new PaymentValidationUnsupportedCurrencyException(t('The currency is not supported by this payment method.'));
     }
   }
@@ -1015,6 +1027,11 @@ class PaymentValidationException extends Exception {}
  * Exception thrown if a payment's total amount is below the required minimum.
  */
 class PaymentValidationAmountBelowMinimumException extends PaymentValidationException {}
+
+/**
+ * Exception thrown if a payment's total amount exceeds the supported maximum.
+ */
+class PaymentValidationAmountExceedsMaximumException extends PaymentValidationException {}
 
 /**
  * Exception thrown if a payment uses a currency that is unsupported by a

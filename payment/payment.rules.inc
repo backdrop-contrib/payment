@@ -430,5 +430,5 @@ function payment_rules_condition_payment_uses_payment_method_type(Payment $payme
  * @return boolean
  */
 function payment_rules_condition_payment_method_controller_supports_currency(Payment $payment, $currency) {
-  return empty($payment->method->controller->currencies) ? TRUE : in_array($currency, $payment->method->controller->currencies);
+  return empty($payment->method->controller->currencies) ? TRUE : isset($payment->method->controller->currencies[$currency]);
 }
