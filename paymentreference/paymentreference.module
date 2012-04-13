@@ -70,7 +70,7 @@ function paymentreference_instance_access(array $instance) {
 function paymentreference_field_info() {
   $field['paymentreference'] = array(
     'label' => t('Payment reference'),
-    'description' => t('This field stores varchar text in the database.'),
+    'description' => t('Adds a reference to a payment.'),
     'instance_settings' => array(
       'amount' => 0,
       'currency_code' => 'XXX',
