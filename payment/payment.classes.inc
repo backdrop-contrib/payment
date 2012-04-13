@@ -757,7 +757,16 @@ class PaymentMethodController {
    * @throws PaymentValidationException
    */
   function validate(Payment $payment, PaymentMethod $payment_method, $strict) {
+    if (!$payment->currency_code) {
+      throw new PaymentValidationMissingCurrencyException(t('The payment has no currency set.'));
+    }
+
     $currencies = $payment_method->controller->currencies;
+
+    // Confirm the payment's currency is supported.
+    if (!empty($this->currencies) && !isset($this->currencies[$payment->currency_code])) {
+      throw new PaymentValidationUnsupportedCurrencyException(t('The currency is not supported by this payment method.'));
+    }
 
     // Confirm the payment amount is higher than the supported minimum.
     $minimum = isset($currencies[$payment->currency_code]['minimum']) ? $currencies[$payment->currency_code]['minimum'] : PAYMENT_MINIMUM_AMOUNT;
@@ -772,11 +781,6 @@ class PaymentMethodController {
       throw new PaymentValidationAmountExceedsMaximumException(t('The amount should be lower than !maximum.', array(
         '!maximum' => payment_amount_human_readable($currencies[$payment->currency_code]['maximum'], $payment->currency_code),
       )));
-    }
-
-    // Confirm the payment's currency is supported.
-    if (!empty($this->currencies) && !isset($this->currencies[$payment->currency_code])) {
-      throw new PaymentValidationUnsupportedCurrencyException(t('The currency is not supported by this payment method.'));
     }
   }
 }
@@ -1035,6 +1039,11 @@ class PaymentValidationAmountBelowMinimumException extends PaymentValidationExce
  */
 class PaymentValidationAmountExceedsMaximumException extends PaymentValidationException {}
 
+/**
+ * Exception thrown if a payment has no currency set.
+ */
+class PaymentValidationMissingCurrencyException extends PaymentValidationException {}
+  
 /**
  * Exception thrown if a payment uses a currency that is unsupported by a
  * payment method.

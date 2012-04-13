@@ -258,9 +258,22 @@ class PaymentValidationTest extends DrupalWebTestCase {
       'controller' => payment_method_controller_load('PaymentMethodBasicController'),
     ));
     $payment = new Payment(array(
-      'currency_code' => 'EUR',
+      'currency_code' => '',
       'method' => $payment_method,
     ));
+
+    // Test that a payment without a currency code set invalidates.
+    $valid = TRUE;
+    try {
+      $payment->method->validate($payment);
+    }
+    // An exception was thrown during validation.
+    catch (PaymentValidationMissingCurrencyException $e) {
+      $valid = FALSE;
+    }
+    $this->assertFalse($valid, 'PaymentMethodController::validate() invalidates a payment that has no currency set.');
+
+    $payment->currency_code = 'EUR';
 
     // Test that a payment with a total amount below PAYMENT_MINIMUM_AMOUNT
     // invalidates.
