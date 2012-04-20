@@ -75,7 +75,7 @@ class PaymentInfoHookTest extends DrupalWebTestCase {
    * @return array
    */
   function modules() {
-    return array('payment', 'paymentform', 'paymentmethodbasic');
+    return array('payment');
   }
 
   /**

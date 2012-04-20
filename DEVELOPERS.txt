@@ -57,4 +57,4 @@ TESTING
 
 If you need to test a module's info hook implementations, extend the class
 PaymentInfoHookTest and override the methods getInfo() and modules() to suit
-your needs.
+your needs. See the class PaymentMethodBasicInfoHookTest.
