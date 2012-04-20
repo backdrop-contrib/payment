@@ -886,7 +886,7 @@ class PaymentLineItem extends PaymentCommon {
    *
    * @var float
    */
-  public $amount = 0;
+  public $amount = 0.0;
 
   /**
    * A US English human-readable description for this line item. May contain
@@ -916,7 +916,7 @@ class PaymentLineItem extends PaymentCommon {
    *
    * @var float
    */
-  public $tax_rate = 0;
+  public $tax_rate = 0.0;
 
   /**
    * Quantity.
