@@ -4,5 +4,4 @@ dependencies[] = currency_api
 dependencies[] = payment
 package = Payment
 core = 7.x
-configure = admin/config/services/payment/paymentform
 files[] = tests/paymentform.test
