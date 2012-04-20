@@ -282,7 +282,6 @@ class PaymentValidationTest extends DrupalWebTestCase {
       $this->payment_method->validate($this->payment);
       $valid = TRUE;
     }
-    // An exception was thrown during validation.
     catch (PaymentValidationException $e) {
       $valid = FALSE;
     }
@@ -295,7 +294,6 @@ class PaymentValidationTest extends DrupalWebTestCase {
       $this->payment_method->validate($this->payment);
       $valid = TRUE;
     }
-    // An exception was thrown during validation.
     catch (PaymentValidationMissingCurrencyException $e) {
       $valid = FALSE;
     }
@@ -312,7 +310,6 @@ class PaymentValidationTest extends DrupalWebTestCase {
       $this->payment_method->validate($this->payment);
       $valid = TRUE;
     }
-    // An exception was thrown during validation.
     catch (PaymentValidationAmountBelowMinimumException $e) {
       $valid = FALSE;
     }
@@ -328,7 +325,6 @@ class PaymentValidationTest extends DrupalWebTestCase {
       $this->payment_method->validate($this->payment);
       $valid = TRUE;
     }
-    // An exception was thrown during validation.
     catch (PaymentValidationAmountBelowMinimumException $e) {
       $valid = FALSE;
     }
@@ -345,7 +341,6 @@ class PaymentValidationTest extends DrupalWebTestCase {
       $this->payment_method->validate($this->payment);
       $valid = TRUE;
     }
-    // An exception was thrown during validation.
     catch (PaymentValidationAmountExceedsMaximumException $e) {
       $valid = FALSE;
     }
