@@ -1,7 +1,8 @@
-name = Payment Form
-description = "Allows users to make payments through a basic stand-alone payment form."
+name = Payment Form Field
+description = Provides a field to add payment forms to entities.
 dependencies[] = currency_api
 dependencies[] = payment
 package = Payment
 core = 7.x
 configure = admin/config/services/payment/paymentform
+files[] = tests/paymentform.test

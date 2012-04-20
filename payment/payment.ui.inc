@@ -487,3 +487,235 @@ function payment_page_method_clone(PaymentMethod $payment_method, $token) {
 
   return payment_method_form($payment_method);
 }
+
+/**
+ * Implements form process callback for a payment_amount element.
+ */
+function payment_form_process_amount(array $element) {
+  $element['#type'] = 'textfield';
+  $element['#field_prefix'] = $element['#currency_code'];
+  $description = NULL;
+  if ($element['#minimum_amount'] > 0) {
+    $description = t('The minimum amount is !amount.', array(
+      '!amount' => payment_amount_human_readable($element['#minimum_amount'], $element['#currency_code']),
+    ));
+  }
+  $element['#description'] = $description;
+  $element['#size'] = 16;
+  $element['#maxlength'] = 16;
+  $element += element_info('textfield');
+
+  return $element;
+}
+
+/**
+ * Implements form validate callback for a payment_amount element.
+ */
+function payment_form_validate_amount(array $element, array &$form_state) {
+  $value = $element['#value'];
+
+  // Do nothing if there is no value and the element is optional.
+  if (!$element['#required'] && $value === '') {
+    return;
+  }
+
+  // Count the number of decimal marks.
+  $count_fragments = count(preg_split('#[.,]#', $value));
+
+  // Check for invalid characters.
+  if (preg_match('#[^\d.,]#', $value)) {
+    form_error($element, t('The amount can only consist of decimals and one decimal mark.'));
+  }
+  // Check for multiple decimal marks.
+  elseif ($count_fragments > 2) {
+    form_error($element, t('The amount can only have one decimal mark.'));
+  }
+  else {
+    // Convert the value to a float.
+    $amount = (float) $value;
+
+    // Confirm the amount lies within the allowed range.
+    if ($amount < $element['#minimum_amount']) {
+      form_error($element, t('The minimum amount is !amount.', array(
+        '!amount' => payment_amount_human_readable($element['#minimum_amount'], $element['#currency_code']),
+      )));
+    }
+
+    // The value passed validation. Set the amount as a float as the value for
+    // further processing.
+    else {
+      form_set_value($element, $amount, $form_state);
+    }
+  }
+}
+
+/**
+ * Implements form process callback for a payment_line_item element.
+ */
+function payment_form_process_line_item(array $element, array &$form_state, array $form) {
+  $form_state[drupal_clean_css_identifier('payment_' . $element['#name'])] = $element['#parents'];
+
+  // Fetch all line items to display elements for.
+  $line_items = array();
+  // We're building the form for the first time.
+  if (!isset($form_state['payment_line_item_count'])) {
+    // Track one empty line item by default.
+    $form_state['payment_line_item_count'] = count($line_items) + 1;
+    // Track and add the default values.
+    if (isset($element['#default_value'])) {
+      $line_items = array_values($element['#default_value']);
+      $form_state['payment_line_item_count'] += count($element['#default_value']);
+    }
+  }
+  // Add any tracked line items that haven't been added yet.
+  if ($form_state['payment_line_item_count'] > count($line_items)) {
+    $diff = $form_state['payment_line_item_count'] - count($line_items);
+    $line_items = array_merge($line_items, array_fill(0, $diff, NULL));
+  }
+
+  // Build the line items.
+  foreach ($line_items as $delta => $line_item) {
+    $required = $delta == 0 && $element['#required'];
+    $element['container_' . $delta] = array(
+      '#type' => 'container',
+      '#attributes' => array(
+        'class' => array('payment-line-item-container payment-line-item-container-' . $delta, ($delta + 1) % 2 == 0 ? 'odd' : 'even'),
+      ),
+    );
+    $element['container_' . $delta]['amount'] = array(
+      '#type' => 'payment_amount',
+      '#title' => t('Amount'),
+      '#default_value' => $line_item ? $line_item->amount : '',
+      '#currency_code' => $element['#currency_code'],
+      '#required' => $required,
+      '#attributes' => array(
+        'class' => array('payment-line-item-amount'),
+      ),
+    );
+    $element['container_' . $delta]['quantity'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Quantity'),
+      '#default_value' => $line_item ? $line_item->quantity : '',
+      '#size' => 3,
+      '#required' => $required,
+    );
+    $element['container_' . $delta]['tax_rate'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Tax rate'),
+      '#default_value' => $line_item ? $line_item->tax_rate * 100 : '',
+      '#size' => 5,
+      '#field_suffix' => '%',
+      '#required' => $required,
+    );
+    $element['container_' . $delta]['description'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Description'),
+      '#default_value' => $line_item ? $line_item->description : '',
+      '#required' => $required,
+      '#maxlength' => 255,
+    );
+    $element['container_' . $delta]['name'] = array(
+      '#type' => 'machine_name',
+      '#default_value' => $line_item ? $line_item->name : '',
+      '#maxlength' => 255,
+      '#required' => TRUE,
+      '#machine_name' => array(
+        'source' => array_merge($element['#parents'], array('container_' . $delta, 'description')),
+        'exists' => 'payment_method_name_exists',
+      ),
+      '#required' => $required,
+    );
+    $element['container_' . $delta]['clear'] = array(
+      '#type' => 'markup',
+      '#markup' => '<div class="clear"></div>',
+    );
+  }
+  // "Add more line items" button.
+  $wrapper_id = drupal_html_id('payment-ajax-replace');
+  $element['add_more'] = array(
+    '#type' => 'submit',
+    '#value' => t('Add a line item'),
+    '#submit' => array('payment_form_line_item_add_more_submit'),
+    '#limit_validation_errors' => array(),
+    '#ajax' => array(
+      'callback' => 'payment_form_line_item_add_more_ajax_callback',
+      'effect' => 'fade',
+      'event' => 'mousedown',
+      'wrapper' => $wrapper_id,
+    ),
+    '#name' => drupal_clean_css_identifier('payment_' . $element['#name']),
+    '#access' => $element['#cardinality'] == 0 || $form_state['payment_line_item_count'] < $element['#cardinality'],
+    '#id' => $wrapper_id,
+    '#attributes' => array(
+      'class' => array('payment-add-more'),
+    ),
+  );
+
+  return $element;
+}
+
+/**
+ * Implements form validate callback for a payment_line_item element.
+ */
+function payment_form_validate_line_item(array $element, array &$form_state) {
+  $line_items = array();
+  foreach ($element['#value'] as $container => $line_item_data) {
+    // All this line item's elements are empty, so there's nothing to validate.
+    if (reset($line_item_data) == '' && count(array_unique($line_item_data)) == 1) {
+      break;
+    }
+    // They're not all empty, so make sure they all contain input.
+    else {
+      // Keep track
+      $errors = array_fill_keys(array_keys($element['#value']), FALSE);
+      foreach ($line_item_data as $property => $value) {
+        if (!strlen($value)) {
+          form_error($element[$container][$property], t('%title is required, or leave all fields for this line item empty.', array(
+            '%title' => $element[$container][$property]['#title'],
+          )));
+        }
+      }
+    }
+
+    // Validate quantity.
+    if (preg_match('#\D#', $line_item_data['quantity'])) {
+      form_error($element[$container]['quantity'], t('Quantity should be a positive integer.'));
+    }
+
+    // Validate tax rate.
+    if (preg_match('#\D#', $line_item_data['tax_rate'])) {
+      form_error($element, t('Tax rate should be a positive integer.'));
+    }
+    else {
+      $line_item_data['tax_rate'] /= 100;
+    }
+
+    // Convert the raw input to a PaymentLineItem object.
+    $line_item_data['amount'] = (int) $line_item_data['amount'];
+    $line_item_data['quantity'] = (int) $line_item_data['quantity'];
+    $line_item_data['tax_rate'] = (float) $line_item_data['tax_rate'];
+    $line_items[] = new PaymentLineItem($line_item_data);
+  }
+  form_set_value($element, $line_items, $form_state);
+}
+
+/**
+ * Implements form submit callback for payment_line_item elements.
+ */
+function payment_form_line_item_add_more_submit(array $form, array &$form_state) {
+  $form_state['payment_line_item_count']++;
+  $form_state['rebuild'] = TRUE;
+}
+
+/**
+ * Implements form AJAX callback for payment_line_item elements.
+ */
+function payment_form_line_item_add_more_ajax_callback(array $form, array &$form_state) {
+  $element = drupal_array_get_nested_value($form, $form_state[$form_state['triggering_element']['#name']]);
+  $container_key = 'container_' . ($form_state['payment_line_item_count'] - 1);
+
+  return array(
+    $container_key => $element[$container_key],
+    'add_more' => $element['add_more'],
+  );
+}

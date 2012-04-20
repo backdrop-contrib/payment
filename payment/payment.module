@@ -529,6 +529,31 @@ function payment_element_info() {
     // An array with IDs of the allowed payment methods. Leave empty to allow all.
     '#pmids' => array(),
   );
+  // An element to collect a payment amount and convert it to a float.
+  $elements['payment_amount'] = array(
+    '#input' => TRUE,
+    '#process' => array('payment_form_process_amount'),
+    '#element_validate' => array('payment_form_validate_amount'),
+    // The minimum payment amount as a float that needs to be entered.
+    '#minimum_amount' => PAYMENT_MINIMUM_AMOUNT,
+    // The ISO 4217 currency code.
+    '#currency_code' => 'XXX',
+  );
+  // Line item configuration. The element's #default_value is an array with
+  // PaymentLineItem objects.
+  $elements['payment_line_item'] = array(
+    '#input' => TRUE,
+    '#tree' => TRUE,
+    '#process' => array('payment_form_process_line_item'),
+    '#attached' => array(
+      'css' => array(drupal_get_path('module', 'payment') . '/css/payment.ui.css'),
+      ),
+    '#element_validate' => array('payment_form_validate_line_item'),
+    // The ISO 4217 currency code.
+    '#currency_code' => 'XXX',
+    // The number of values this element allows. Enter 0 for unlimited.
+    '#cardinality' => 0,
+  );
 
   return $elements;
 }

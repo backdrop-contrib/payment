@@ -2,192 +2,205 @@
 
 /**
  * @file
- * Hook implementations and shared functions.
+ *   Hook implementations and general functions.
  */
 
 /**
- * Implements hook_menu().
+ * Implements hook_field_info().
  */
-function paymentform_menu() {
-  $base = array(
-    'title' => 'Payment form',
-    'access callback' => TRUE,
-  );
-  $items['paymentform'] = array(
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('paymentform_form'),
-  ) + $base;
-  $items['paymentform/%'] = array(
-    'page callback' => 'paymentform_page_payment_form',
-    'page arguments' => array(1),
-  ) + $base;
-  $items['admin/config/services/payment/paymentform'] = array(
-    'title' => 'Payment Form',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('paymentform_form_configuration'),
-    'access arguments' => array('paymentform.administer'),
-  );
-  $items['admin/config/services/payment/paymentform/configure'] = array(
-    'title' => 'Configure Payment Form',
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-    'context' => MENU_CONTEXT_INLINE,
+function paymentform_field_info() {
+  $field['paymentform'] = array(
+    'label' => t('Payment form'),
+    'description' => t('Adds a payment form to the <em>view</em> page.'),
+    'instance_settings' => array(
+      'currency_code' => 'XXX',
+    ),
+    'default_widget' => 'paymentform_line_item',
+    'default_formatter' => 'paymentform',
   );
 
-  return $items;
+  return $field;
 }
 
 /**
- * Implements hook_element_info().
+ * Implements hook_field_widget_info().
  */
-function paymentform_element_info() {
-  $elements['paymentform_amount'] = array(
-    '#input' => TRUE,
-    '#process' => array('paymentform_form_process_amount'),
-    // The minimum payment amount as a float that needs to be entered.
-    '#minimum_amount' => 0,
-    // The ISO 4217 currency code.
-    '#currency_code' => 'XXX',
-  );
-
-  return $elements;
-}
-
-/**
- * Implements hook_permission().
- */
-function paymentform_permission() {
-  return array(
-    'paymentform.administer' => array(
-      'title' => t('Administer Payment Form'),
+function paymentform_field_widget_info() {
+  $widget['paymentform_line_item'] = array(
+    'label' => t('Payment line item configuration'),
+    'description' => t("Allows users to configure line items for the form's payment."),
+    'field types' => array('paymentform'),
+    'behaviors' => array(
+      'multiple values' => FIELD_BEHAVIOR_CUSTOM,
+      'default value' => FIELD_BEHAVIOR_NONE,
     ),
   );
+
+  return $widget;
 }
 
 /**
- * Implements hook_block_info().
+ * Implements hook_field_formatter_info().
  */
-function paymentform_block_info() {
-  $blocks['paymentform'] = array(
-    'info' => t('Payment Form'),
+function paymentform_field_formatter_info() {
+  $formatters['paymentform'] = array(
+    'label' => t('Payment form'),
+    'field types' => array('paymentform'),
   );
 
-  return $blocks;
-}
-
-function paymentform_block_view($delta = '') {
-  return array(
-    'subject' => t('Payment Form'),
-    'content' => drupal_get_form('paymentform_form'),
-  );
+  return $formatters;
 }
 
 /**
- * Implements hook_payment_line_item_info().
+ * Implements hook_field_instance_settings_form().
  */
-function paymentform_payment_line_item_info() {
-  return array(
-    new PaymentLineItemInfo(array(
-      'name' => 'paymentform',
-      'title' => t('Payment Form amount'),
-    )),
-  );
-}
+function paymentform_field_instance_settings_form($field, $instance) {
+  $form = array();
 
-/**
- * Return paymentform_payment_form().
- *
- * @param $amount mixed
- *   This is the same parameter as accepted by paymentform_payment_form().
- *   However, that function accepts a float value only, while this function
- *   accepts anything and converts and validates it.
- *
- * @return array
- */
-function paymentform_page_payment_form($amount) {
-  $amount = (float) $amount;
-  if ($amount > 0) {
-    return paymentform_payment_form((float) $amount);
+  if ($instance['widget']['type'] == 'paymentform_line_item') {
+    $form['currency_code'] = array(
+      '#type' => 'select',
+      '#title' => t('Currency'),
+      '#options' => currency_api_get_list(),
+      '#default_value' => $instance['settings']['currency_code'],
+      '#required' => TRUE,
+    );
   }
-  else {
-    drupal_not_found();
-  }
-}
-
-/**
- * Build and return payment_form() after a paymentform_form() submission.
- *
- * @see paymentform_page_payment_form()
- *
- * @param $amount float
- *
- * @return array
- */
-function paymentform_payment_form($amount) {
-  $payment = new Payment(array(
-    'currency_code' => variable_get('paymentform_currency_code', 'XXX'),
-    'finish_callback' => 'paymentform_payment_finish',
-  ));
-  // @todo Description should be US English, but can be anything.
-  $payment->setLineItem(new PaymentLineItem(array(
-    'amount' => $amount,
-    'description' => variable_get('paymentform_description'),
-    'name' => 'paymentform',
-  )));
-  module_load_include('inc', 'payment', 'payment.ui');
-
-  return drupal_get_form('payment_form', $payment);
-}
-
-/**
- * Form build callback: render the donation form.
- *
- * @return array
- *  The form build array.
- */
-function paymentform_form(array $form, array &$form_state) {
-  // Conditions that need to be met in order to show the form.
-  if (!entity_load('payment_method')) {
-    $form['#access'] = FALSE;
-    drupal_set_message(t('There are no payment methods.'), 'warning');
-  }
-  if (!variable_get('paymentform_currency_code', FALSE)) {
-    $form['#access'] = FALSE;
-    drupal_set_message(t('Payment Form has not been configured.') . ' ' . l(t('Configure Payment Form'), 'admin/config/services/payment/paymentform') . '.', 'warning');
-  }
-
-  // Build the form.
-  $form['#contextual_links']['paymentform'] = array('admin/config/services/payment/paymentform', array());
-  $form['actions'] = array(
-    '#type' => 'actions',
-    '#weight' => 1,
-  );
-  $form['actions']['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Continue'),
-  );
-  $message = paymentform_form_message();
-  $form['message'] = array(
-    '#markup' => check_markup($message['value'], $message['format']),
-  );
-  $form['amount'] = array(
-    '#type' => 'paymentform_amount',
-    '#title' => t('Amount'),
-    '#minimum_amount' => variable_get('paymentform_amount', 0),
-    '#currency_code' => variable_get('paymentform_currency_code', 'XXX'),
-  );
 
   return $form;
 }
 
 /**
- * Implements form submit callback for paymentform_form().
+ * Implements hook_field_widget_form().
  */
-function paymentform_form_submit(array $form, array &$form_state) {
-  drupal_goto('paymentform/' . $form_state['values']['amount']);
+function paymentform_field_widget_form(array &$form, array &$form_state, array $field, array $instance, $langcode, array $items, $delta, array $element) {
+  global $user;
+
+  $default_value = array();
+  foreach ($items as $line_item_data) {
+    $default_value[] = new PaymentLineItem($line_item_data);
+  }
+  if ($instance['widget']['type'] == 'paymentform_line_item') {
+    $element = array(
+      '#type' => 'value',
+      // Use a validation callback to convert the PaymentLineItem objects from
+      // the payment_line_item element to arrays usable by Field API.
+      '#element_validate' => array('paymentform_field_widget_form_validate'),
+    ) + $element;
+    $element['line_item'] = array(
+      '#type' => 'payment_line_item',
+      '#currency_code' => $instance['settings']['currency_code'],
+      '#cardinality' => (int) $field['cardinality'],
+      '#default_value' => $default_value,
+      '#required' => $element['#required'],
+    );
+  }
+
+  return $element;
 }
 
 /**
- * Implements Payment finish callback.
+ * Implements hook_field_validate().
+ */
+function paymentform_field_validate($entity_type, $entity, $field, $instance, $langcode, $items, &$errors) {
+  if ($field['type'] == 'paymentform') {
+    foreach ($items as $delta => $line_item_data) {
+      $base = array(
+        'delta' => $delta,
+      );
+
+      // Amount.
+      $base['property'] = 'amount';
+      if (!is_float($line_item_data['amount'])) {
+        $errors[$field['field_name']][$langcode][$delta][] = array(
+          'error' => 'paymentform_line_item_amount_no_float',
+          'message' => t('The amount is no floating point.'),
+        ) + $base;
+      }
+      elseif ($line_item_data['amount'] < 0) {
+        $errors[$field['field_name']][$langcode][$delta][] = array(
+          'error' => 'paymentform_line_item_amount_negative',
+          'message' => t('The amount cannot be negative.'),
+        ) + $base;
+      }
+
+      // Quantity.
+      $base['property'] = 'quantity';
+      if (!is_int($line_item_data['quantity'])) {
+        $errors[$field['field_name']][$langcode][$delta][] = array(
+          'error' => 'paymentform_line_item_quantity_no_integer',
+          'message' => t('The quantity is no integer.'),
+        ) + $base;
+      }
+      elseif ($line_item_data['quantity'] < 0) {
+        $errors[$field['field_name']][$langcode][$delta][] = array(
+          'error' => 'paymentform_line_item_quantity_negative',
+          'message' => t('The quantity cannot be negative.'),
+        ) + $base;
+      }
+
+      // Tax rate.
+      $base['property'] = 'tax_rate';
+      if (!is_float($line_item_data['tax_rate'])) {
+        $errors[$field['field_name']][$langcode][$delta][] = array(
+          'error' => 'paymentform_line_item_tax_rate_no_float',
+          'message' => t('The tax rate is no floating point.'),
+        ) + $base;
+      }
+      elseif ($line_item_data['tax_rate'] < 0) {
+        $errors[$field['field_name']][$langcode][$delta][] = array(
+          'error' => 'paymentform_line_item_tax_rate_negative',
+          'message' => t('The tax rate cannot be negative.'),
+        ) + $base;
+      }
+
+      // Machine name.
+      $base['property'] = 'name';
+      if (empty($line_item_data['name'])) {
+        $errors[$field['field_name']][$langcode][$delta][] = array(
+          'error' => 'paymentform_line_item_name_empty',
+          'message' => t('The machine-readable name is empty.'),
+        ) + $base;
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_field_widget_error().
+ */
+function paymentform_field_widget_error($element, $error, $form, &$form_state) {
+  form_error($element['line_item']['container_' . $error['delta']][$error['property']], $error['message']);
+}
+
+/**
+ * Implements hook_field_is_empty().
+ */
+function paymentform_field_is_empty($item, array $field) {
+  if ($field['type'] == 'paymentform') {
+    return empty($item);
+  }
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+function paymentform_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  if ($display['type'] == 'paymentform') {
+    $payment = new Payment(array(
+      'currency_code' => $instance['settings']['currency_code'],
+      'finish_callback' => 'paymentform_payment_finish',
+    ));
+    foreach ($items as $line_item_data) {
+      $payment->setLineItem(new PaymentLineItem($line_item_data));
+    }
+
+    return drupal_get_form('payment_form', $payment);
+  }
+}
+
+/**
+ * Implements Payment::finish_callback.
  */
 function paymentform_payment_finish(Payment $payment) {
   if (payment_access('view', $payment)) {
@@ -204,131 +217,15 @@ function paymentform_payment_finish(Payment $payment) {
   }
 }
 
-/**
- * Implements form build callback: the global configuration form.
- */
-function paymentform_form_configuration(array $form, array &$form_state) {
-  $form['paymentform_amount'] = array(
-    '#type' => 'paymentform_amount',
-    '#title' => t('Minimum amount'),
-    '#default_value' => payment_amount_human_readable(variable_get('paymentform_amount', 0)),
-    '#editable' => TRUE,
-    '#currency_code' => variable_get('paymentform_currency_code', 'XXX'),
-  );
-  $form['paymentform_currency_code'] = array(
-    '#type' => 'select',
-    '#title' => t('Currency'),
-    '#options' => currency_api_get_list(),
-    '#default_value' => variable_get('paymentform_currency_code', 'XXX'),
-    '#required' => TRUE,
-  );
-  $form['paymentform_description'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Description'),
-    '#default_value' => paymentform_description(),
-    '#required' => TRUE,
-  );
-  $message = paymentform_form_message();
-  $form['paymentform_form_message'] = array(
-    '#type' => 'text_format',
-    '#title' => t('Payment form message'),
-    '#default_value' => $message['value'],
-    '#format' => $message['format'],
-  );
 
-  return system_settings_form($form);
-}
 
 /**
- * Return the payment form message.
- *
- * @return string
+ * Implements form validate callback for a paymentform_line_item field widget.
  */
-function paymentform_form_message() {
-  return variable_get('paymentform_form_message', array(
-    'value' => t('Make a payment to @site_name.', array(
-      '@site_name' => variable_get('site_name', NULL),
-    )),
-    'format' => NULL,
-  ));
-}
-
-/**
- * Return the payment description.
- *
- * @return string
- */
-function paymentform_description() {
-  return variable_get('paymentform_description', t('Payment to @site_name', array(
-    '@site_name' => variable_get('site_name', NULL),
-  )));
-}
-
-/**
- * Implements form process callback for a paymentform_amount element.
- */
-function paymentform_form_process_amount(array $element) {
-  $element['#type'] = 'textfield';
-  $element['#field_prefix'] = $element['#currency_code'];
-  $description = NULL;
-  if ($element['#minimum_amount'] > 0) {
-    $description = t('The minimum amount is !amount.', array(
-      '!amount' => payment_amount_human_readable($element['#minimum_amount'], $element['#currency_code']),
-    ));
+function paymentform_field_widget_form_validate(array $element, array &$form_state) {
+  $line_items = array();
+  foreach ($form_state['values'][$element['#field_name']][$element['#language']]['line_item'] as $line_item) {
+    $line_items[] = (array) $line_item;
   }
-  $element['#description'] = $description;
-  $element['#size'] = 16;
-  $element['#maxlength'] = 16;
-  $element += element_info('textfield');
-  // Set validate handlers.
-  $element['#element_validate'][] = 'paymentform_form_validate_amount';
-
-  return $element;
-}
-
-/**
- * Implements form validate callback for a paymentform_amount element.
- */
-function paymentform_form_validate_amount(array $element, array &$form_state) {
-  $value = $element['#value'];
-
-  // Count the number of decimal marks.
-  $count_fragments = count(preg_split('#[.,]#', $value));
-
-  // Check for invalid characters.
-  if (preg_match('#[^\d.,]#', $value)) {
-    form_set_error('amount', t('The amount can only consist of decimals and one decimal mark.'));
-  }
-  // Check for multiple decimal marks.
-  elseif ($count_fragments > 2) {
-    form_set_error('amount', t('The amount can only have one decimal mark.'));
-  }
-  // Make sure that if there is a decimal mark, it is followed by two digits.
-  elseif ($count_fragments == 2 && !preg_match('#[.,]\d\d$#', $value)) {
-    // @todo Implement Currency 7.x-2.x.
-    // @todo Number of digits can vary from 0 to 3.
-    form_set_error('amount', t('The decimal mark must be followed by two digits.'));
-  }
-  else {
-    // Convert the value to a float.
-    $amount = (float) $value;
-
-    // Confirm the amount lies within the allowed range.
-    if ($amount <= 0) {
-      form_set_error('amount', t('The amount should be higher than !amount.', array(
-        '!amount' => payment_amount_human_readable(0, $element['#currency_code']),
-      )));
-    }
-    if ($amount < $element['#minimum_amount']) {
-      form_set_error('amount', t('The minimum amount is !amount.', array(
-        '!amount' => payment_amount_human_readable($element['#minimum_amount'], $element['#currency_code']),
-      )));
-    }
-
-    // The value passed validation. Set the amount as a float as the value for
-    // further processing.
-    else {
-      form_set_value($element, $amount, $form_state);
-    }
-  }
+  form_set_value($element, $line_items, $form_state);
 }
