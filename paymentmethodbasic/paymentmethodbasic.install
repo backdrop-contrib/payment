@@ -21,6 +21,11 @@ function paymentmethodbasic_schema() {
         'not null' => TRUE,
         'default' => 0,
       ),
+      'status' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
       'text_format' => array(
         'type' => 'varchar',
         'length' => 255,

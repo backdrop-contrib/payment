@@ -85,6 +85,7 @@ function paymentmethodbasic_payment_method_delete($entity) {
 function paymentmethodbasic_controller_data() {
   return array(
     'message' => '',
+    'status' => PAYMENT_STATUS_SUCCESS,
     'text_format' => '',
   );
 }
@@ -111,7 +112,8 @@ class PaymentMethodBasicController extends PaymentMethodController {
    * Implements PaymentMethodController::execute().
    */
   function execute(Payment $payment) {
-    $payment->setStatus(new PaymentStatusItem(PAYMENT_STATUS_SUCCESS));
+    debug($payment->method->controller_data);
+    $payment->setStatus(new PaymentStatusItem($payment->method->controller_data['status']));
   }
 }
 
@@ -124,6 +126,17 @@ class PaymentMethodBasicController extends PaymentMethodController {
 function paymentmethodbasic_form_payment_method(array $form, array &$form_state) {
   $controller_data = $form_state['payment_method']->controller_data;
 
+  $options = array();
+  foreach (payment_statuses_info() as $status_info) {
+    $options[$status_info->status] = $status_info->title;
+  }
+  $form['status'] = array(
+    '#type' => 'select',
+    '#title' => t('Final payment status'),
+    '#description' => t('The status to give a payment after being processed by this payment method.'),
+    '#default_value' => isset($controller_data['status']) ? $controller_data['status'] : PAYMENT_STATUS_SUCCESS,
+    '#options' => $options,
+  );
   $form['message'] = array(
     '#type' => 'text_format',
     '#title' => t('Payment form message'),
@@ -139,6 +152,7 @@ function paymentmethodbasic_form_payment_method(array $form, array &$form_state)
  */
 function paymentmethodbasic_form_payment_method_submit(array $form, array &$form_state) {
   $form_state['payment_method']->controller_data['message'] = $form_state['values']['message']['value'];
+  $form_state['payment_method']->controller_data['status'] = $form_state['values']['status'];
   $form_state['payment_method']->controller_data['text_format'] = $form_state['values']['message']['format'];
 }
 

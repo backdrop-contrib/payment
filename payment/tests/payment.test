@@ -27,6 +27,9 @@ class PaymentActionHookAndCallbackTest extends DrupalWebTestCase {
   function testActionHooksAndCallbacks() {
     $payment_method = new PaymentMethod(array(
       'controller' => payment_method_controller_load('PaymentMethodBasicController'),
+      'controller_data' => array(
+        'status' => PAYMENT_STATUS_SUCCESS,
+      ),
     ));
     $payment = new Payment(array(
       'method' => $payment_method,
