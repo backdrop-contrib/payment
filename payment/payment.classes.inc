@@ -768,6 +768,11 @@ class PaymentMethodController {
       throw new PaymentValidationUnsupportedCurrencyException(t('The currency is not supported by this payment method.'));
     }
 
+    // Confirm the finish callback is set and the function exists.
+    if (empty($payment->finish_callback) || !function_exists($payment->finish_callback)) {
+      throw new PaymentValidationMissingFinishCallback(t('The finish callback is not set or not callable.'));
+    }
+
     // Confirm the payment amount is higher than the supported minimum.
     $minimum = isset($currencies[$payment->currency_code]['minimum']) ? $currencies[$payment->currency_code]['minimum'] : PAYMENT_MINIMUM_AMOUNT;
     if ($payment->totalAmount(TRUE) < $minimum) {
@@ -1049,3 +1054,9 @@ class PaymentValidationMissingCurrencyException extends PaymentValidationExcepti
  * payment method.
  */
 class PaymentValidationUnsupportedCurrencyException extends PaymentValidationException {}
+
+/**
+ * Exception thrown if a payment's finish callback is not set or the function
+ * does not exist.
+ */
+class PaymentValidationMissingFinishCallback extends PaymentValidationException {}

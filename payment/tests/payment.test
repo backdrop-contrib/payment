@@ -300,6 +300,20 @@ class PaymentValidationTest extends DrupalWebTestCase {
     $this->assertFalse($valid, 'PaymentMethodController::validate() invalidates a payment that has no currency set.');
     $this->payment->currency_code = $currency;
 
+    // Test that a payment without a (callable) finish callback set
+    // invalidates.
+    $finish_callback = $this->payment->finish_callback;
+    $this->payment->finish_callback = '';
+    try {
+      $this->payment_method->validate($this->payment);
+      $valid = TRUE;
+    }
+    catch (PaymentValidationMissingFinishCallback $e) {
+      $valid = FALSE;
+    }
+    $this->assertFalse($valid, 'PaymentMethodController::validate() invalidates a payment that has no (callable) finish callback set.');
+    $this->payment->finish_callback = $finish_callback;
+
     // Test that a payment with a total amount below PAYMENT_MINIMUM_AMOUNT
     // invalidates.
     $currencies = $this->payment_method->controller->currencies;
