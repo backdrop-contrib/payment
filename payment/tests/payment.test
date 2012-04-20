@@ -18,7 +18,7 @@ class PaymentActionHookAndCallbackTest extends DrupalWebTestCase {
   }
 
   function setUp() {
-    parent::setUp('payment_test', 'paymentmethodbasic');
+    parent::setUp('paymenttest', 'paymentmethodbasic');
   }
 
   /**
@@ -30,26 +30,26 @@ class PaymentActionHookAndCallbackTest extends DrupalWebTestCase {
     ));
     $payment = new Payment(array(
       'method' => $payment_method,
-      'finish_callback' => 'payment_test_finish_callback',
+      'finish_callback' => 'paymenttest_finish_callback',
     ));
     $payment->setLineItem(new PaymentLineItem(array(
-      'name' => 'payment_test',
+      'name' => 'paymenttest',
       'amount' => 1,
     )));
     $validation = FALSE;
     try {
-      $payment->payment_test_payment_validate = TRUE;
+      $payment->paymenttest_payment_validate = TRUE;
       $payment_method->validate($payment);
     }
     catch (PaymentValidationException $e) {
-      $validation = $e->getMessage() == 'payment_test';
+      $validation = $e->getMessage() == 'paymenttest';
     }
-    unset($payment->payment_test_payment_validate);
+    unset($payment->paymenttest_payment_validate);
     $this->assertTrue($validation, 'hook_payment_validate() is invoked when validating a payment before execution.');
     $payment->execute();
-    $this->assertTrue(isset($payment->payment_test_payment_pre_execute), 'hook_payment_pre_execute() is invoked before executing a payment.');
-    $this->assertTrue(isset($payment->payment_test_payment_status_change), 'hook_payment_status_change() is invoked before executing a payment.');
-    $this->assertTrue(isset($payment->payment_test_finish_callback), 'The finish callback is invoked after executing a payment.');
+    $this->assertTrue(isset($payment->paymenttest_payment_pre_execute), 'hook_payment_pre_execute() is invoked before executing a payment.');
+    $this->assertTrue(isset($payment->paymenttest_payment_status_change), 'hook_payment_status_change() is invoked before executing a payment.');
+    $this->assertTrue(isset($payment->paymenttest_finish_callback), 'The finish callback is invoked after executing a payment.');
   }
 }
 
@@ -147,7 +147,7 @@ class PaymentLineItemTest extends DrupalWebTestCase {
   }
 
   function setUp() {
-    parent::setUp('payment_test');
+    parent::setUp('paymenttest');
   }
 
   /**
@@ -187,7 +187,7 @@ class PaymentLineItemTest extends DrupalWebTestCase {
     )));
 
     // Test Payment::totalAmount() with passed on amounts.
-    $line_items = $payment->getLineItems('payment_test');
+    $line_items = $payment->getLineItems('paymenttest');
     $this->assertTrue($payment->totalAmount(TRUE, $line_items) == 40.801, 'Payment::totalAmount() adds up only passed on line items.');
 
     // Test payment_line_item_get_specific() and whether
@@ -250,7 +250,7 @@ class PaymentValidationTest extends DrupalWebTestCase {
    * Implements DrupalWebTestCase::setUp().
    */
   function setUp() {
-    parent::setUp('payment', 'paymentmethodbasic', 'payment_test');
+    parent::setUp('payment', 'paymentmethodbasic', 'paymenttest');
 
     // Set up a valid payment.
     $this->payment_method = new PaymentMethod(array(
@@ -264,11 +264,11 @@ class PaymentValidationTest extends DrupalWebTestCase {
     );
     $this->payment = new Payment(array(
       'currency_code' => 'XXX',
-      'finish_callback' => 'payment_test_finish_callback',
+      'finish_callback' => 'paymenttest_finish_callback',
       'method' => $this->payment_method,
     ));
     $this->payment->setLineItem(new PaymentLineItem(array(
-      'name' => 'payment_test',
+      'name' => 'paymenttest',
       'amount' => 15,
     )));
   }
@@ -348,7 +348,7 @@ class PaymentValidationTest extends DrupalWebTestCase {
     // Test that a payment with a total amount above its controller's maximum
     // invalidates.
     $this->payment->setLineItem(new PaymentLineItem(array(
-      'name' => 'payment_test2',
+      'name' => 'paymenttest2',
       'amount' => 25,
     )));
     try {
@@ -359,7 +359,7 @@ class PaymentValidationTest extends DrupalWebTestCase {
       $valid = FALSE;
     }
     $this->assertFalse($valid, "PaymentMethodController::validate() invalidates a payment of which the amount exceeds its controller's supported maximum.");
-    unset($this->payment->line_items['payment_test2']);
+    unset($this->payment->line_items['paymenttest2']);
   }
 }
 
@@ -376,7 +376,7 @@ class PaymentLineItemFormElementTest extends DrupalWebTestCase {
   }
 
   function setUp() {
-    parent::setUp('payment', 'payment_test');
+    parent::setUp('payment', 'paymenttest');
     $this->PaymentLineItemData = array(
       'line_item[container_0][amount]' => '10.0',
       'line_item[container_0][description]' => 'foo',
@@ -415,7 +415,7 @@ class PaymentLineItemFormElementTest extends DrupalWebTestCase {
    * Test a regular submission.
    */
   function testSubmission() {
-    $this->drupalGet('payment-test-form-element-payment-line-item');
+    $this->drupalGet('paymenttest-form-element-payment-line-item');
     $this->LineItemElements();
     $this->SubmitButton(TRUE);
     $this->drupalPost(NULL, array(), t('Add a line item'));
@@ -427,7 +427,7 @@ class PaymentLineItemFormElementTest extends DrupalWebTestCase {
    * Test an AJAX submission.
    */
   function testAJAXSubmission() {
-    $this->drupalPostAJAX('payment-test-form-element-payment-line-item', array(), 'payment-line-item', NULL, array(), array(), 'payment-test-form-payment-line-item');
+    $this->drupalPostAJAX('paymenttest-form-element-payment-line-item', array(), 'payment-line-item', NULL, array(), array(), 'paymenttest-form-payment-line-item');
     $this->LineItemElements(1);
     $this->SubmitButton(FALSE);
   }
@@ -436,8 +436,8 @@ class PaymentLineItemFormElementTest extends DrupalWebTestCase {
    * Test default value handling.
    */
   function testDefaultValues() {
-    $this->drupalGet('payment-test-form-element-payment-line-item/default-values');
-    foreach (payment_test_default_line_items() as $delta => $line_item) {
+    $this->drupalGet('paymenttest-form-element-payment-line-item/default-values');
+    foreach (paymenttest_default_line_items() as $delta => $line_item) {
       $properties = array(
         'amount' => $line_item->amount,
         'description' => $line_item->description,
@@ -457,14 +457,14 @@ class PaymentLineItemFormElementTest extends DrupalWebTestCase {
    */
   function testValidation() {
     // Test valid values.
-    $this->drupalPost('payment-test-form-element-payment-line-item', $this->PaymentLineItemData, t('Submit'));
+    $this->drupalPost('paymenttest-form-element-payment-line-item', $this->PaymentLineItemData, t('Submit'));
     $this->assertUrl('user', array(), 'Valid values trigger form submission.');
 
     // Test leaving some elements empty.
     $values = array(
       'line_item[container_0][description]' => '',
     ) + $this->PaymentLineItemData;
-    $this->drupalPost('payment-test-form-element-payment-line-item', $values, t('Submit'));
+    $this->drupalPost('paymenttest-form-element-payment-line-item', $values, t('Submit'));
     $this->assertRaw(t('%title is required, or leave all fields for this line item empty.', array(
       '%title' => t('Description'),
     )), "Partially filling in a line item's element throws a validation error.");
@@ -473,14 +473,14 @@ class PaymentLineItemFormElementTest extends DrupalWebTestCase {
     $values =  array(
       'line_item[container_0][quantity]' => $this->randomName(2),
     );
-    $this->drupalPost('payment-test-form-element-payment-line-item', $values, t('Submit'));
+    $this->drupalPost('paymenttest-form-element-payment-line-item', $values, t('Submit'));
     $this->assertText(t('Quantity should be a positive integer.'), 'A non-integer amount throws a validation error.');
 
     // Test a non-integer tax rate.
     $values =  array(
       'line_item[container_0][tax_rate]' => $this->randomName(2),
     );
-    $this->drupalPost('payment-test-form-element-payment-line-item', $values, t('Submit'));
+    $this->drupalPost('paymenttest-form-element-payment-line-item', $values, t('Submit'));
     $this->assertText(t('Tax rate should be a positive integer.'), 'A non-integer tax rate throws a validation error.');
   }
 }
@@ -498,7 +498,7 @@ class PaymentAmountFormElementTest extends DrupalWebTestCase {
   }
 
   function setUp() {
-    parent::setUp('payment', 'payment_test');
+    parent::setUp('payment', 'paymenttest');
   }
 
   /**
@@ -509,33 +509,33 @@ class PaymentAmountFormElementTest extends DrupalWebTestCase {
     $values =  array(
       'amount' => '49.95',
     );
-    $this->drupalPost('payment-test-form-element-payment-amount', $values, t('Submit'));
+    $this->drupalPost('paymenttest-form-element-payment-amount', $values, t('Submit'));
     $this->assertUrl('user', array(), 'A valid value higher than the default <em>#minimum_value</em> triggers form submission.');
     $values =  array(
       'amount' => '50,95',
     );
-    $this->drupalPost('payment-test-form-element-payment-amount/50', $values, t('Submit'));
+    $this->drupalPost('paymenttest-form-element-payment-amount/50', $values, t('Submit'));
     $this->assertUrl('user', array(), 'A valid value higher than an explicitely configured <em>#minimum_value</em> triggers form submission.');
 
     // Test illegal characters.
     $values =  array(
       'amount' => $this->randomName(2),
     );
-    $this->drupalPost('payment-test-form-element-payment-amount', $values, t('Submit'));
+    $this->drupalPost('paymenttest-form-element-payment-amount', $values, t('Submit'));
     $this->assertText(t('The amount can only consist of decimals and one decimal mark.'), 'Non-alphanumeric characters that are neither a period nor a comma throw a validation error.');
 
     // Test multiple decimal marks.
     $values =  array(
       'amount' => '49,.95',
     );
-    $this->drupalPost('payment-test-form-element-payment-amount', $values, t('Submit'));
+    $this->drupalPost('paymenttest-form-element-payment-amount', $values, t('Submit'));
     $this->assertText(t('The amount can only have one decimal mark.'), 'Multiple decimal marks throw a validation error.');
 
     // Test the minimum value.
     $values =  array(
       'amount' => '49.95',
     );
-    $this->drupalPost('payment-test-form-element-payment-amount/50', $values, t('Submit'));
+    $this->drupalPost('paymenttest-form-element-payment-amount/50', $values, t('Submit'));
     $this->assertText(t('The minimum amount is !amount.', array(
       '!amount' => payment_amount_human_readable(50, 'XXX'),
     )), 'An amount below the minimum throws a validation error.');
