@@ -178,19 +178,7 @@ function payment_method_form_add($controller) {
     'controller' => $controller,
   ));
 
-  return payment_method_form($payment_method);
-}
-
-/**
- * Return a payment method's settings form.
- *
- * @param $payment_method PaymentMethod
- *
- * @return array
- *   A Drupal form.
- */
-function payment_method_form(PaymentMethod $payment_method) {
-  return drupal_get_form('payment_form_payment_method_' . $payment_method->controller->payment_method_form_id, $payment_method);
+  return drupal_get_form('payment_form_payment_method', $payment_method);
 }
 
 /**
@@ -240,6 +228,7 @@ function payment_form_payment_method(array $form, array &$form_state, PaymentMet
     '#default_value' => $payment_method->title_generic,
     '#maxlength' => 255,
   );
+  $form['controller_form'] = payment_method_controller_form_callback($form, $form_state, $payment_method->controller, 'payment_method', 'build');
   $form['actions'] = array(
     '#type' => 'actions',
   );
@@ -256,6 +245,13 @@ function payment_form_payment_method(array $form, array &$form_state, PaymentMet
   }
 
   return $form;
+}
+
+/**
+ * Implements form validate callback for payment_form_payment_method().
+ */
+function payment_form_payment_method_validate(array $form, array &$form_state) {
+  payment_method_controller_form_callback($form, $form_state, $form_state['payment_method']->controller, 'payment_method', 'validate');
 }
 
 /**
@@ -718,4 +714,33 @@ function payment_form_line_item_add_more_ajax_callback(array $form, array &$form
     $container_key => $element[$container_key],
     'add_more' => $element['add_more'],
   );
+}
+
+/**
+ * Call one of a payment method controller's form callbacks.
+ *
+ * @param array $form
+ * @param array $form_state
+ * @param PaymentMethodController $controller
+ * @param string $callback
+ *   Either "payment" or "payment_method".
+ * @param string $operation
+ *   Either "build" or "validate".
+ *
+ * @return mixed
+ *   The callback's return value. 
+ */
+function payment_method_controller_form_callback(array $form, array &$form_state, PaymentMethodController $controller, $callback, $operation) {
+  $property = $callback . '_configuration_form_elements_callback';
+  switch ($operation) {
+    case 'build':
+      $function = $controller->$property;
+      break;
+    case 'validate':
+      $function = $controller->$property . '_validate';
+      break;
+  }
+  if (function_exists($function)) {
+    return $function($form, $form_state);
+  }
 }

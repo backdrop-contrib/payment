@@ -702,26 +702,47 @@ class PaymentMethodController {
   public $name = '';
 
   /**
-   * The name of the function that returns form elements to configure this
-   * payment method for a specific payment. Using #element_validate callbacks,
-   * input can be added to the Payment object in $form_state['payment']. The
-   * function accepts a Payment object and the $form_state (not by reference)
-   * array as arguments.
+   * The function name of the payment configuration form elements.
+   *
+   * Note that this is not a form ID and because the form will not be called
+   * using drupal_get_form(), it can only be altered by altering the form
+   * payment_form(). The validate callback is expected to be a function with
+   * the same name, but suffixed with "_validate". If this function exists, it
+   * will be called automatically. $form_state['payment'] contains the Payment
+   * that is added or edited. All method-specific information should be added
+   * to it in the validate callback. The payment will be saved automatically
+   * using entity_save().
+   *
+   * The function accepts its parent payment_method element and &$form_state as
+   * parameters. It should return an array of form elements.
+   *
+   * @see payment_element_info()
+   * @see payment_form_method_process()
+   * @see payment_form_process_method_controller_payment_configuration()
    *
    * @var string
    */
-  public $payment_form_elements_callback = '';
+  public $payment_configuration_form_elements_callback = '';
 
   /**
-   * The form ID of the payment method settings form.
+   * The function name of the payment method configuration form elements.
    *
-   * The form's submit callback is expected to add all relevant information to
-   * the PaymentMethod object in $form_sate['payment_method], so
-   * payment_form_payment_method_submit() can call entity_save() on it.
+   * Note that this is not a form ID and because the form will not be called
+   * using drupal_get_form(), it can only be altered by altering the form
+   * payment_form_payment_method(). The validate callback is expected to be a
+   * function with the same name, but suffixed with "_validate". If this
+   * function exists, it will be called automatically.
+   * $form_state['payment_method'] contains the PaymentMethod that is added or
+   * edited. All controller-specific information should be added to it in the
+   * validate callback. The payment method will be saved automatically using
+   * entity_save().
+   *
+   * The function accepts the same arguments as payment_form_method(). It
+   * should return an array of form elements.
    *
    * @var string
    */
-  public $payment_method_form_id = 'payment_form_payment_method_controller';
+  public $payment_method_configuration_form_elements_callback = '';
 
   /**
    * The human-readable title.
@@ -816,16 +837,6 @@ class PaymentMethodControllerUnavailable extends PaymentMethodController {
   function validate(Payment $payment, PaymentMethod $payment_method, $strict) {
     throw new PaymentValidationException;
   }
-}
-
-/**
- * Form build callback: implements PaymentMethodController payment method form.
- *
- * @return array
- *   A Drupal form.
- */
-function payment_form_payment_method_controller(array $form, array &$form_state) {
-  return $form;
 }
 
 /**

@@ -128,8 +128,8 @@ function payment_menu() {
   );
   $items['admin/config/services/payment/method/%entity_object'] = array(
     'load arguments' => array('payment_method'),
-    'page callback' => 'payment_method_form',
-    'page arguments' => array(5),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('payment_form_payment_method', 5),
     'access arguments' => array('payment.method.administer'),
     'title callback' => 'payment_method_title',
     'title arguments' => array(5),
@@ -269,37 +269,6 @@ function payment_permission() {
       'title' => t('View payment status overview'),
     ),
   );
-}
-
-/**
- * Implements hook_forms().
- */
-function payment_forms() {
-  $forms = array();
-  foreach (payment_method_controller_load_multiple() as $controller) {
-    $forms['payment_form_payment_method_' . $controller->payment_method_form_id] = array(
-      'callback' => $controller->payment_method_form_id,
-      'wrapper_callback' => 'payment_form_payment_method',
-    );
-  }
-
-  return $forms;
-}
-
-/**
- * Implements hook_form_alter().
- */
-function payment_form_alter(array &$form, array &$form_state, $form_id) {
-  // Check for payment method forms.
-  foreach (payment_method_controller_load_multiple() as $controller) {
-    if ($form_id == 'payment_form_payment_method_' . $controller->payment_method_form_id) {
-      // Add payment method form callbacks. We do this here to make sure the
-      // form provided by the payment method controller doesn't have to set
-      // anything explicitely and the wrapper callback's callbacks are the last
-      // to be executed, so it can save the entire modified payment method.
-      $form['#submit'][] = 'payment_form_payment_method_submit';
-    }
-  }
 }
 
 /**
@@ -792,7 +761,7 @@ function payment_form_method_process(array $element, array &$form_state, array &
     '#empty_value' => 'select',
     '#required' => $element['#required'],
     '#ajax' => array(
-      'callback' => 'payment_form_method_controller_settings_ajax_callback',
+      'callback' => 'payment_form_method_payment_method_controller_payment_configuration_ajax_callback',
       'effect' => 'fade',
       'event' => 'change',
       'wrapper' => 'payment-method-wrapper',
@@ -806,7 +775,7 @@ function payment_form_method_process(array $element, array &$form_state, array &
     ),
     '#id' => 'payment-method-pmid',
   );
-  $element += payment_form_method_controller_settings($form, $form_state);
+  $element += payment_form_process_method_controller_payment_configuration($element, $form_state);
 
   // The element itself has no input, only its children, so mark it not
   // required to prevent validation errors.
@@ -822,6 +791,7 @@ function payment_form_method_validate(array $element, array &$form_state) {
     if (!$payment->method || $payment->method->pmid != $pmid) {
       $form_state['rebuild'] = TRUE;
       $payment->method = entity_load_single('payment_method', $pmid);
+      payment_method_controller_form_callback($element, $form_state, $payment->method->controller, 'payment', 'validate');
     }
   }
 }
@@ -836,12 +806,13 @@ function payment_form_method_change_submit(array $form, array &$form_state) {
 /**
  * Return a payment's method controller's form elements to configure a payment.
  *
- * @param array $form
+ * @param array $element
+ *   The payment_method element that is the parent of the elements to create.
  * @param array $form_state
  *
  * @return array
  */
-function payment_form_method_controller_settings(array &$form, array &$form_state) {
+function payment_form_process_method_controller_payment_configuration(array $element, array &$form_state) {
   $payment = $form_state['payment'];
 
   $elements = array();
@@ -855,9 +826,7 @@ function payment_form_method_controller_settings(array &$form, array &$form_stat
         'class' => array('js-hide')
       ),
     );
-    if ($function = $payment->method->controller->payment_form_elements_callback) {
-      $elements['controller_settings'] = $function($form, $form_state);
-    }
+    $elements['payment_method_controller_payment_configuration'] = payment_method_controller_form_callback($element, $form_state, $payment->method->controller, 'payment', 'build');
   }
 
   return $elements;
@@ -866,7 +835,7 @@ function payment_form_method_controller_settings(array &$form, array &$form_stat
 /**
  * Return a payment method controller's form elements to configure a payment.
  */
-function payment_form_method_controller_settings_ajax_callback(array $form, array &$form_state) {
+function payment_form_method_payment_method_controller_payment_configuration_ajax_callback(array $form, array &$form_state) {
   return $form;
 }
 

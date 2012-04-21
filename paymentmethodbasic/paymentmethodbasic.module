@@ -99,9 +99,9 @@ function paymentmethodbasic_controller_data() {
  */
 class PaymentMethodBasicController extends PaymentMethodController {
 
-  public $payment_method_form_id = 'paymentmethodbasic_form_payment_method';
+  public $payment_method_configuration_form_elements_callback = 'paymentmethodbasic_payment_method_configuration_form_elements';
 
-  public $payment_form_elements_callback = 'paymentmethodbasic_payment_form_elements';
+  public $payment_configuration_form_elements_callback = 'paymentmethodbasic_payment_configuration_form_elements';
 
   function __construct() {
     $this->title = t('Basic');
@@ -112,54 +112,56 @@ class PaymentMethodBasicController extends PaymentMethodController {
    * Implements PaymentMethodController::execute().
    */
   function execute(Payment $payment) {
-    debug($payment->method->controller_data);
     $payment->setStatus(new PaymentStatusItem($payment->method->controller_data['status']));
   }
 }
 
 /**
- * Form build callback: implements PaymentMethodController payment method form.
+ * Form build callback: implements
+ * PaymentMethodController::payment_method_configuration_form_elements_callback.
  *
  * @return array
  *   A Drupal form.
  */
-function paymentmethodbasic_form_payment_method(array $form, array &$form_state) {
+function paymentmethodbasic_payment_method_configuration_form_elements(array $form, array &$form_state) {
   $controller_data = $form_state['payment_method']->controller_data;
 
   $options = array();
   foreach (payment_statuses_info() as $status_info) {
     $options[$status_info->status] = $status_info->title;
   }
-  $form['status'] = array(
+  $elements['status'] = array(
     '#type' => 'select',
     '#title' => t('Final payment status'),
     '#description' => t('The status to give a payment after being processed by this payment method.'),
     '#default_value' => isset($controller_data['status']) ? $controller_data['status'] : PAYMENT_STATUS_SUCCESS,
     '#options' => $options,
   );
-  $form['message'] = array(
+  $elements['message'] = array(
     '#type' => 'text_format',
     '#title' => t('Payment form message'),
     '#default_value' => isset($controller_data['message']) ? $controller_data['message'] : '',
     '#format' => isset($controller_data['text_format']) ? $controller_data['text_format'] : NULL,
   );
 
-  return $form;
+  return $elements;
 }
 
 /**
- * Implements form submit callback for paymentmethodbasic_form_payment_method().
+ * Implements form validate callback for
+ * paymentmethodbasic_payment_method_configuration_form_elements().
  */
-function paymentmethodbasic_form_payment_method_submit(array $form, array &$form_state) {
+function paymentmethodbasic_payment_method_configuration_form_elements_validate(array $form, array &$form_state) {
   $form_state['payment_method']->controller_data['message'] = $form_state['values']['message']['value'];
   $form_state['payment_method']->controller_data['status'] = $form_state['values']['status'];
   $form_state['payment_method']->controller_data['text_format'] = $form_state['values']['message']['format'];
 }
 
 /**
- * Implements PaymentMethodController payment_form_elements_callback.
+ * Implements
+ * PaymentMethodController::payment_configuration_form_elements_callback.
  */
-function paymentmethodbasic_payment_form_elements(array &$form, array &$form_state) {
+function paymentmethodbasic_payment_configuration_form_elements(array &$form, array &$form_state) {
   $payment = $form_state['payment'];
 
   $elements = array();
@@ -169,4 +171,7 @@ function paymentmethodbasic_payment_form_elements(array &$form, array &$form_sta
   );
 
   return $elements;
+}
+function paymentmethodbasic_payment_configuration_form_elements_submit(array &$form, array &$form_state) {
+  drupal_set_message('yaman');
 }
