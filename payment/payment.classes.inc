@@ -310,7 +310,8 @@ class Payment extends PaymentCommon {
           $payment_method->validate($this, FALSE);
           $available[$payment_method->pmid] = $payment_method;
         }
-        catch (PaymentValidationException $e) {}
+        catch (PaymentValidationException $e) {
+        }
       }
     }
 
@@ -1063,7 +1064,7 @@ class PaymentValidationAmountExceedsMaximumException extends PaymentValidationEx
  * Exception thrown if a payment has no currency set.
  */
 class PaymentValidationMissingCurrencyException extends PaymentValidationException {}
-  
+
 /**
  * Exception thrown if a payment uses a currency that is unsupported by a
  * payment method.

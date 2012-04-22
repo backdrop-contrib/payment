@@ -1,6 +1,11 @@
 <?php
 
 /**
+ * @file
+ * A views field handler. See payment_views_data().
+ */
+
+/**
  * Views field handler for a payment method's controller description.
  */
 class PaymentViewsHandlerFieldPaymentLineItemAmountTotal  extends views_handler_field {

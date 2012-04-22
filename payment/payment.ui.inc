@@ -103,7 +103,7 @@ function payment_form_validate(array $form, array &$form_state) {
   $payment = $form_state['payment'];
   field_attach_form_validate('payment', $payment, $form, $form_state);
 
-  if (empty($form_state['rebuild']) && $payment->method) {  
+  if (empty($form_state['rebuild']) && $payment->method) {
     try {
       $payment->method->validate($payment);
     }
@@ -335,7 +335,6 @@ function payment_page_status() {
  * @param $rows array
  *   The table rows to which to add new ones.
  * @param $depth integer
- *   
  */
 function _payment_page_status_rows(array $statuses, array $children, array &$rows, $depth = 0) {
   foreach ($statuses as $status) {
@@ -459,7 +458,7 @@ function payment_page_method_enable_disable($op, PaymentMethod $payment_method, 
     exit;
   }
 
-  switch($op) {
+  switch ($op) {
     case 'enable':
       $payment_method->enabled = TRUE;
       break;
@@ -841,7 +840,7 @@ function payment_form_process_method_submit_ajax_callback(array $form, array &$f
  *   Either "build" or "validate".
  *
  * @return mixed
- *   The callback's return value. 
+ *   The callback's return value.
  */
 function payment_method_controller_form_callback(array $form, array &$form_state, PaymentMethodController $controller, $callback, $operation) {
   $property = $callback . '_configuration_form_elements_callback';

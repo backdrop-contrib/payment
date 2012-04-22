@@ -94,7 +94,7 @@ function paymentbilling_payment_validate(Payment $payment, PaymentMethod $paymen
 }
 
 /**
- * 
+ * Return information about fields that are required for billing information.
  */
 function paymentbilling_field_dependencies() {
   static $dependencies = NULL;

@@ -796,7 +796,7 @@ function payment_rules_access($type, $name) {
  * @return boolean
  */
 function payment_access_method_enable_disable($op, PaymentMethod $payment_method) {
-  switch($op) {
+  switch ($op) {
     case 'enable':
       return $payment_method->enabled == FALSE && user_access('payment.method.administer');
     case 'disable':

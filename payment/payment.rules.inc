@@ -317,7 +317,7 @@ function payment_rules_action_payment_line_item_add(Payment $payment, $name, $de
     $payment->setLineItem(new PaymentLineItem(array(
       'name' => $name,
       'amount' => $amount,
-      'description'=> $description,
+      'description' => $description,
       'tax_rate' => $tax_rate,
       'quantity' => $quantity,
     )));

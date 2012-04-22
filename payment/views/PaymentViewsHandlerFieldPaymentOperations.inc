@@ -1,6 +1,11 @@
 <?php
 
 /**
+ * @file
+ * A views field handler. See payment_views_data().
+ */
+
+/**
  * Views field handler for a payment's operations links.
  */
 class PaymentViewsHandlerFieldPaymentOperations extends views_handler_field {
