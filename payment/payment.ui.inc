@@ -507,7 +507,7 @@ function payment_form_process_amount(array $element) {
 /**
  * Implements form validate callback for a payment_amount element.
  */
-function payment_form_validate_amount(array $element, array &$form_state) {
+function payment_form_process_amount_validate(array $element, array &$form_state) {
   $value = $element['#value'];
 
   // Do nothing if there is no value and the element is optional.
@@ -631,10 +631,10 @@ function payment_form_process_line_item(array $element, array &$form_state, arra
   $element['add_more'] = array(
     '#type' => 'submit',
     '#value' => t('Add a line item'),
-    '#submit' => array('payment_form_line_item_add_more_submit'),
+    '#submit' => array('payment_form_process_line_item_submit'),
     '#limit_validation_errors' => array(),
     '#ajax' => array(
-      'callback' => 'payment_form_line_item_add_more_ajax_callback',
+      'callback' => 'payment_form_process_line_item_submit_ajax_callback',
       'effect' => 'fade',
       'event' => 'mousedown',
       'wrapper' => $wrapper_id,
@@ -653,7 +653,7 @@ function payment_form_process_line_item(array $element, array &$form_state, arra
 /**
  * Implements form validate callback for a payment_line_item element.
  */
-function payment_form_validate_line_item(array $element, array &$form_state) {
+function payment_form_process_line_item_validate(array $element, array &$form_state) {
   $line_items = array();
   foreach ($element['#value'] as $container => $line_item_data) {
     // All this line item's elements are empty, so there's nothing to validate.
@@ -698,7 +698,7 @@ function payment_form_validate_line_item(array $element, array &$form_state) {
 /**
  * Implements form submit callback for payment_line_item elements.
  */
-function payment_form_line_item_add_more_submit(array $form, array &$form_state) {
+function payment_form_process_line_item_submit(array $form, array &$form_state) {
   $form_state['payment_line_item_count']++;
   $form_state['rebuild'] = TRUE;
 }
@@ -706,7 +706,7 @@ function payment_form_line_item_add_more_submit(array $form, array &$form_state)
 /**
  * Implements form AJAX callback for payment_line_item elements.
  */
-function payment_form_line_item_add_more_ajax_callback(array $form, array &$form_state) {
+function payment_form_process_line_item_submit_ajax_callback(array $form, array &$form_state) {
   $element = drupal_array_get_nested_value($form, $form_state[$form_state['triggering_element']['#name']]);
   $container_key = 'container_' . ($form_state['payment_line_item_count'] - 1);
 
@@ -714,6 +714,116 @@ function payment_form_line_item_add_more_ajax_callback(array $form, array &$form
     $container_key => $element[$container_key],
     'add_more' => $element['add_more'],
   );
+}
+
+/**
+ * Implements form process callback for a payment_method element.
+ *
+ * @see payment_element_info()
+ */
+function payment_form_process_method(array $element, array &$form_state, array &$form) {
+  $form_state['payment_parents'] = $element['#parents'];
+  $payment = $form_state['payment'];
+
+  $element['#tree'] = TRUE;
+  $pmid_options = array();
+  $pmids = empty($element['#pmids']) ? FALSE : $element['#pmids'];
+  foreach ($payment->availablePaymentMethods(entity_load('payment_method', $pmids)) as $payment_method) {
+    // Cast the PMID to a string or the AJAX callback won't work.
+    $pmid_options[(string) $payment_method->pmid] = $payment_method->title_generic;
+  }
+  $form['#prefix'] = '<div id="payment-method-wrapper">';
+  $form['#suffix'] = '</div>';
+  $element['pmid'] = array(
+    '#type' => 'select',
+    '#title' => isset($element['#title']) ? $element['#title'] : NULL,
+    '#options' => $pmid_options,
+    '#default_value' => isset($payment->method) ? $payment->method->pmid : NULL,
+    '#empty_value' => 'select',
+    '#required' => $element['#required'],
+    '#ajax' => array(
+      'callback' => 'payment_form_process_method_submit_ajax_callback',
+      'effect' => 'fade',
+      'event' => 'change',
+      'wrapper' => 'payment-method-wrapper',
+    ),
+    // Disable the selector for non-JS pages. This means that if we're
+    // executing an AJAX callback, _triggering_element_name is set and we leave
+    // the element enabled.
+    '#disabled' => !empty($payment->method) && !isset($form_state['input']['_triggering_element_name']),
+    '#attached' => array(
+      'js' => array(drupal_get_path('module', 'payment') . '/js/payment.js'),
+    ),
+    '#id' => 'payment-method-pmid',
+  );
+  $element += payment_form_process_method_controller_payment_configuration($element, $form_state);
+
+  // The element itself has no input, only its children, so mark it not
+  // required to prevent validation errors.
+  $element['#required'] = FALSE;
+
+  return $element;
+}
+
+/**
+ * Implements form validate callback for a payment_method element.
+ */
+function payment_form_process_method_validate(array $element, array &$form_state) {
+  $pmid = drupal_array_get_nested_value($form_state['values'], array_merge($element['#parents'], array('pmid')));
+  if ($pmid) {
+    $payment = $form_state['payment'];
+    if (!$payment->method || $payment->method->pmid != $pmid) {
+      $form_state['rebuild'] = TRUE;
+      $payment->method = entity_load_single('payment_method', $pmid);
+      payment_method_controller_form_callback($element, $form_state, $payment->method->controller, 'payment', 'validate');
+    }
+  }
+}
+
+/**
+ * Implements form submit callback for a payment_method element.
+ */
+function payment_form_process_method_submit(array $form, array &$form_state) {
+  $pmid = drupal_array_get_nested_value($form_state['values'], array_merge($form_state['payment_parents'], array('pmid')));
+  unset($pmid);
+  $form_state['payment']->method = NULL;
+  $form_state['rebuild'] = TRUE;
+}
+
+/**
+ * Return a payment's method controller's form elements to configure a payment.
+ *
+ * @param array $element
+ *   The payment_method element that is the parent of the elements to create.
+ * @param array $form_state
+ *
+ * @return array
+ */
+function payment_form_process_method_controller_payment_configuration(array $element, array &$form_state) {
+  $payment = $form_state['payment'];
+
+  $elements = array();
+  if ($payment->method) {
+    $elements['change'] = array(
+      '#type' => 'submit',
+      '#value' => t('Change payment method'),
+      '#submit' => array('payment_form_process_method_submit'),
+      '#limit_validation_errors' => array(),
+      '#attributes' => array(
+        'class' => array('js-hide')
+      ),
+    );
+    $elements['payment_method_controller_payment_configuration'] = payment_method_controller_form_callback($element, $form_state, $payment->method->controller, 'payment', 'build');
+  }
+
+  return $elements;
+}
+
+/**
+ * Implements form AJAX callback for a payment_method element.
+ */
+function payment_form_process_method_submit_ajax_callback(array $form, array &$form_state) {
+  return $form;
 }
 
 /**

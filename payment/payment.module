@@ -493,8 +493,8 @@ function payment_element_info() {
   // element is used in should have a Payment object in $form_state['payment'].
   $elements['payment_method'] = array(
     '#input' => TRUE,
-    '#process' => array('payment_form_method_process'),
-    '#element_validate' => array('payment_form_method_validate'),
+    '#process' => array('payment_form_process_method'),
+    '#element_validate' => array('payment_form_process_method_validate'),
     // An array with IDs of the allowed payment methods. Leave empty to allow all.
     '#pmids' => array(),
   );
@@ -502,7 +502,7 @@ function payment_element_info() {
   $elements['payment_amount'] = array(
     '#input' => TRUE,
     '#process' => array('payment_form_process_amount'),
-    '#element_validate' => array('payment_form_validate_amount'),
+    '#element_validate' => array('payment_form_process_amount_validate'),
     // The minimum payment amount as a float that needs to be entered.
     '#minimum_amount' => PAYMENT_MINIMUM_AMOUNT,
     // The ISO 4217 currency code.
@@ -517,7 +517,7 @@ function payment_element_info() {
     '#attached' => array(
       'css' => array(drupal_get_path('module', 'payment') . '/css/payment.ui.css'),
       ),
-    '#element_validate' => array('payment_form_validate_line_item'),
+    '#element_validate' => array('payment_form_process_line_item_validate'),
     // The ISO 4217 currency code.
     '#currency_code' => 'XXX',
     // The number of values this element allows. Enter 0 for unlimited.
@@ -733,110 +733,6 @@ function payment_amount_human_readable($amount, $currency_code = NULL) {
     '!cents' => substr($amount_string, $decimal_separator_position + 1),
   );
   return $currency_code ? t('!currency_code !units.!cents', $arguments) : t('!units.!cents', $arguments);
-}
-
-/**
- * Form process callback for a payment_method element.
- *
- * @see payment_element_info()
- */
-function payment_form_method_process(array $element, array &$form_state, array &$form) {
-  $form_state['payment_parents'] = $element['#parents'];
-  $payment = $form_state['payment'];
-
-  $element['#tree'] = TRUE;
-  $pmid_options = array();
-  $pmids = empty($element['#pmids']) ? FALSE : $element['#pmids'];
-  foreach ($payment->availablePaymentMethods(entity_load('payment_method', $pmids)) as $payment_method) {
-    // Cast the PMID to a string or the AJAX callback won't work.
-    $pmid_options[(string) $payment_method->pmid] = $payment_method->title_generic;
-  }
-  $form['#prefix'] = '<div id="payment-method-wrapper">';
-  $form['#suffix'] = '</div>';
-  $element['pmid'] = array(
-    '#type' => 'select',
-    '#title' => isset($element['#title']) ? $element['#title'] : NULL,
-    '#options' => $pmid_options,
-    '#default_value' => isset($payment->method) ? $payment->method->pmid : NULL,
-    '#empty_value' => 'select',
-    '#required' => $element['#required'],
-    '#ajax' => array(
-      'callback' => 'payment_form_method_payment_method_controller_payment_configuration_ajax_callback',
-      'effect' => 'fade',
-      'event' => 'change',
-      'wrapper' => 'payment-method-wrapper',
-    ),
-    // Disable the selector for non-JS pages. This means that if we're
-    // executing an AJAX callback, _triggering_element_name is set and we leave
-    // the element enabled.
-    '#disabled' => !empty($payment->method) && !isset($form_state['input']['_triggering_element_name']),
-    '#attached' => array(
-      'js' => array(drupal_get_path('module', 'payment') . '/js/payment.js'),
-    ),
-    '#id' => 'payment-method-pmid',
-  );
-  $element += payment_form_process_method_controller_payment_configuration($element, $form_state);
-
-  // The element itself has no input, only its children, so mark it not
-  // required to prevent validation errors.
-  $element['#required'] = FALSE;
-
-  return $element;
-}
-
-function payment_form_method_validate(array $element, array &$form_state) {
-  $pmid = drupal_array_get_nested_value($form_state['values'], array_merge($element['#parents'], array('pmid')));
-  if ($pmid) {
-    $payment = $form_state['payment'];
-    if (!$payment->method || $payment->method->pmid != $pmid) {
-      $form_state['rebuild'] = TRUE;
-      $payment->method = entity_load_single('payment_method', $pmid);
-      payment_method_controller_form_callback($element, $form_state, $payment->method->controller, 'payment', 'validate');
-    }
-  }
-}
-
-function payment_form_method_change_submit(array $form, array &$form_state) {
-  $pmid = drupal_array_get_nested_value($form_state['values'], array_merge($form_state['payment_parents'], array('pmid')));
-  unset($pmid);
-  $form_state['payment']->method = NULL;
-  $form_state['rebuild'] = TRUE;
-}
-
-/**
- * Return a payment's method controller's form elements to configure a payment.
- *
- * @param array $element
- *   The payment_method element that is the parent of the elements to create.
- * @param array $form_state
- *
- * @return array
- */
-function payment_form_process_method_controller_payment_configuration(array $element, array &$form_state) {
-  $payment = $form_state['payment'];
-
-  $elements = array();
-  if ($payment->method) {
-    $elements['change'] = array(
-      '#type' => 'submit',
-      '#value' => t('Change payment method'),
-      '#submit' => array('payment_form_method_change_submit'),
-      '#limit_validation_errors' => array(),
-      '#attributes' => array(
-        'class' => array('js-hide')
-      ),
-    );
-    $elements['payment_method_controller_payment_configuration'] = payment_method_controller_form_callback($element, $form_state, $payment->method->controller, 'payment', 'build');
-  }
-
-  return $elements;
-}
-
-/**
- * Return a payment method controller's form elements to configure a payment.
- */
-function payment_form_method_payment_method_controller_payment_configuration_ajax_callback(array $form, array &$form_state) {
-  return $form;
 }
 
 /**
