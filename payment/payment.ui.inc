@@ -654,8 +654,11 @@ function payment_form_process_line_item(array $element, array &$form_state, arra
  * Implements form validate callback for a payment_line_item element.
  */
 function payment_form_process_line_item_validate(array $element, array &$form_state) {
+  $values = drupal_array_get_nested_value($form_state['values'], $element['#parents']);
+  // Don't let the submit button's value be validated.
+  unset($values['add_more']);
   $line_items = array();
-  foreach ($element['#value'] as $container => $line_item_data) {
+  foreach ($values as $container => $line_item_data) {
     // All this line item's elements are empty, so there's nothing to validate.
     if (reset($line_item_data) == '' && count(array_unique($line_item_data)) == 1) {
       break;
@@ -687,7 +690,7 @@ function payment_form_process_line_item_validate(array $element, array &$form_st
     }
 
     // Convert the raw input to a PaymentLineItem object.
-    $line_item_data['amount'] = (int) $line_item_data['amount'];
+    $line_item_data['amount'] = (float) $line_item_data['amount'];
     $line_item_data['quantity'] = (int) $line_item_data['quantity'];
     $line_item_data['tax_rate'] = (float) $line_item_data['tax_rate'];
     $line_items[] = new PaymentLineItem($line_item_data);
