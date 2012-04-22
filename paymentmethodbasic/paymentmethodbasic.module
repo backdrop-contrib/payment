@@ -161,7 +161,7 @@ function paymentmethodbasic_payment_method_configuration_form_elements_validate(
  * Implements
  * PaymentMethodController::payment_configuration_form_elements_callback.
  */
-function paymentmethodbasic_payment_configuration_form_elements(array &$form, array &$form_state) {
+function paymentmethodbasic_payment_configuration_form_elements(array $element, array &$form_state) {
   $payment = $form_state['payment'];
 
   $elements = array();
@@ -171,7 +171,4 @@ function paymentmethodbasic_payment_configuration_form_elements(array &$form, ar
   );
 
   return $elements;
-}
-function paymentmethodbasic_payment_configuration_form_elements_submit(array &$form, array &$form_state) {
-  drupal_set_message('yaman');
 }

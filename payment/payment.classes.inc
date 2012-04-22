@@ -719,6 +719,7 @@ class PaymentMethodController {
    * @see payment_element_info()
    * @see payment_form_method_process()
    * @see payment_form_process_method_controller_payment_configuration()
+   * @see paymentmethodbasic_payment_configuration_form_elements()
    *
    * @var string
    */
@@ -739,6 +740,9 @@ class PaymentMethodController {
    *
    * The function accepts the same arguments as payment_form_method(). It
    * should return an array of form elements.
+   *
+   * @see payment_form_payment_method()
+   * @see paymentmethodbasic_payment_method_configuration_form_elements()
    *
    * @var string
    */
