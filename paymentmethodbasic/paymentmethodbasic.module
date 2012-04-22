@@ -141,7 +141,7 @@ function paymentmethodbasic_payment_method_configuration_form_elements(array $fo
     '#type' => 'text_format',
     '#title' => t('Payment form message'),
     '#default_value' => isset($controller_data['message']) ? $controller_data['message'] : '',
-    '#format' => isset($controller_data['text_format']) ? $controller_data['text_format'] : NULL,
+    '#format' => isset($controller_data['text_format']) ? $controller_data['text_format'] : filter_default_format(),
   );
 
   return $elements;
