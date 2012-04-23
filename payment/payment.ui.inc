@@ -219,6 +219,7 @@ function payment_form_payment_method(array $form, array &$form_state, PaymentMet
       'source' => array('title_specific'),
       'exists' => 'payment_method_name_exists',
     ),
+    '#disabled' => !empty($payment_method->pmid),
   );
   $form['title_generic'] = array(
     '#type' => 'textfield',
