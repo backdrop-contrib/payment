@@ -212,7 +212,6 @@ function payment_form_payment_method(array $form, array &$form_state, PaymentMet
   );
   $form['name'] = array(
     '#type' => 'machine_name',
-    // '#title' => t('Machine name'),
     '#default_value' => $payment_method->name,
     '#maxlength' => 255,
     '#required' => TRUE,
