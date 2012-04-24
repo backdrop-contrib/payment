@@ -58,8 +58,10 @@ function payment_init() {
   module_load_include('inc', 'payment', 'payment.ui');
 
   // Add administration CSS.
-  if (preg_match('#^admin/config/services/payment/method#', $_GET['q']) || preg_match('#^admin/content/payment#', $_GET['q'])) {
-    drupal_add_css(drupal_get_path('module', 'payment') . '/css/payment.admin.css');
+  if (preg_match('#^admin/config/services/payment/method#', $_GET['q'])
+    || preg_match('#^admin/content/payment#', $_GET['q'])
+    || preg_match('#^user/\d+?/payment#', $_GET['q'])) {
+    drupal_add_css(drupal_get_path('module', 'payment') . '/css/payment.css');
   }
 }
 
@@ -515,7 +517,7 @@ function payment_element_info() {
     '#tree' => TRUE,
     '#process' => array('payment_form_process_line_item'),
     '#attached' => array(
-      'css' => array(drupal_get_path('module', 'payment') . '/css/payment.ui.css'),
+      'css' => array(drupal_get_path('module', 'payment') . '/css/payment.css'),
       ),
     '#element_validate' => array('payment_form_process_line_item_validate'),
     // The ISO 4217 currency code.
