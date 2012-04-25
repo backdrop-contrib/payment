@@ -112,12 +112,12 @@ function hook_payment_line_item_info_alter(&$line_items_info) {
  * @see Payment::setStatus()
  *
  * @param $payment Payment
- * @param $old_status string
+ * @param $old_status PaymentStatusItem
  *   The status the payment had before it was changed.
  *
  * @return NULL
  */
-function hook_payment_status_change(Payment $payment, $old_status) {
+function hook_payment_status_change(Payment $payment, PaymentStatusItem $old_status) {
   // Notify the site administrator, for instance.
 }
 
