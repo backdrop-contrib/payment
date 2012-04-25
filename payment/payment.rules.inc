@@ -225,7 +225,7 @@ function payment_rules_condition_info() {
  * @return boolean
  */
 function payment_rules_condition_payment_status_is(Payment $payment, array $payment_statuses) {
-  return in_array($payment->status, $payment_statuses);
+  return in_array($payment->getStatus()->status, $payment_statuses);
 }
 
 /**
@@ -254,7 +254,7 @@ function payment_rules_options_list_payment_statuses() {
  */
 function payment_rules_condition_payment_status_has_ancestor(Payment $payment, array $payment_statuses) {
   foreach ($payment_statuses as $payment_status) {
-    if (payment_status_has_ancestor($payment->status, $payment_status)) {
+    if (payment_status_has_ancestor($payment->getStatus()->status, $payment_status)) {
       return TRUE;
     }
   }
