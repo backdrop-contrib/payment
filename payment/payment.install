@@ -185,6 +185,20 @@ function payment_schema() {
         'length' => 255,
         'not null' => TRUE,
       ),
+      'uid' => array(
+        'description' => 'The {users}.uid this {payment_method} belongs to.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'foreign keys' => array(
+      'uid' => array(
+        'table' => 'user',
+        'columns' => array(
+          'uid' => 'uid',
+        ),
+      ),
     ),
     'primary key' => array('pmid'),
     'unique keys' => array(

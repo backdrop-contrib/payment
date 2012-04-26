@@ -483,6 +483,13 @@ function payment_entity_property_info() {
     'label' => t('Title (generic)'),
     'schema field' => 'title_generic',
   );
+  $properties['payment_method']['properties']['uid'] = array(
+    'label' => 'User ID',
+    'description' => t('The ID of the user this payment method belongs to.'),
+    'required' => TRUE,
+    'schema field' => 'uid',
+    'type' => 'integer',
+  );
 
   return $properties;
 }

@@ -542,6 +542,26 @@ class PaymentMethod extends PaymentCommon {
   public $title_generic = NULL;
 
   /**
+   * The UID of the user this payment method belongs to.
+   *
+   * @var integer
+   */
+  public $uid = 0;
+
+  /**
+   * Implements PaymentCommon::__construct().
+   */
+  function __construct(array $properties = array()) {
+    global $user;
+
+    parent::__construct($properties);
+
+    if (!$this->uid) {
+      $this->uid = $user->uid;
+    }
+  }
+
+  /**
    * Validate a payment against this payment method.
    *
    * @param $payment Payment
