@@ -268,10 +268,10 @@ function payment_rules_options_list_payment_status_parents() {
   $statuses_info = payment_statuses_info();
   $parents = array();
   foreach ($statuses_info as $status_info) {
-    $parents = array_merge($parents, $status_info->parents);
+    $parents[] = $status_info->parent;
   }
   $options = array();
-  foreach (array_unique($parents) as $status) {
+  foreach (array_unique(array_filter($parents)) as $status) {
     $options[$status] = $statuses_info[$status]->title;
   }
   asort($options);

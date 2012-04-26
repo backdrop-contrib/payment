@@ -16,7 +16,7 @@ function hook_payment_status_info() {
     new PaymentStatusInfo(array(
       'description' => t('Foo payments are still being processed by Bar to guarantee their authenticity.'),
       'status' => PAYMENT_STATUS_FOO,
-      'parents' => array(PAYMENT_STATUS_PENDING),
+      'parent' => PAYMENT_STATUS_PENDING,
       'title' => t('Pending (waiting for Bar authentication)'),
     )),
   );

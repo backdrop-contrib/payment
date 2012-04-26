@@ -857,11 +857,11 @@ class PaymentStatusInfo extends PaymentCommon {
   public $description = '';
 
   /**
-   * The machine names of this status's parent statuses.
+   * This status's parent status.
    *
    * @var array
    */
-  public $parents = array();
+  public $parent = NULL;
 
   /**
    * The status itself.
@@ -884,10 +884,9 @@ class PaymentStatusInfo extends PaymentCommon {
    *   The machine names of this status's ancestors.
    */
   function ancestors() {
-    $ancestors = $this->parents;
-    foreach ($this->parents as $status) {
-      $parent = payment_status_info($status);
-      $ancestors += $parent->ancestors();
+    $ancestors = array($this->parent);
+    if ($this->parent) {
+      $ancestors += payment_status_info($this->parent)->ancestors();
     }
 
     return array_unique($ancestors);
