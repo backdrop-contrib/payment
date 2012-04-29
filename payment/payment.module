@@ -707,7 +707,7 @@ function payment_method_controller_load($controller_class_name) {
  *   controller could not be loaded.
  */
 function payment_method_controller_load_multiple(array $controller_class_names = array()) {
-  static $controllers = NULL;
+  $controllers = NULL;
 
   // Load all existing controllers.
   if (is_null($controllers)) {

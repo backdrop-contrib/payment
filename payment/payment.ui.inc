@@ -372,7 +372,8 @@ function payment_payment_status_sort_title(PaymentStatusInfo $status_a, PaymentS
 }
 
 function payment_method_name_exists($name) {
-  return (bool) entity_load_single('payment_method', $name);
+  return !is_a(entity_load_single('payment_method', $name), 'PaymentMethodUnavailable');
+  
 }
 
 /**

@@ -325,11 +325,13 @@ function payment_view_payments() {
   $handler->display->display_options['fields']['title_specific']['alter']['nl2br'] = 0;
   $handler->display->display_options['fields']['title_specific']['alter']['word_boundary'] = 1;
   $handler->display->display_options['fields']['title_specific']['alter']['ellipsis'] = 1;
+  $handler->display->display_options['fields']['title_specific']['alter']['more_link'] = 0;
   $handler->display->display_options['fields']['title_specific']['alter']['strip_tags'] = 0;
   $handler->display->display_options['fields']['title_specific']['alter']['trim'] = 0;
   $handler->display->display_options['fields']['title_specific']['alter']['html'] = 0;
   $handler->display->display_options['fields']['title_specific']['element_label_colon'] = 1;
   $handler->display->display_options['fields']['title_specific']['element_default_classes'] = 1;
+  $handler->display->display_options['fields']['title_specific']['empty'] = 'Unavailable';
   $handler->display->display_options['fields']['title_specific']['hide_empty'] = 0;
   $handler->display->display_options['fields']['title_specific']['empty_zero'] = 0;
   $handler->display->display_options['fields']['title_specific']['hide_alter_empty'] = 0;
@@ -453,11 +455,13 @@ function payment_view_payments() {
   $handler->display->display_options['fields']['title_generic']['alter']['nl2br'] = 0;
   $handler->display->display_options['fields']['title_generic']['alter']['word_boundary'] = 1;
   $handler->display->display_options['fields']['title_generic']['alter']['ellipsis'] = 1;
+  $handler->display->display_options['fields']['title_generic']['alter']['more_link'] = 0;
   $handler->display->display_options['fields']['title_generic']['alter']['strip_tags'] = 0;
   $handler->display->display_options['fields']['title_generic']['alter']['trim'] = 0;
   $handler->display->display_options['fields']['title_generic']['alter']['html'] = 0;
   $handler->display->display_options['fields']['title_generic']['element_label_colon'] = 1;
   $handler->display->display_options['fields']['title_generic']['element_default_classes'] = 1;
+  $handler->display->display_options['fields']['title_generic']['empty'] = 'Unavailable';
   $handler->display->display_options['fields']['title_generic']['hide_empty'] = 0;
   $handler->display->display_options['fields']['title_generic']['empty_zero'] = 0;
   $handler->display->display_options['fields']['title_generic']['hide_alter_empty'] = 1;
@@ -523,6 +527,7 @@ function payment_view_payments() {
     t('Administration page'),
     t('Amount'),
     t('[currency_code] [amount_total]'),
+    t('Unavailable'),
     t('User\'s own payments'),
     t('All'),
   );

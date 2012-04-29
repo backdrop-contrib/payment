@@ -580,6 +580,27 @@ class PaymentMethod extends PaymentCommon {
 }
 
 /**
+ * A payment method that essentially disables payments.
+ *
+ * This is a 'placeholder' method that returns defaults and doesn't really do
+ * anything else. It is used when no working payment method is available, so
+ * other modules don't have to check for that.
+ */
+class PaymentMethodUnavailable extends PaymentMethod {
+
+  public $enabled = FALSE;
+  public $name = 'payment_method_unavailable';
+  public $module = 'payment';
+  // Use a negative ID, so it will not pass validation.
+  public $pmid = -1;
+
+  function __construct() {
+    $this->title_specific = $this->title_generic = t('Unavailable');
+    $this->controller = payment_method_controller_load('PaymentMethodControllerUnavailable');
+  }
+}
+
+/**
  * Entity API controller for payment_method entities.
  */
 class PaymentMethodEntityController extends EntityAPIControllerExportable {
@@ -588,12 +609,27 @@ class PaymentMethodEntityController extends EntityAPIControllerExportable {
    * Implements EntityAPIController::load().
    */
   function load($ids = array(), $conditions = array()) {
+    static $unavailable = NULL;
+
     $entities = parent::load($ids, $conditions);
     foreach ($entities as $payment_method) {
       // Cast non-string scalars to their original types, because some backends
       // store/return all variables as strings.
       $payment_method->pmid = (int) $payment_method->pmid;
     }
+    // Load PaymentMethodUnavailable for all requested IDs that did not match
+    // any existing payment methods.
+    if (is_array($ids)) {
+      $diff = array_diff($ids, array_keys($entities));
+      if ($diff && is_null($unavailable)) {
+        $unavailable = new PaymentMethodUnavailable;
+      }
+      foreach ($diff as $pmid) {
+        $entities[$pmid] = $unavailable;
+      }
+      ksort($entities);
+    }
+
 
     return $entities;
   }

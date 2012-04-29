@@ -6,6 +6,54 @@
  */
 
 class PaymentWebTestCase extends DrupalWebTestCase {
+
+  /**
+   * Create, save, and return a Payment.
+   *
+   * @param PaymentMethod $payment_method
+   *   An optional payment method to set. Defaults to PaymentMethodUnavailable.
+   *
+   * @return Payment
+   */
+  function paymentCreate(PaymentMethod $payment_method = NULL) {
+    $payment_method = $payment_method ? $payment_method : new PaymentMethodUnavailable;
+    $payment = new Payment(array(
+      'currency_code' => 'XXX',
+      'finish_callback' => 'paymenttest_finish_callback',
+      'method' => $payment_method,
+    ));
+    $payment->setLineItem(new PaymentLineItem(array(
+      'name' => 'foo',
+      'amount' => 1.0,
+      'tax_rate' => 0.1,
+    )));
+    entity_save('payment', $payment);
+
+    return $payment;
+  }
+
+  /**
+   * Create, save, and return a PaymentMethod.
+   *
+   * @param PaymentMethodController $controller
+   *   An optional controller to set. Defaults to
+   *   PaymentMethodControllerUnavailable.
+   *
+   * @return PaymentMethod
+   */
+  function paymentMethodCreate(PaymentMethodController $controller = NULL) {
+    $name = $this->randomName();
+    $controller ? $controller : payment_method_controller_load('PaymentMethodControllerUnavailable');
+    $payment_method = new PaymentMethod(array(
+      'controller' => $controller,
+      'controller_data' => $controller->controller_data_defaults,
+      'name' => $name,
+      'title' => $name,
+    ));
+    entity_save('payment_method', $payment_method);
+
+    return $payment_method;
+  }
 }
 
 /**
@@ -545,5 +593,37 @@ class PaymentAmountFormElementTest extends PaymentWebTestCase {
     $this->assertText(t('The minimum amount is !amount.', array(
       '!amount' => payment_amount_human_readable(50, 'XXX'),
     )), 'An amount below the minimum throws a validation error.');
+  }
+}
+
+/**
+ * Test unavailable payment methods and payment methods controllers.
+ */
+class PaymentUnavailableTest extends PaymentWebTestCase {
+
+  static function getInfo() {
+    return array(
+      'name' => 'Unavailable payment methods and payment method controllers',
+      'group' => 'Payment',
+    );
+  }
+
+  function setUp() {
+    parent::setUp('payment');
+  }
+
+  /**
+   * Test unavailable payment methods and payment method controllers.
+   */
+  function testUnavailable() {
+    // Set a non-existing controller;
+    $controller = new PaymentMethodController;
+    $controller->name = 'foo';
+    $payment = $this->paymentCreate($this->paymentMethodCreate($controller));
+    $payment = entity_load_single('payment', $payment->pid);
+    $this->assertEqual($payment->method->controller->name, 'PaymentMethodControllerUnavailable', 'When loading a payment method, if its controller unavailable, it is replaced by PaymentMethodControllerUnavailable.');
+    entity_delete('payment_method', $payment->method->pmid);
+    $payment = entity_load_single('payment', $payment->pid);
+    $this->assertTrue(is_a($payment->method, 'PaymentMethodUnavailable'), 'When loading a payment, if its payment method is unavailable, it is replaced by PaymentMethodUnavailable.');
   }
 }
