@@ -148,12 +148,17 @@ function payment_page_payment_method_add_select_controller() {
   if ($controllers) {
     $items = array();
     foreach ($controllers as $controller) {
-      $items[] = array(
-        'title' => $controller->title,
-        'href' => 'admin/config/services/payment/method/add/' . $controller->name,
-        'description' => $controller->description,
-        'localized_options' => array(),
-      );
+      $payment_method = new PaymentMethod(array(
+        'controller' => $controller,
+      ));
+      if (payment_method_access('create', $payment_method)) {
+        $items[] = array(
+          'title' => $controller->title,
+          'href' => 'admin/config/services/payment/method/add/' . $controller->name,
+          'description' => $controller->description,
+          'localized_options' => array(),
+        );
+      }
     }
     return theme('admin_block_content', array(
       'content' => $items,
@@ -162,6 +167,45 @@ function payment_page_payment_method_add_select_controller() {
   else {
     return t('There are no payment method types available. Enable modules that provide them in order to add payment methods.');
   }
+}
+
+/**
+ * Menu access callback for
+ * payment_page_payment_method_add_select_controller().
+ *
+ * @return boolean
+ *   TRUE if there is at least one payment method controller the current user
+ *   has permission to create payment methods with.
+ */
+function payment_page_payment_method_add_select_controller_access() {
+  $controllers = payment_method_controller_load_multiple();
+  unset($controllers['PaymentMethodControllerUnavailable']);
+  foreach ($controllers as $controller) {
+    $payment_method = new PaymentMethod(array(
+      'controller' => $controller,
+    ));
+    if (payment_method_access('create', $payment_method)) {
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
+
+/**
+ * Menu access callback for payment_method_form_add().
+ *
+ * @param string $controller_class_name
+ *   The name of the controller class the current user wants to add a payment
+ *   method with.
+ *
+ * @return boolean
+ */
+function payment_method_form_add_access(PaymentMethodController $controller) {
+  $payment_method = new PaymentMethod(array(
+    'controller' => $controller,
+  ));
+
+  return payment_method_access('create', $payment_method);
 }
 
 /**

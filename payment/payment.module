@@ -5,6 +5,9 @@
  * Hook implementations and shared functions.
  */
 
+// Load include files that contain hooks or callback code.
+module_load_include('inc', 'payment', 'payment.ui');
+
 /**
  * An absolute parent status: a payment for which all money has been transferred.
  */
@@ -54,9 +57,6 @@ define('PAYMENT_MINIMUM_AMOUNT', 0.001);
  * Implements hook_init().
  */
 function payment_init() {
-  // Load include files that contain hooks or callback code.
-  module_load_include('inc', 'payment', 'payment.ui');
-
   // Add administration CSS.
   if (preg_match('#^admin/config/services/payment/method#', $_GET['q'])
     || preg_match('#^admin/content/payment#', $_GET['q'])
@@ -115,7 +115,7 @@ function payment_menu() {
   $items['admin/config/services/payment/method/add'] = array(
     'title' => 'Add payment method',
     'page callback' => 'payment_page_payment_method_add_select_controller',
-    'access arguments' => array('payment.method.administer'),
+    'access callback' => 'payment_page_payment_method_add_select_controller_access',
     'file' => 'payment.ui.inc',
     'type' => MENU_LOCAL_ACTION,
     'weight' => 1,
@@ -124,7 +124,8 @@ function payment_menu() {
     'title' => 'Add payment method',
     'page callback' => 'payment_method_form_add',
     'page arguments' => array(6),
-    'access arguments' => array('payment.method.administer'),
+    'access callback' => 'payment_method_form_add_access',
+    'access arguments' => array(6),
     'file' => 'payment.ui.inc',
     'type' => MENU_CALLBACK,
   );
@@ -132,7 +133,8 @@ function payment_menu() {
     'load arguments' => array('payment_method'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('payment_form_payment_method', 5),
-    'access arguments' => array('payment.method.administer'),
+    'access callback' => 'payment_method_access',
+    'access arguments' => array('update', 5),
     'title callback' => 'payment_method_title',
     'title arguments' => array(5),
     'file' => 'payment.ui.inc',
@@ -147,7 +149,7 @@ function payment_menu() {
     'load arguments' => array('payment_method'),
     'page callback' => 'payment_page_method_enable_disable',
     'page arguments' => array('enable', 5),
-    'access callback' => 'payment_access_method_enable_disable',
+    'access callback' => 'payment_method_access',
     'access arguments' => array('enable', 5),
     'title' => 'Enable',
     'file' => 'payment.ui.inc',
@@ -159,7 +161,7 @@ function payment_menu() {
     'load arguments' => array('payment_method'),
     'page callback' => 'payment_page_method_enable_disable',
     'page arguments' => array('disable', 5),
-    'access callback' => 'payment_access_method_enable_disable',
+    'access callback' => 'payment_method_access',
     'access arguments' => array('disable', 5),
     'title' => 'Disable',
     'file' => 'payment.ui.inc',
@@ -171,7 +173,8 @@ function payment_menu() {
     'load arguments' => array('payment_method'),
     'page callback' => 'payment_page_method_clone',
     'page arguments' => array(5),
-    'access arguments' => array('payment.method.administer'),
+    'access callback' => 'payment_method_access',
+    'access arguments' => array('clone', 5),
     'title' => 'Clone',
     'file' => 'payment.ui.inc',
     'type' => MENU_LOCAL_TASK,
@@ -182,7 +185,8 @@ function payment_menu() {
     'load arguments' => array('payment_method'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('payment_form_payment_method_delete', 5),
-    'access arguments' => array('payment.method.administer'),
+    'access callback' => 'payment_method_access',
+    'access arguments' => array('delete', 5),
     'title' => 'Delete',
     'file' => 'payment.ui.inc',
     'type' => MENU_LOCAL_TASK,
@@ -215,7 +219,8 @@ function payment_menu() {
     ) + $base;
     $items['admin/config/services/payment/method'] = array(
       'title' => 'Payment',
-      'access arguments' => array('payment.method.administer'),
+      'access callback' => 'payment_method_access',
+      'access arguments' => array('view'),
     ) + $base;
   }
 
@@ -239,9 +244,11 @@ function payment_menu_alter(&$items) {
 
 /**
  * Implements hook_permission().
+ *
+ * @see payment_method_access()
  */
 function payment_permission() {
-  return array(
+  $permissions = array(
     'payment.rules.administer' => array(
       'title' => t('Administer rule configurations'),
       'restrict access' => TRUE,
@@ -264,13 +271,41 @@ function payment_permission() {
     'payment.update.own' => array(
       'title' => t('Update own payments'),
     ),
-    'payment.method.administer' => array(
-      'title' => t('Administer payment methods'),
+    'payment.method.update.any' => array(
+      'title' => t('Update any payment method'),
+      'restrict access' => TRUE,
+    ),
+    'payment.method.update.own' => array(
+      'title' => t('Update own payment methods'),
+    ),
+    'payment.method.delete.any' => array(
+      'title' => t('Delete any payment method'),
+    ),
+    'payment.method.delete.own' => array(
+      'title' => t('Delete own payment methods'),
+    ),
+    'payment.method.view.any' => array(
+      'title' => t('View any payment method'),
+      'restrict access' => TRUE,
+    ),
+    'payment.method.view.own' => array(
+      'title' => t('View own payment methods'),
     ),
     'payment.status.view' => array(
       'title' => t('View payment status overview'),
     ),
   );
+  $controllers = payment_method_controller_load_multiple();
+  unset($controllers['PaymentMethodControllerUnavailable']);
+  foreach ($controllers as $controller) {
+    $permissions['payment.method.create.' . $controller->name] = array(
+      'title' => t('Create %controller_title payment methods', array(
+        '%controller_title' => $controller->title,
+      )),
+    );
+  }
+
+  return $permissions;
 }
 
 /**
@@ -393,6 +428,7 @@ function payment_entity_info() {
     'exportable' => TRUE,
     // @todo Enable static cache once http://drupal.org/node/1273756 is fixed.
     'static cache' => FALSE,
+    'access callback' => 'payment_method_access',
   );
 
   return $entity_info;
@@ -796,20 +832,51 @@ function payment_rules_access($type, $name) {
 }
 
 /**
- * Implements menu access callback.
+ * Check if a user has access to perform a certain payment method operation.
  *
- * @param string $op
- *   Either 'enable' or 'disable'.
+ * @see payment_permission()
+ *
+ * @param string $operation
+ *   One of the following operations:
+ *   - "create" (requires $payment_method)
+ *   - "update" (does not require $payment_method, but only grants access if
+ *     the user has permission to update any payment method)
+ *   - "delete" (does not require $payment_method, but only grants access if
+ *     the user has permission to delete any payment method)
+ *   - "view" (does not require $payment_method, but only grants access if the
+ *     user has permission to view any payment method)
+ *   - "enable" (requires $payment_method)
+ *   - "disable" (requires $payment_method)
+ *   - "clone" (requires $payment_method)
  * @param PaymentMethod $payment_method
+ *   The payment method the user wants to perform the operation on.
+ * @param stdClass $account
+ *   The user account for which to check access. If NULL, the current user is
+ *   used.
  *
  * @return boolean
  */
-function payment_access_method_enable_disable($op, PaymentMethod $payment_method) {
-  switch ($op) {
+function payment_method_access($operation, PaymentMethod $payment_method = NULL, $account = NULL) {
+  global $user;
+
+  // Default to the currently logged-in user.
+  if (!$account) {
+    $account = $user;
+  }
+
+  switch ($operation) {
+    case 'create':
+      return $payment_method && user_access('payment.method.create.' . $payment_method->controller->name, $account);
     case 'enable':
-      return $payment_method->enabled == FALSE && user_access('payment.method.administer');
+      return $payment_method && $payment_method->enabled == FALSE && payment_method_access('update', $payment_method, $account);
     case 'disable':
-      return $payment_method->enabled == TRUE && user_access('payment.method.administer');
+      return $payment_method && $payment_method->enabled == TRUE && payment_method_access('update', $payment_method, $account);
+    case 'clone':
+      return payment_method_access('create', $payment_method, $account) && payment_method_access('view', $payment_method, $account);
+    case 'view':
+    case 'update':
+    case 'delete':
+      return user_access('payment.method.' . $operation . '.any', $account) || $payment_method && user_access('payment.method.' . $operation . '.own', $account) && $payment_method->uid == $account->uid;
   }
   return FALSE;
 }
