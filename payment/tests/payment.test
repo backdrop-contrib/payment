@@ -710,62 +710,62 @@ class PaymentMethodPermissionTest extends PaymentWebTestCase {
     $account_2 = drupal_anonymous_user();
     $account_2->uid = 2;
 
-// Create a new payment method.
-$this->paymentCheckEntityPermission($this->paymentMethod(), 'payment_method', array('payment.method.create.PaymentMethodBasicController'), 'create');
+    // Create a new payment method.
+    $this->paymentCheckEntityPermission($this->paymentMethod(), 'payment_method', array('payment.method.create.PaymentMethodBasicController'), 'create');
 
-// Update a payment method that belongs to user 1.
-$this->paymentCheckEntityPermission($this->paymentMethod(1), 'payment_method', array('payment.method.update.any'), 'update');
+    // Update a payment method that belongs to user 1.
+    $this->paymentCheckEntityPermission($this->paymentMethod(1), 'payment_method', array('payment.method.update.any'), 'update');
 
-// Update a payment method that belongs to user 2.
-$this->paymentCheckEntityPermission($this->paymentMethod(2), 'payment_method', array('payment.method.update.own'), 'update');
+    // Update a payment method that belongs to user 2.
+    $this->paymentCheckEntityPermission($this->paymentMethod(2), 'payment_method', array('payment.method.update.own'), 'update');
 
-// Delete a payment method that belongs to user 1.
-$this->paymentCheckEntityPermission($this->paymentMethod(1), 'payment_method', array('payment.method.delete.any'), 'delete');
+    // Delete a payment method that belongs to user 1.
+    $this->paymentCheckEntityPermission($this->paymentMethod(1), 'payment_method', array('payment.method.delete.any'), 'delete');
 
-// Delete a payment method that belongs to user 2.
-$this->paymentCheckEntityPermission($this->paymentMethod(2), 'payment_method', array('payment.method.delete.own'), 'delete');
+    // Delete a payment method that belongs to user 2.
+    $this->paymentCheckEntityPermission($this->paymentMethod(2), 'payment_method', array('payment.method.delete.own'), 'delete');
 
-// Enable an enabled payment method.
-$payment_method = $this->paymentMethod();
-$payment_method->enabled = TRUE;
-$this->assertFalse(payment_method_access('enable', $payment_method, $account_1), 'UID 1 cannot enable an enabled payment method');
-$permissions[2]['payment.method.update.any'] = TRUE;
-$this->assertFalse(payment_method_access('enable', $payment_method, $account_2), 'UID 2 cannot enable an enabled payment method ' . $this->paymentPermissionLabel(array('payment.method.update.any')));
+    // Enable an enabled payment method.
+    $payment_method = $this->paymentMethod();
+    $payment_method->enabled = TRUE;
+    $this->assertFalse(payment_method_access('enable', $payment_method, $account_1), 'UID 1 cannot enable an enabled payment method');
+    $permissions[2]['payment.method.update.any'] = TRUE;
+    $this->assertFalse(payment_method_access('enable', $payment_method, $account_2), 'UID 2 cannot enable an enabled payment method ' . $this->paymentPermissionLabel(array('payment.method.update.any')));
 
-// Enable a disabled payment method that belongs to user 1.
-$payment_method = $this->paymentMethod(1);
-$payment_method->enabled = FALSE;
-$this->paymentCheckEntityPermission($payment_method, 'payment_method', array('payment.method.update.any'), 'enable');
+    // Enable a disabled payment method that belongs to user 1.
+    $payment_method = $this->paymentMethod(1);
+    $payment_method->enabled = FALSE;
+    $this->paymentCheckEntityPermission($payment_method, 'payment_method', array('payment.method.update.any'), 'enable');
 
-// Enable a disabled payment method that belongs to user 2.
-$payment_method = $this->paymentMethod(2);
-$payment_method->enabled = FALSE;
-$this->paymentCheckEntityPermission($payment_method, 'payment_method', array('payment.method.update.own'), 'enable');
+    // Enable a disabled payment method that belongs to user 2.
+    $payment_method = $this->paymentMethod(2);
+    $payment_method->enabled = FALSE;
+    $this->paymentCheckEntityPermission($payment_method, 'payment_method', array('payment.method.update.own'), 'enable');
 
-// Disable a disabled payment method.
-$payment_method = $this->paymentMethod();
-$payment_method->enabled = FALSE;
-$this->assertFalse(payment_method_access('disable', $payment_method, $account_1), 'UID 1 cannot disable a disabled payment method');
-$permissions[2]['payment.method.update.any'] = TRUE;
-$this->assertFalse(payment_method_access('disable', $payment_method, $account_2), 'UID 2 cannot disable a disabled payment method with permission ' . $this->paymentPermissionLabel(array('payment.method.update.any')));
+    // Disable a disabled payment method.
+    $payment_method = $this->paymentMethod();
+    $payment_method->enabled = FALSE;
+    $this->assertFalse(payment_method_access('disable', $payment_method, $account_1), 'UID 1 cannot disable a disabled payment method');
+    $permissions[2]['payment.method.update.any'] = TRUE;
+    $this->assertFalse(payment_method_access('disable', $payment_method, $account_2), 'UID 2 cannot disable a disabled payment method with permission ' . $this->paymentPermissionLabel(array('payment.method.update.any')));
 
-// Disable an enabled payment method that belongs to user 1.
-$this->paymentCheckEntityPermission($this->paymentMethod(1), 'payment_method', array('payment.method.update.any'), 'disable');
+    // Disable an enabled payment method that belongs to user 1.
+    $this->paymentCheckEntityPermission($this->paymentMethod(1), 'payment_method', array('payment.method.update.any'), 'disable');
 
-// Disable an enabled payment method that belongs to user 2.
-$this->paymentCheckEntityPermission($this->paymentMethod(2), 'payment_method', array('payment.method.update.own'), 'disable');
+    // Disable an enabled payment method that belongs to user 2.
+    $this->paymentCheckEntityPermission($this->paymentMethod(2), 'payment_method', array('payment.method.update.own'), 'disable');
 
-// Clone a payment method that belongs to user 1.
-$this->paymentCheckEntityPermission($this->paymentMethod(1), 'payment_method', array('payment.method.view.any', 'payment.method.create.PaymentMethodBasicController'), 'clone');
+    // Clone a payment method that belongs to user 1.
+    $this->paymentCheckEntityPermission($this->paymentMethod(1), 'payment_method', array('payment.method.view.any', 'payment.method.create.PaymentMethodBasicController'), 'clone');
 
-// Clone a payment method that belongs to user 2.
-$this->paymentCheckEntityPermission($this->paymentMethod(2), 'payment_method', array('payment.method.view.own', 'payment.method.create.PaymentMethodBasicController'), 'clone');
+    // Clone a payment method that belongs to user 2.
+    $this->paymentCheckEntityPermission($this->paymentMethod(2), 'payment_method', array('payment.method.view.own', 'payment.method.create.PaymentMethodBasicController'), 'clone');
 
-// View a payment method that belongs to user 1.
-$this->paymentCheckEntityPermission($this->paymentMethod(1), 'payment_method', array('payment.method.view.any'), 'view');
+    // View a payment method that belongs to user 1.
+    $this->paymentCheckEntityPermission($this->paymentMethod(1), 'payment_method', array('payment.method.view.any'), 'view');
 
-// View a payment method that belongs to user 2.
-$this->paymentCheckEntityPermission($this->paymentMethod(2), 'payment_method', array('payment.method.view.own'), 'view');
+    // View a payment method that belongs to user 2.
+    $this->paymentCheckEntityPermission($this->paymentMethod(2), 'payment_method', array('payment.method.view.own'), 'view');
   }
 }
 
