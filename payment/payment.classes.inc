@@ -693,6 +693,12 @@ class PaymentMethodFeaturesController extends EntityDefaultFeaturesController {
 class PaymentMethodController {
 
   /**
+   * Default values for the controller_data property of a PaymentMethod that
+   * uses this controller.
+   */
+  public $controller_data_defaults = array();
+
+  /**
    * An array with ISO 4217 currency codes that this controller supports.
    *
    * Keys are ISO 4217 currency codes. Values are associative arrays with keys

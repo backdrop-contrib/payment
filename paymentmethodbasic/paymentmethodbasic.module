@@ -43,7 +43,7 @@ if ($entity_type == 'payment_method') {
  */
 function paymentmethodbasic_payment_method_insert(PaymentMethod $payment_method) {
   if ($payment_method->controller->name == 'PaymentMethodBasicController') {
-    $payment_method->controller_data += paymentmethodbasic_controller_data();
+    $payment_method->controller_data += $payment_method->controller->controller_data_defaults;
     $query = db_insert('paymentmethodbasic');
     $values = array_merge($payment_method->controller_data, array(
       'pmid' => $payment_method->pmid,
@@ -80,17 +80,6 @@ function paymentmethodbasic_payment_method_delete($entity) {
 }
 
 /**
- * Return all payment method-specific property names.
- */
-function paymentmethodbasic_controller_data() {
-  return array(
-    'message' => '',
-    'status' => PAYMENT_STATUS_SUCCESS,
-    'text_format' => '',
-  );
-}
-
-/**
  * A basic payment method controller.
  *
  * This controller always executes payments successfully, does not require
@@ -98,6 +87,12 @@ function paymentmethodbasic_controller_data() {
  * useful to create a "collect on delivery" payment method, for instance.
  */
 class PaymentMethodBasicController extends PaymentMethodController {
+
+  public $controller_data_defaults = array(
+    'message' => '',
+    'status' => PAYMENT_STATUS_SUCCESS,
+    'text_format' => '',
+  );
 
   public $payment_method_configuration_form_elements_callback = 'paymentmethodbasic_payment_method_configuration_form_elements';
 
