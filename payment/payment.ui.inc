@@ -285,6 +285,7 @@ function payment_form_payment_method(array $form, array &$form_state, PaymentMet
       '#type' => 'link',
       '#title' => t('Delete'),
       '#href' => 'admin/config/services/payment/method/' . $payment_method->pmid . '/delete',
+      '#access' => payment_method_access('delete', $payment_method),
     );
   }
 
