@@ -5,10 +5,13 @@
  * Tests for payment.module.
  */
 
+class PaymentWebTestCase extends DrupalWebTestCase {
+}
+
 /**
  * Tests action hook and callback invocations.
  */
-class PaymentActionHookAndCallbackTest extends DrupalWebTestCase {
+class PaymentActionHookAndCallbackTest extends PaymentWebTestCase {
 
   static function getInfo() {
     return array(
@@ -59,7 +62,7 @@ class PaymentActionHookAndCallbackTest extends DrupalWebTestCase {
 /**
  * Tests info hook return values.
  */
-class PaymentInfoHookTest extends DrupalWebTestCase {
+class PaymentInfoHookTest extends PaymentWebTestCase {
 
   static function getInfo() {
     return array(
@@ -140,7 +143,7 @@ class PaymentInfoHookTest extends DrupalWebTestCase {
 /**
  * Test line item handling.
  */
-class PaymentLineItemTest extends DrupalWebTestCase {
+class PaymentLineItemTest extends PaymentWebTestCase {
 
   static function getInfo() {
     return array(
@@ -208,7 +211,7 @@ class PaymentLineItemTest extends DrupalWebTestCase {
 /**
  * Test payment status item handling.
  */
-class PaymentStatusItemTest extends DrupalWebTestCase {
+class PaymentStatusItemTest extends PaymentWebTestCase {
 
   static function getInfo() {
     return array(
@@ -240,7 +243,7 @@ class PaymentStatusItemTest extends DrupalWebTestCase {
 /**
  * Test payment validation.
  */
-class PaymentValidationTest extends DrupalWebTestCase {
+class PaymentValidationTest extends PaymentWebTestCase {
 
   static function getInfo() {
     return array(
@@ -369,7 +372,7 @@ class PaymentValidationTest extends DrupalWebTestCase {
 /**
  * Tests the payment_line_item form element.
  */
-class PaymentLineItemFormElementTest extends DrupalWebTestCase {
+class PaymentLineItemFormElementTest extends PaymentWebTestCase {
 
   static function getInfo() {
     return array(
@@ -491,7 +494,7 @@ class PaymentLineItemFormElementTest extends DrupalWebTestCase {
 /**
  * Tests the payment_line_item form element.
  */
-class PaymentAmountFormElementTest extends DrupalWebTestCase {
+class PaymentAmountFormElementTest extends PaymentWebTestCase {
 
   static function getInfo() {
     return array(
