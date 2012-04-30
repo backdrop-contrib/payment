@@ -218,7 +218,7 @@ function payment_menu() {
       'access arguments' => array('payment.view.any'),
     ) + $base;
     $items['admin/config/services/payment/method'] = array(
-      'title' => 'Payment',
+      'title' => 'Payment methods',
       'access callback' => 'payment_method_access',
       'access arguments' => array('view'),
     ) + $base;
