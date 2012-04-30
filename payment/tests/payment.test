@@ -770,9 +770,9 @@ class PaymentMethodPermissionTest extends PaymentWebTestCase {
 }
 
 /**
- * Tests payment method permissions.
+ * Tests payment method router item permissions.
  */
-class PaymentMethodAdministrationUIPermissionTest extends PaymentWebTestCase {
+class PaymentMethodURLPathPermissionTest extends PaymentWebTestCase {
 
   static function getInfo() {
     return array(
@@ -810,6 +810,7 @@ class PaymentMethodAdministrationUIPermissionTest extends PaymentWebTestCase {
     $this->paymentCheckPathPermission('admin/config/services/payment/method/' . $payment_method->pmid . '/delete', 'payment.method.delete.any');
   }
 }
+
 /**
  * Test unavailable payment methods and payment methods controllers.
  */
