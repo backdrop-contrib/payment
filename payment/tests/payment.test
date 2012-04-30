@@ -776,7 +776,7 @@ class PaymentMethodURLPathPermissionTest extends PaymentWebTestCase {
 
   static function getInfo() {
     return array(
-      'name' => 'Payment method administration interface permissions',
+      'name' => 'Payment method router item permissions',
       'group' => 'Payment',
     );
   }
