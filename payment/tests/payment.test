@@ -94,13 +94,13 @@ class PaymentWebTestCase extends DrupalWebTestCase {
     $permission_text = $this->paymentPermissionLabel(array($permission));
     $this->drupalLogout();
     $this->drupalGet($path);
-    $this->assertText(t('Access denied'), "Anonymous users cannot view admin/config/services/payment/method$comment");
+    $this->assertText(t('Access denied'), "Anonymous users cannot view $path$comment");
     $this->drupalLogin($this->drupalCreateUser());
     $this->drupalGet($path);
-    $this->assertText(t('Access denied'), "Authenticated users cannot view admin/config/services/payment/method$comment without permission $permission_text");
+    $this->assertText(t('Access denied'), "Authenticated users cannot view $path$comment without permission $permission_text");
     $this->drupalLogin($this->drupalCreateUser(array($permission)));
     $this->drupalGet($path);
-    $this->assertNoText(t('Access denied'), "Authenticated users can view admin/config/services/payment/method$comment with permission $permission_text");
+    $this->assertNoText(t('Access denied'), "Authenticated users can view $path$comment with permission $permission_text");
   }
 
   /**
