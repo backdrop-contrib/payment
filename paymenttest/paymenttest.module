@@ -52,7 +52,7 @@ function paymenttest_payment_validate(Payment $payment, PaymentMethod $payment_m
 /**
  * Implements hook_payment_status_change().
  */
-function paymenttest_payment_status_change(Payment $payment, PaymentStatusItem $old_status) {
+function paymenttest_payment_status_change(Payment $payment, PaymentStatusItem $previous_status_item) {
   $payment->paymenttest_payment_status_change = TRUE;
 }
 

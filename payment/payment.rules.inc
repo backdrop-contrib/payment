@@ -217,9 +217,9 @@ function payment_rules_condition_info() {
  * Implements Rules condition callback: check whether a payment's status
  * is one of the selected statuses.
  *
- * @param $payment Payment
+ * @param Payment $payment
  *   The payment to check the condition for.
- * @param $payment_statuses array
+ * @param array $payment_statuses
  *   An array with payment statuses.
  *
  * @return boolean
@@ -245,9 +245,9 @@ function payment_rules_options_list_payment_statuses() {
  * Implements Rules condition callback: check whether a payment's status
  * is a child of any of the selected statuses.
  *
- * @param $payment Payment
+ * @param Payment $payment
  *   The payment to check the condition for.
- * @param $payment_statuses array
+ * @param array $payment_statuses
  *   An array with payment statuses.
  *
  * @return boolean
@@ -340,8 +340,8 @@ function payment_rules_options_list_payment_line_item_name() {
 /**
  * Implements Rules action callback: delete a line item.
  *
- * @param $payment Payment
- * @param $name string
+ * @param Payment $payment
+ * @param string $name
  *   The machine name of the line item to delete.
  */
 function payment_rules_action_payment_line_item_delete(Payment $payment, $name) {
@@ -379,9 +379,9 @@ function payment_rules_options_list_payment_uses_payment_method() {
  * Implements Rules condition callback: check whether a payment uses one of the
  * selected payment methods.
  *
- * @param $payment Payment
+ * @param Payment $payment
  *   The payment to check the condition for.
- * @param $pmids array
+ * @param array $pmids
  *   An array with payment method IDs.
  *
  * @return boolean
@@ -407,9 +407,9 @@ function payment_rules_options_list_payment_uses_payment_method_type() {
  * Implements Rules condition callback: check whether a payment uses one of the
  * selected payment methods types.
  *
- * @param $payment Payment
+ * @param Payment $payment
  *   The payment to check the condition for.
- * @param $payment_method_controller_class_names array
+ * @param array $payment_method_controller_class_names
  *   An array with class names of payment method controllers.
  *
  * @return boolean
@@ -422,13 +422,13 @@ function payment_rules_condition_payment_uses_payment_method_type(Payment $payme
  * Implements Rules condition callback: check whether a payment method
  * controller supports a currency.
  *
- * @param $payment Payment
+ * @param Payment $payment
  *   The payment to check the condition for.
- * @param $currency string
+ * @param string $currency_code
  *   The ISO 4217 currency code to check for.
  *
  * @return boolean
  */
-function payment_rules_condition_payment_method_controller_supports_currency(Payment $payment, $currency) {
-  return empty($payment->method->controller->currencies) ? TRUE : isset($payment->method->controller->currencies[$currency]);
+function payment_rules_condition_payment_method_controller_supports_currency(Payment $payment, $currency_code) {
+  return empty($payment->method->controller->currencies) ? TRUE : isset($payment->method->controller->currencies[$currency_code]);
 }

@@ -106,7 +106,7 @@ class PaymentWebTestCase extends DrupalWebTestCase {
   /**
    * Test an entity's permissions.
    *
-   * @param mixed $entity
+   * @param object $entity
    * @param string $entity_type
    *   The value suffixed with "_access" will be used as the access callback,
    *   which receives the $operation, $entity and a user account object as

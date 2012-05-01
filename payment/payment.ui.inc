@@ -8,7 +8,7 @@
 /**
  * Menu title callback: return a payment's title.
  *
- * @param $payment Payment
+ * @param Payment $payment
  *
  * @return string
  */
@@ -22,7 +22,7 @@ function payment_title(Payment $payment) {
  * Menu page callback: show a message that describes the dependencies for
  * viewing this page have not been met.
  *
- * @param $modules array
+ * @param array $modules
  *   Keys are modules' machine names or numeric, values are modules'
  *   human-readable titles.
  *
@@ -43,7 +43,7 @@ function payment_page_required_modules(array $modules) {
 /**
  * Menu page callback: show a payment.
  *
- * @param $payment Payment
+ * @param Payment $payment
  *
  * @return array
  */
@@ -54,9 +54,9 @@ function payment_page_payment_view(Payment $payment) {
 /**
  * Implements form build callback: the payment add/edit form.
  *
- * @param $form array
- * @param $form_state array
- * @param $payment Payment
+ * @param array $form
+ * @param array $form_state
+ * @param Payment $payment
  *
  * @return array
  *   A render array.
@@ -211,7 +211,7 @@ function payment_method_form_add_access(PaymentMethodController $controller) {
 /**
  * Create a blank payment method and return its payment form.
  *
- * @param $controller_class_name string
+ * @param string $controller_class_name
  *   The name of the controller class for which to create a payment method.
  *
  * @return array
@@ -229,9 +229,8 @@ function payment_method_form_add($controller) {
  * Implements form build callback: the payment method add/edit form.
  *
  * @see payment_forms()
- * @see payment_method_form()
  *
- * @param $payment_method PaymentMethod
+ * @param PaymentMethod $payment_method
  */
 function payment_form_payment_method(array $form, array &$form_state, PaymentMethod $payment_method) {
   $form_state['payment_method'] = $payment_method;
@@ -372,14 +371,14 @@ function payment_page_status() {
  *
  * @see payment_page_status()
  *
- * @param $statuses array
+ * @param array $statuses
  *   The statuses for which to build table rows.
- * @param $children array
+ * @param array $children
  *   Keys are payment statuses, values are the statuses that are the keys's
  *   children.
- * @param $rows array
+ * @param array $rows
  *   The table rows to which to add new ones.
- * @param $depth integer
+ * @param integer $depth
  */
 function _payment_page_status_rows(array $statuses, array $children, array &$rows, $depth = 0) {
   foreach ($statuses as $status) {
@@ -396,7 +395,7 @@ function _payment_page_status_rows(array $statuses, array $children, array &$row
 /**
  * Implements theme callback: a payment status for the overview page.
  *
- * @param $variables array
+ * @param array $variables
  *   An associative array containing:
  *   - status_info: the PaymentStatusInfo object to theme.
  *   - depth: the status' depth within the status hierarchy.
@@ -424,7 +423,7 @@ function payment_method_name_exists($name) {
 /**
  * Return a render array containing a Payment's line items.
  *
- * @param $payment Payment
+ * @param Payment $payment
  *
  * @return array
  */
@@ -467,7 +466,7 @@ function payment_line_items(Payment $payment) {
 /**
  * Return a render array containing a Payment's status items.
  *
- * @param $payment Payment
+ * @param Payment $payment
  *
  * @return array
  */
@@ -492,19 +491,19 @@ function payment_status_items(Payment $payment) {
 /**
  * Toggle a payment method's enabled status.
  *
- * @param string $op
+ * @param string $operation
  *   Either 'enable' or 'disable'.
  * @param PaymentMethod $payment_method
  *
  * @return NULL
  */
-function payment_page_method_enable_disable($op, PaymentMethod $payment_method, $token) {
+function payment_page_method_enable_disable($operation, PaymentMethod $payment_method, $token) {
   if ($token != drupal_get_token('payment_method_administer')) {
     drupal_access_denied();
     exit;
   }
 
-  switch ($op) {
+  switch ($operation) {
     case 'enable':
       $payment_method->enabled = TRUE;
       break;
@@ -516,6 +515,16 @@ function payment_page_method_enable_disable($op, PaymentMethod $payment_method, 
   drupal_goto('admin/config/services/payment/method');
 }
 
+/**
+ * Clone a payment method and return its payment form.
+ *
+ * @param PaymentMethod $payment_method
+ *   The payment method to clone.
+ * @param string $token
+ *   A token to validate.
+ *
+ * @return array.
+ */
 function payment_page_method_clone(PaymentMethod $payment_method, $token) {
   if ($token != drupal_get_token('payment_method_administer')) {
     drupal_access_denied();

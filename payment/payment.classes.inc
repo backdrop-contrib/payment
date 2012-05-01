@@ -123,7 +123,7 @@ class Payment extends PaymentCommon {
   /**
    * Constructor.
    *
-   * @param $properties array
+   * @param array $properties
    *   An associative array. Keys are property names and values are property
    *   values.
    *
@@ -194,7 +194,7 @@ class Payment extends PaymentCommon {
    *
    * @see Payment::getLineItems()
    *
-   * @param $line_item PaymentLineItem
+   * @param PaymentLineItem $line_item
    *
    * @return Payment
    */
@@ -207,7 +207,7 @@ class Payment extends PaymentCommon {
   /**
    * Get line items.
    *
-   * @param $name string
+   * @param string $name
    *   The requested line item(s)'s machine name, as possibly defined in
    *   hook_payment_line_item_info().
    *
@@ -226,9 +226,9 @@ class Payment extends PaymentCommon {
   /**
    * Get the total payment amount.
    *
-   * @param $tax boolean
+   * @param boolean $tax
    *   Whether to include taxes or not.
-   * @param $line_items array
+   * @param array $line_items
    *   An array with PaymentLineItem objects to calculate the total from.
    *   Leave empty to use $this->line_items.
    *
@@ -249,7 +249,7 @@ class Payment extends PaymentCommon {
   /**
    * Set the payment status.
    *
-   * @param $status_item PaymentStatusItem
+   * @param PaymentStatusItem $status_item
    *
    * @return Payment
    */
@@ -291,11 +291,11 @@ class Payment extends PaymentCommon {
   /**
    * Get available/valid payment methods for this payment.
    *
-   * @param $payment_methods array
+   * @param array $payment_methods
    *   An array with the PaymentMethod objects to check for. Use an empty
    *   array to check the availability of all payment methods.
    *
-   * @param array
+   * @return array
    *   An array with PaymentMethod objects usable for Payment in its current
    *   state, keyed by PMID.
    */
@@ -564,8 +564,8 @@ class PaymentMethod extends PaymentCommon {
   /**
    * Validate a payment against this payment method.
    *
-   * @param $payment Payment
-   * @param $strict boolean
+   * @param Payment $payment
+   * @param boolean $strict
    *   Whether to validate everything a payment method needs or to validate the
    *   most important things only. Useful when finding available payment methods,
    *   for instance, which does not require unimportant things to be a 100%
@@ -821,7 +821,7 @@ class PaymentMethodController {
   /**
    * Execute a payment.
    *
-   * @param $payment Payment
+   * @param Payment $payment
    *
    * @return boolean
    *   Whether the payment was successfully executed or not.
@@ -834,9 +834,9 @@ class PaymentMethodController {
    *
    * @see PaymentMethod::validate()
    *
-   * @param $payment Payment
-   * @param $payment_method PaymentMethod
-   * @param $strict boolean
+   * @param Payment $payment
+   * @param PaymentMethod $payment_method
+   * @param boolean $strict
    *   Whether to validate everything a payment method needs or to validate the
    *   most important things only. Useful when finding available payment methods,
    *   for instance, which does not require unimportant things to be a 100%
@@ -1010,7 +1010,7 @@ class PaymentLineItem extends PaymentCommon {
   /**
    * Return this line item's unit amount.
    *
-   * @param $tax boolean
+   * @param boolean $tax
    *   Whether to include taxes or not.
    *
    * @return float
@@ -1022,7 +1022,7 @@ class PaymentLineItem extends PaymentCommon {
   /**
    * Return this line item's total amount.
    *
-   * @param $tax boolean
+   * @param boolean $tax
    *   Whether to include taxes or not.
    *
    * @return float

@@ -607,9 +607,9 @@ function payment_statuses_info() {
 /**
  * Gets a specific payment status.
  *
- * @param $status string
+ * @param string $status
  *   A status' system name.
- * @param $unknown boolean
+ * @param boolean $unknown
  *   Whether to return info for PAYMENT_STATUS_UNKNOWN if the requested status
  *   does not exist.
  *
@@ -647,7 +647,7 @@ function payment_line_items_info() {
 /**
  * Returns information about a specific line item type.
  *
- * @param $name string
+ * @param string $name
  *   The line item type's machine name.
  *
  * @return mixed
@@ -663,9 +663,9 @@ function payment_line_item_info($name) {
 /**
  * Check if a payment status has a given other status as one of its ancestors.
  *
- * @param $status string
+ * @param string $status
  *   The payment status.
- * @param $ancestor_status string
+ * @param string $ancestor_status
  *   The ancestor status to check for.
  *
  * @return boolean
@@ -678,9 +678,9 @@ function payment_status_has_ancestor($status, $ancestor_status) {
  * Check if a payment status is equal to a given other status or has it one of
  * its ancestors.
  *
- * @param $status string
+ * @param string $status
  *   The payment status.
- * @param $ancestor_status string
+ * @param string $ancestor_status
  *   The ancestor status to check for.
  *
  * @return boolean
@@ -718,7 +718,7 @@ function payment_method_controllers_info() {
 /**
  * Load a payment method controller().
  *
- * @param $controller_class_name string
+ * @param string $controller_class_name
  *   The name of the controller class to load.
  *
  * @return mixed
@@ -733,7 +733,7 @@ function payment_method_controller_load($controller_class_name) {
 /**
  * Load multiple payment method controllers.
  *
- * @param $controller_class_names array
+ * @param array $controller_class_names
  *   An array with names of controller classes. Leave empty to load all
  *   controllers.
  *
@@ -763,8 +763,8 @@ function payment_method_controller_load_multiple(array $controller_class_names =
 /**
  * Convert an amount as a float to a human-readable format.
  *
- * @param $amount float
- * @param $currency_code string
+ * @param float $amount
+ * @param string $currency_code
  *
  * @return string
  */
@@ -783,7 +783,7 @@ function payment_amount_human_readable($amount, $currency_code = NULL) {
 /**
  * Menu access callback: return a user's access to a payment.
  *
- * @param $payment Payment
+ * @param Payment $payment
  *
  * @return string
  */
@@ -850,7 +850,7 @@ function payment_rules_access($type, $name) {
  *   - "clone" (requires $payment_method)
  * @param PaymentMethod $payment_method
  *   The payment method the user wants to perform the operation on.
- * @param stdClass $account
+ * @param object $account
  *   The user account for which to check access. If NULL, the current user is
  *   used.
  *

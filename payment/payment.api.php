@@ -25,7 +25,7 @@ function hook_payment_status_info() {
 /**
  * Alters payment statuses.
  *
- * @param $statuses_info array
+ * @param array $statuses_info
  *   An array with PaymentStatusInfo objects.
  *
  * @return NULL
@@ -55,7 +55,7 @@ function hook_payment_method_controller_info() {
 /**
  * Alters payment method controllers.
  *
- * @param array
+ * @param array $controllers_info
  *   Keys are payment controller aliases, values are actual payment method
  *   controller class names.
  */
@@ -98,7 +98,7 @@ function hook_payment_line_item_info() {
 /**
  * Alters line item types.
  *
- * @param array
+ * @param array $line_items_info
  *   An array with PaymentLineItemInfo objects, keyed by PaymentLineItemInfo::name.
  */
 function hook_payment_line_item_info_alter(&$line_items_info) {
@@ -111,13 +111,13 @@ function hook_payment_line_item_info_alter(&$line_items_info) {
  *
  * @see Payment::setStatus()
  *
- * @param $payment Payment
- * @param $old_status PaymentStatusItem
+ * @param Payment $payment
+ * @param PaymentStatusItem $previous_status_item
  *   The status the payment had before it was changed.
  *
  * @return NULL
  */
-function hook_payment_status_change(Payment $payment, PaymentStatusItem $old_status) {
+function hook_payment_status_change(Payment $payment, PaymentStatusItem $previous_status_item) {
   // Notify the site administrator, for instance.
 }
 
@@ -127,7 +127,7 @@ function hook_payment_status_change(Payment $payment, PaymentStatusItem $old_sta
  *
  * @see Payment::execute()
  *
- * @param $payment Payment
+ * @param Payment $payment
  *
  * @return NULL
  */
@@ -147,11 +147,11 @@ function hook_payment_pre_execute(Payment $payment) {
  * different payment methods, for example when looking for payment methods that
  * are capable of processing a payment.
  *
- * @param $payment Payment
+ * @param Payment $payment
  *   $payment->method contains the method currently configured, but NOT the
  *   method that $payment should be tested against, which is $payment_method.
- * @param $payment_method PaymentMethod
- * @param $strict boolean
+ * @param PaymentMethod $payment_method
+ * @param boolean $strict
  *   Whether to validate everything a payment method needs or to validate the
  *   most important things only. Useful when finding available payment methods,
  *   for instance, which does not require unimportant things to be a 100%
