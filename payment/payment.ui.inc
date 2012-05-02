@@ -91,6 +91,14 @@ function payment_form(array $form, array &$form_state, Payment $payment) {
     '#type' => 'submit',
     '#value' => $payment->pid ? t('Save') : t('Pay'),
   );
+  if ($payment->pid) {
+    $form['actions']['delete'] = array(
+      '#type' => 'link',
+      '#title' => t('Delete'),
+      '#href' => 'payment/' . $payment->pid . '/delete',
+      '#access' => payment_access('delete', $payment),
+    );
+  }
   field_attach_form('payment', $payment, $form, $form_state);
 
   return $form;
@@ -135,6 +143,29 @@ function payment_form_submit(array $form, array &$form_state) {
       $form_state['rebuild'] = TRUE;
     }
   }
+}
+
+/**
+ * Implements form build callback: payment deletion form.
+ */
+function payment_form_payment_delete(array $form, array &$form_state, Payment $payment) {
+  $form_state['payment'] = $payment;
+
+  return confirm_form($form, t('Do you really want to delete payment !pid?', array(
+    '!pid' => $payment->pid,
+  )), 'payment/' . $payment->pid, t('Existing information that uses this payment, such as a webshop order, may become unusable. This action cannot be undone.'), t('Delete payment'));
+}
+
+/**
+ * Implements form submit callback for payment_form_payment_delete().
+ */
+function payment_form_payment_delete_submit(array $form, array &$form_state) {
+  $payment = $form_state['payment'];
+  entity_delete('payment', $payment->pid);
+  $form_state['redirect'] = '<front>';
+  drupal_set_message(t('Payment !pid has been deleted.', array(
+    '!pid' => $payment->pid,
+  )));
 }
 
 /**

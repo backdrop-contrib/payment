@@ -21,6 +21,7 @@ class PaymentWebTestCase extends DrupalWebTestCase {
       'currency_code' => 'XXX',
       'finish_callback' => 'paymenttest_finish_callback',
       'method' => $payment_method,
+      'uid' => 2,
     ));
     $payment->setLineItem(new PaymentLineItem(array(
       'name' => 'foo',
@@ -123,7 +124,7 @@ class PaymentWebTestCase extends DrupalWebTestCase {
     $account_2 = drupal_anonymous_user();
     $account_2->uid = 2;
     $function = $entity_type . '_access';
-    $uid_string = $entity->uid ? ' with UID ' . $entity->uid : NULL;
+    $uid_string = $entity ? ' with UID ' . $entity->uid : NULL;
 
     $this->assertTrue($function($operation, $entity, $account_1), "UID 1 can $operation a $entity_type$uid_string without permission(s) " . $this->paymentPermissionLabel($permissions));
     foreach ($permissions as $i => $permission) {
@@ -133,7 +134,8 @@ class PaymentWebTestCase extends DrupalWebTestCase {
       $this->assertFalse($function($operation, $entity, $account_2), "UID 2 cannot $operation a $entity_type$uid_string without permission " . $this->paymentPermissionLabel(array($permissions[$i])));
     }
     $user_access_permissions[2] = array_fill_keys($permissions, TRUE);
-    $this->assertTrue($function($operation, $entity, $account_1), "UID 2 can $operation a $entity_type$uid_string with permission(s) " . $this->paymentPermissionLabel($permissions));
+    $with = $permissions ? 'with' : 'without';
+    $this->assertTrue($function($operation, $entity, $account_1), "UID 2 can $operation a $entity_type$uid_string $with permission(s) " . $this->paymentPermissionLabel($permissions));
   }
 }
 
@@ -840,5 +842,103 @@ class PaymentUnavailableTest extends PaymentWebTestCase {
     entity_delete('payment_method', $payment->method->pmid);
     $payment = entity_load_single('payment', $payment->pid);
     $this->assertTrue(is_a($payment->method, 'PaymentMethodUnavailable'), 'When loading a payment, if its payment method is unavailable, it is replaced by PaymentMethodUnavailable.');
+  }
+}
+
+/**
+ * Tests payment permissions.
+ */
+class PaymentPermissionTest extends PaymentWebTestCase {
+
+  static function getInfo() {
+    return array(
+      'name' => 'Payment permissions',
+      'group' => 'Payment',
+    );
+  }
+
+  function setUp() {
+    parent::setUp('payment', 'paymentmethodbasic');
+  }
+
+  function payment($uid = NULL) {
+    return new Payment(array(
+      'uid' => $uid,
+    ));
+  }
+
+  /**
+   * Test permissions.
+   */
+  function testPermissions() {
+    // Create a payment.
+    $this->paymentCheckEntityPermission(NULL, 'payment', array(), 'create');
+    
+    // Update a payment that belongs to user 1.
+    $this->paymentCheckEntityPermission($this->payment(1), 'payment', array('payment.update.any'), 'update');
+
+    // Update a payment that belongs to user 2.
+    $this->paymentCheckEntityPermission($this->payment(2), 'payment', array('payment.update.own'), 'update');
+
+    // Delete a payment that belongs to user 1.
+    $this->paymentCheckEntityPermission($this->payment(1), 'payment', array('payment.delete.any'), 'delete');
+
+    // Delete a payment that belongs to user 2.
+    $this->paymentCheckEntityPermission($this->payment(2), 'payment', array('payment.delete.own'), 'delete');
+
+    // View a payment that belongs to user 1.
+    $this->paymentCheckEntityPermission($this->payment(1), 'payment', array('payment.view.any'), 'view');
+
+    // View a payment that belongs to user 2.
+    $this->paymentCheckEntityPermission($this->payment(2), 'payment', array('payment.view.own'), 'view');
+  }
+}
+
+/**
+ * Tests payment router item permissions.
+ */
+class PaymentMenuRouterItemTest extends PaymentWebTestCase {
+
+  static function getInfo() {
+    return array(
+      'name' => 'Payment menu router items',
+      'group' => 'Payment',
+    );
+  }
+
+  function setUp() {
+    parent::setUp('payment', 'paymentmethodbasic', 'paymenttest');
+  }
+
+  /**
+   * Test permissions.
+   */
+  function testPermissions() {
+    $payment = $this->paymentCreate($this->paymentMethodCreate(payment_method_controller_load('PaymentMethodBasicController')));
+
+    // Test the payment view page.
+    $this->paymentCheckPathPermission('payment/' . $payment->pid, 'payment.view.any');
+
+    // Test the payment edit page.
+    $this->paymentCheckPathPermission('payment/' . $payment->pid . '/edit', 'payment.update.any');
+
+    // Test the payment delete page.
+    $this->paymentCheckPathPermission('payment/' . $payment->pid . '/delete', 'payment.delete.any');
+
+    // Test the administrative payment overview page (Views disabled).
+    $this->paymentCheckPathPermission('admin/content/payment', 'payment.view.any', 'Views disabled');
+
+    // Test a user's payment overview page (Views disabled).
+    $this->paymentCheckPathPermission('user/2/payment', 'payment.view.own', 'Views disabled');
+
+    // Enable Views.
+    $this->assertTrue(module_enable(array('views')), 'Enabled modules: <em>views</em>');
+    $this->resetAll();
+
+    // Test the administrative payment overview page (Views enabled).
+    $this->paymentCheckPathPermission('admin/content/payment', 'payment.view.any', 'Views enabled');
+
+    // Test a user's payment overview page (Views enabled).
+    $this->paymentCheckPathPermission('user/2/payment', 'payment.view.own', 'Views enabled');
   }
 }
