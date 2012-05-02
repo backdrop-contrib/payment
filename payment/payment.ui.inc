@@ -553,6 +553,9 @@ function payment_page_method_clone(PaymentMethod $payment_method) {
   $payment_method = clone $payment_method;
   $payment_method->pmid = 0;
   $payment_method->name = '';
+  drupal_set_message(t('You are now editing an unsaved clone of payment method %title.', array(
+    '%title' => $payment_method->title_specific,
+  )));
 
   return drupal_get_form('payment_form_payment_method', $payment_method);
 }
