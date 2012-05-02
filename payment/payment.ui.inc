@@ -566,7 +566,7 @@ function payment_page_method_clone(PaymentMethod $payment_method, $token) {
   $payment_method->pmid = 0;
   $payment_method->name = '';
 
-  return payment_method_form($payment_method);
+  return drupal_get_form('payment_form_payment_method', $payment_method);
 }
 
 /**
