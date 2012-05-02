@@ -772,13 +772,13 @@ class PaymentMethodPermissionTest extends PaymentWebTestCase {
 }
 
 /**
- * Tests payment method router item permissions.
+ * Tests payment method router items.
  */
-class PaymentMethodURLPathPermissionTest extends PaymentWebTestCase {
+class PaymentMethodMenuRouterItemTest extends PaymentWebTestCase {
 
   static function getInfo() {
     return array(
-      'name' => 'Payment method router item permissions',
+      'name' => 'Payment method menu router items',
       'group' => 'Payment',
     );
   }
@@ -793,8 +793,11 @@ class PaymentMethodURLPathPermissionTest extends PaymentWebTestCase {
   function testPermissions() {
     // Test the payment method overview.
     $this->paymentCheckPathPermission('admin/config/services/payment/method', 'payment.method.view.any', 'Views disabled');
-    module_enable(array('views'));
-    drupal_flush_all_caches();
+
+    // Enable Views.
+    $this->assertTrue(module_enable(array('views')), 'Enabled modules: <em>views</em>');
+    $this->resetAll();
+
     $this->paymentCheckPathPermission('admin/config/services/payment/method', 'payment.method.view.any', 'Views enabled');
 
     // Test the payment method controller selection page.
