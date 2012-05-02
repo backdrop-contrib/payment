@@ -14,12 +14,13 @@ class PaymentViewsHandlerFieldPaymentMethodOperations extends views_handler_fiel
    * Implements views_handler_field::render().
    */
   function render($values) {
+    $token = drupal_get_token('payment');
     $pmid = $this->get_value($values);
-    $links = menu_contextual_links('payment', 'admin/config/services/payment/method', array($pmid));
+    $links = menu_contextual_links('payment', 'admin/config/services/payment/method', array($pmid, '', $token));
 
     foreach (array('enable', 'disable') as $operation) {
       if (isset($links['payment-' . $operation])) {
-        $links['payment-' . $operation]['href'] .= '/' . drupal_get_token('payment_method_administer');
+        $links['payment-' . $operation]['href'] .= '/' . $token;
       }
     }
 

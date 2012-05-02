@@ -528,12 +528,7 @@ function payment_status_items(Payment $payment) {
  *
  * @return NULL
  */
-function payment_page_method_enable_disable($operation, PaymentMethod $payment_method, $token) {
-  if ($token != drupal_get_token('payment_method_administer')) {
-    drupal_access_denied();
-    exit;
-  }
-
+function payment_page_method_enable_disable($operation, PaymentMethod $payment_method) {
   switch ($operation) {
     case 'enable':
       $payment_method->enabled = TRUE;

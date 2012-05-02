@@ -161,8 +161,8 @@ function payment_menu() {
     'load arguments' => array('payment_method'),
     'page callback' => 'payment_page_method_enable_disable',
     'page arguments' => array('enable', 5),
-    'access callback' => 'payment_method_access',
-    'access arguments' => array('enable', 5),
+    'access callback' => 'payment_method_access_token',
+    'access arguments' => array(7, 'enable', 5),
     'title' => 'Enable',
     'file' => 'payment.ui.inc',
     'type' => MENU_LOCAL_TASK,
@@ -173,8 +173,8 @@ function payment_menu() {
     'load arguments' => array('payment_method'),
     'page callback' => 'payment_page_method_enable_disable',
     'page arguments' => array('disable', 5),
-    'access callback' => 'payment_method_access',
-    'access arguments' => array('disable', 5),
+    'access callback' => 'payment_method_access_token',
+    'access arguments' => array(7, 'disable', 5),
     'title' => 'Disable',
     'file' => 'payment.ui.inc',
     'type' => MENU_LOCAL_TASK,
@@ -906,4 +906,20 @@ function payment_method_access($operation, PaymentMethod $payment_method = NULL,
       return user_access('payment.method.' . $operation . '.any', $account) || $payment_method && user_access('payment.method.' . $operation . '.own', $account) && $payment_method->uid == $account->uid;
   }
   return FALSE;
+}
+
+/**
+ * Check if a user has access to perform a certain payment method operation and
+ * do additional token validation.
+ *
+ * @see payment_method_access
+ *
+ * @param string $token
+ *   A token to validate, that was generated with value "payment_method".
+ * @param string $operation
+ * @param PaymentMethod $payment_method
+ * @param stdClass $account
+ */
+function payment_method_access_token($token, $operation, PaymentMethod $payment_method = NULL, $account = NULL) {
+  return drupal_valid_token($token, 'payment') && payment_method_access($operation, $payment_method, $account);
 }
