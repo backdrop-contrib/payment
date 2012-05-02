@@ -551,17 +551,10 @@ function payment_page_method_enable_disable($operation, PaymentMethod $payment_m
  *
  * @param PaymentMethod $payment_method
  *   The payment method to clone.
- * @param string $token
- *   A token to validate.
  *
  * @return array.
  */
-function payment_page_method_clone(PaymentMethod $payment_method, $token) {
-  if ($token != drupal_get_token('payment_method_administer')) {
-    drupal_access_denied();
-    exit;
-  }
-
+function payment_page_method_clone(PaymentMethod $payment_method) {
   $payment_method = clone $payment_method;
   $payment_method->pmid = 0;
   $payment_method->name = '';

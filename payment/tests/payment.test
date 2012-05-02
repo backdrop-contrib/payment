@@ -83,23 +83,23 @@ class PaymentWebTestCase extends DrupalWebTestCase {
    * Test a URL path's permissions.
    *
    * @param string $path
-   * @param string $permission
+   * @param array $permissions
    * @param string $comment
    *
    * @return NULL
    */
-  function paymentCheckPathPermission($path, $permission, $comment = NULL) {
+  function paymentCheckPathPermission($path, $permissions, $comment = NULL) {
     if ($comment) {
       $comment = " ($comment)";
     }
-    $permission_text = $this->paymentPermissionLabel(array($permission));
+    $permission_text = $this->paymentPermissionLabel($permissions);
     $this->drupalLogout();
     $this->drupalGet($path);
     $this->assertText(t('Access denied'), "Anonymous users cannot view $path$comment");
     $this->drupalLogin($this->drupalCreateUser());
     $this->drupalGet($path);
     $this->assertText(t('Access denied'), "Authenticated users cannot view $path$comment without permission $permission_text");
-    $this->drupalLogin($this->drupalCreateUser(array($permission)));
+    $this->drupalLogin($this->drupalCreateUser($permissions));
     $this->drupalGet($path);
     $this->assertNoText(t('Access denied'), "Authenticated users can view $path$comment with permission $permission_text");
   }
@@ -792,27 +792,30 @@ class PaymentMethodMenuRouterItemTest extends PaymentWebTestCase {
    */
   function testPermissions() {
     // Test the payment method overview.
-    $this->paymentCheckPathPermission('admin/config/services/payment/method', 'payment.method.view.any', 'Views disabled');
+    $this->paymentCheckPathPermission('admin/config/services/payment/method', array('payment.method.view.any'), 'Views disabled');
 
     // Enable Views.
     $this->assertTrue(module_enable(array('views')), 'Enabled modules: <em>views</em>');
     $this->resetAll();
 
-    $this->paymentCheckPathPermission('admin/config/services/payment/method', 'payment.method.view.any', 'Views enabled');
+    $this->paymentCheckPathPermission('admin/config/services/payment/method', array('payment.method.view.any'), 'Views enabled');
 
     // Test the payment method controller selection page.
-    $this->paymentCheckPathPermission('admin/config/services/payment/method/add', 'payment.method.create.PaymentMethodBasicController');
+    $this->paymentCheckPathPermission('admin/config/services/payment/method/add', array('payment.method.create.PaymentMethodBasicController'));
 
     // Test the payment method add page.
-    $this->paymentCheckPathPermission('admin/config/services/payment/method/add/PaymentMethodBasicController', 'payment.method.create.PaymentMethodBasicController');
+    $this->paymentCheckPathPermission('admin/config/services/payment/method/add/PaymentMethodBasicController', array('payment.method.create.PaymentMethodBasicController'));
 
-    $payment_method = $this->paymentMethodCreate();
+    $payment_method = $this->paymentMethodCreate(payment_method_controller_load('PaymentMethodBasicController'));
 
     // Test the payment method edit page.
-    $this->paymentCheckPathPermission('admin/config/services/payment/method/' . $payment_method->pmid . '/edit', 'payment.method.update.any');
+    $this->paymentCheckPathPermission('admin/config/services/payment/method/' . $payment_method->pmid . '/edit', array('payment.method.update.any'));
 
     // Test the payment method delete page.
-    $this->paymentCheckPathPermission('admin/config/services/payment/method/' . $payment_method->pmid . '/delete', 'payment.method.delete.any');
+    $this->paymentCheckPathPermission('admin/config/services/payment/method/' . $payment_method->pmid . '/delete', array('payment.method.delete.any'));
+
+    // Test the payment method clone page.
+    $this->paymentCheckPathPermission('admin/config/services/payment/method/' . $payment_method->pmid . '/clone', array('payment.method.view.any', 'payment.method.create.' . $payment_method->controller->name));
   }
 }
 
@@ -920,28 +923,28 @@ class PaymentMenuRouterItemTest extends PaymentWebTestCase {
     $payment = $this->paymentCreate($this->paymentMethodCreate(payment_method_controller_load('PaymentMethodBasicController')));
 
     // Test the payment view page.
-    $this->paymentCheckPathPermission('payment/' . $payment->pid, 'payment.view.any');
+    $this->paymentCheckPathPermission('payment/' . $payment->pid, array('payment.view.any'));
 
     // Test the payment edit page.
-    $this->paymentCheckPathPermission('payment/' . $payment->pid . '/edit', 'payment.update.any');
+    $this->paymentCheckPathPermission('payment/' . $payment->pid . '/edit', array('payment.update.any'));
 
     // Test the payment delete page.
-    $this->paymentCheckPathPermission('payment/' . $payment->pid . '/delete', 'payment.delete.any');
+    $this->paymentCheckPathPermission('payment/' . $payment->pid . '/delete', array('payment.delete.any'));
 
     // Test the administrative payment overview page (Views disabled).
-    $this->paymentCheckPathPermission('admin/content/payment', 'payment.view.any', 'Views disabled');
+    $this->paymentCheckPathPermission('admin/content/payment', array('payment.view.any'), 'Views disabled');
 
     // Test a user's payment overview page (Views disabled).
-    $this->paymentCheckPathPermission('user/2/payment', 'payment.view.own', 'Views disabled');
+    $this->paymentCheckPathPermission('user/2/payment', array('payment.view.own'), 'Views disabled');
 
     // Enable Views.
     $this->assertTrue(module_enable(array('views')), 'Enabled modules: <em>views</em>');
     $this->resetAll();
 
     // Test the administrative payment overview page (Views enabled).
-    $this->paymentCheckPathPermission('admin/content/payment', 'payment.view.any', 'Views enabled');
+    $this->paymentCheckPathPermission('admin/content/payment', array('payment.view.any'), 'Views enabled');
 
     // Test a user's payment overview page (Views enabled).
-    $this->paymentCheckPathPermission('user/2/payment', 'payment.view.own', 'Views enabled');
+    $this->paymentCheckPathPermission('user/2/payment', array('payment.view.own'), 'Views enabled');
   }
 }
