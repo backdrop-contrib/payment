@@ -264,6 +264,8 @@ function payment_method_form_add($controller) {
  * @param PaymentMethod $payment_method
  */
 function payment_form_payment_method(array $form, array &$form_state, PaymentMethod $payment_method) {
+  global $user;
+
   $form_state['payment_method'] = $payment_method;
 
   $form['controller'] = array(
@@ -302,6 +304,14 @@ function payment_form_payment_method(array $form, array &$form_state, PaymentMet
     '#default_value' => $payment_method->title_generic,
     '#maxlength' => 255,
   );
+  $form['owner'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Owner'),
+    '#default_value' => $payment_method->uid ? user_load($payment_method->uid)->name : $user->name,
+    '#maxlength' => 255,
+    '#autocomplete_path' => 'user/autocomplete', 
+    '#required' => TRUE,
+  );
   $form['controller_form'] = payment_method_controller_form_callback($form, $form_state, $payment_method->controller, 'payment_method', 'build');
   $form['actions'] = array(
     '#type' => 'actions',
@@ -326,6 +336,12 @@ function payment_form_payment_method(array $form, array &$form_state, PaymentMet
  * Implements form validate callback for payment_form_payment_method().
  */
 function payment_form_payment_method_validate(array $form, array &$form_state) {
+  $values = $form_state['values'];
+  if (!($account = user_load_by_name($values['owner']))) {
+    form_set_error('owner', t('The username %name does not exist.', array(
+      '%name' => $values['owner'],
+    )));
+  }
   payment_method_controller_form_callback($form, $form_state, $form_state['payment_method']->controller, 'payment_method', 'validate');
 }
 
@@ -340,6 +356,7 @@ function payment_form_payment_method_submit(array $form, array &$form_state) {
   $payment_method->title_specific = $values['title_specific'];
   // The generic title defaults to the specific one.
   $payment_method->title_generic = $values['title_generic'] ? $values['title_generic'] : $values['title_specific'];
+  $payment_method->uid = user_load_by_name($values['owner'])->uid;
   entity_save('payment_method', $payment_method);
   $form_state['redirect'] = 'admin/config/services/payment/method';
   drupal_set_message(t('Payment method %title has been saved.', array(
