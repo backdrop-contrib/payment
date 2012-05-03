@@ -239,6 +239,12 @@ function payment_views_data_alter(&$data) {
       'handler' => 'PaymentViewsHandlerFieldPaymentMethodOperations',
     ),
   );
+  $data['payment_method']['uid']['relationship'] = array(
+    'title' => t('User'),
+    'base' => 'users',
+    'handler' => 'views_handler_relationship',
+    'label' => t('User'),
+  );
 
   // Payment status items. This is not an alteration, but implementing
   // hook_views_data() prevents Entity API from exposing our entities to Views
