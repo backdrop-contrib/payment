@@ -63,16 +63,11 @@ function payment_page_payment_view(Payment $payment) {
  */
 function payment_form(array $form, array &$form_state, Payment $payment) {
   $form_state['payment'] = $payment;
-  $options = array();
-  foreach (payment_statuses_info() as $status_info) {
-    $options[$status_info->status] = $status_info->title;
-  }
-  asort($options);
   $form['status'] = array(
     '#access' => !empty($payment->pid),
     '#type' => 'select',
     '#title' => t('Status'),
-    '#options' => $options,
+    '#options' => payment_status_options(),
     '#default_value' => $payment->getStatus()->status,
     '#required' => TRUE,
     '#description' => t('Updating a payment status manually can disrupt automatic payment processing.') . (user_access('payment.status.view') ? ' ' . l(t('Payment status overview.'), 'admin/config/services/payment/status') : ''),
@@ -393,25 +388,34 @@ function payment_form_payment_method_delete_submit(array $form, array &$form_sta
  * @return string
  */
 function payment_page_status() {
-  $parents = $children = array();
-  $statuses_info = payment_statuses_info();
-  uasort($statuses_info, 'payment_payment_status_sort_title');
-  foreach ($statuses_info as $status_info) {
-    foreach ($status_info->parents as $parent_status) {
-      $children[$parent_status][] = $status_info->status;
-    }
-    if (!$status_info->parents) {
-      $parents[] = $status_info->status;
-    }
-  }
-  $rows = array();
-  _payment_page_status_rows($parents, $children, $rows);
-  $header = array(t('Title'));
-
   return theme('table', array(
-    'header' => $header,
-    'rows' => $rows,
+    'header' => array(t('Title'), t('Description')),
+    'rows' => _payment_page_status_level(payment_status_hierarchy(), 0),
   ));
+}
+
+/**
+ * Helper function for payment_page_status() to build table rows.
+ *
+ * @param array $hierarchy
+ *   A payment status hierarchy as returned by payment_status_hierarchy().
+ * @param integer $depth
+ *   The depth of $hierarchy's top-level items as seen from the original
+ *   hierarchy's root (this function is recursive), starting with 0.
+ *
+ * @return array
+ */
+function _payment_page_status_level(array $hierarchy, $depth) {
+  $rows = array();
+  foreach ($hierarchy as $status => $children) {
+    $status_info = payment_status_info($status);
+    $rows[] = array(theme('indentation', array(
+    'size' => $depth,
+  )) . $status_info->title, $status_info->description);
+    $rows = array_merge($rows, _payment_page_status_level($children, $depth + 1));
+  }
+
+  return $rows;
 }
 
 /**
@@ -438,22 +442,6 @@ function _payment_page_status_rows(array $statuses, array $children, array &$row
       _payment_page_status_rows($children[$status], $children, $rows, $depth + 1);
     }
   }
-}
-
-/**
- * Implements theme callback: a payment status for the overview page.
- *
- * @param array $variables
- *   An associative array containing:
- *   - status_info: the PaymentStatusInfo object to theme.
- *   - depth: the status' depth within the status hierarchy.
- */
-function theme_payment_page_status_row(array $variables) {
-  $status_info = payment_status_info($variables['status']);
-
-  return theme('indentation', array(
-    'size' => $variables['depth'],
-  )) . '<div style="float: left;">' . $status_info->title . '<div class="description">' . $status_info->description . '</div></div>';
 }
 
 /**
@@ -949,4 +937,85 @@ function payment_method_controller_form_callback(array $form, array &$form_state
   if (function_exists($function)) {
     return $function($form, $form_state);
   }
+}
+
+/**
+ * Returns a hierarchical representation of payment statuses.
+ *
+ * @return array
+ *   A possibly infinitely nested associative array. Keys are statuses and
+ *   values are arrays of similar structure as this function's return value.
+ */
+function payment_status_hierarchy() {
+  static $hierarchy = NULL;
+
+  if (is_null($hierarchy)) {
+    $parents = $children = array();
+    $statuses_info = payment_statuses_info();
+    uasort($statuses_info, 'payment_payment_status_sort_title');
+    foreach ($statuses_info as $status_info) {
+      $children[$status_info->parent][] = $status_info->status;
+      if (!$status_info->parent) {
+        $parents[] = $status_info->status;
+      }
+    }
+    $hierarchy = _payment_status_hierarchy_level($parents, $children);
+  }
+
+  return $hierarchy;
+}
+
+/**
+ * Helper function for payment_status_hierarchy().
+ *
+ * @param array $parents
+ *   An array with payment statuses that are part of the same hierarchy level.
+ * @param array $children
+ *   Keys are payment statuses. Values are arrays with those statuses' child
+ *   statuses.
+ *
+ * @return array
+ *   The return value is identical to that of payment_status_hierarchy().
+ */
+function _payment_status_hierarchy_level(array $statuses, array $children) {
+  $hierarchy = array();
+  foreach ($statuses as $status) {
+    $hierarchy[$status] = isset($children[$status]) ? _payment_status_hierarchy_level($children[$status], $children) : array();
+  }
+
+  return $hierarchy;
+}
+
+/**
+ * Return payment statuses for use in form elements.
+ *
+ * @return array
+ *   Keys are payment statuses. Values are status titles, prefixed with dashes
+ *   to show hierarchy.
+ */
+function payment_status_options() {
+  return _payment_status_options_level(payment_status_hierarchy(), 0);
+}
+
+/**
+ * Helper function for payment_status_options().
+ *
+ * @param array $hierarchy
+ *   A payment status hierarchy as returned by payment_status_hierarchy().
+ * @param integer $depth
+ *   The depth of $hierarchy's top-level items as seen from the original
+ *   hierarchy's root (this function is recursive), starting with 0.
+ *
+ * @return array
+ *   The return value is identical to that of payment_status_options().
+ */
+function _payment_status_options_level(array $hierarchy, $depth) {
+  $options = array();
+  $prefix = $depth ? str_repeat('-', $depth) . ' ' : '';
+  foreach ($hierarchy as $status => $children) {
+    $options[$status] = $prefix . payment_status_info($status)->title;
+    $options += _payment_status_options_level($children, $depth + 1);
+  }
+
+  return $options;
 }

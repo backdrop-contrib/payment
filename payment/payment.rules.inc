@@ -54,7 +54,7 @@ function payment_rules_action_info() {
       'status' => array(
         'type' => 'text',
         'label' => t('Status'),
-        'options list' => 'payment_rules_options_list_payment_set_status',
+        'options list' => 'payment_status_options',
       ),
     ),
     'group' => t('Payment'),
@@ -133,7 +133,7 @@ function payment_rules_condition_info() {
       'payment_statuses' => array(
         'type' => 'list<text>',
         'label' => t('Payment status'),
-        'options list' => 'payment_rules_options_list_payment_statuses',
+        'options list' => 'payment_status_options',
         'restriction' => 'input',
       ),
     ),
@@ -151,7 +151,7 @@ function payment_rules_condition_info() {
       'payment_statuses' => array(
         'type' => 'list<text>',
         'label' => t('Payment status is or is derived from'),
-        'options list' => 'payment_rules_options_list_payment_status_parents',
+        'options list' => 'payment_status_options',
         'restriction' => 'input',
       ),
     ),
@@ -229,19 +229,6 @@ function payment_rules_condition_payment_status_is(Payment $payment, array $paym
 }
 
 /**
- * Implements Rules options list: list all payment statuses.
- */
-function payment_rules_options_list_payment_statuses() {
-  $options = array();
-  foreach (payment_statuses_info() as $status_info) {
-    $options[$status_info->status] = $status_info->title;
-  }
-  asort($options);
-
-  return $options;
-}
-
-/**
  * Implements Rules condition callback: check whether a payment's status
  * is a child of any of the selected statuses.
  *
@@ -259,24 +246,6 @@ function payment_rules_condition_payment_status_has_ancestor(Payment $payment, a
     }
   }
   return FALSE;
-}
-
-/**
- * Implements Rules options list: list all parent statuses.
- */
-function payment_rules_options_list_payment_status_parents() {
-  $statuses_info = payment_statuses_info();
-  $parents = array();
-  foreach ($statuses_info as $status_info) {
-    $parents[] = $status_info->parent;
-  }
-  $options = array();
-  foreach (array_unique(array_filter($parents)) as $status) {
-    $options[$status] = $statuses_info[$status]->title;
-  }
-  asort($options);
-
-  return $options;
 }
 
 /**
@@ -346,20 +315,6 @@ function payment_rules_options_list_payment_line_item_name() {
  */
 function payment_rules_action_payment_line_item_delete(Payment $payment, $name) {
   unset($payment->line_items[$name]);
-}
-
-/**
- * Implements Rules options list callback for
- * payment_rules_payment_status_change.
- */
-function payment_rules_options_list_payment_set_status() {
-  $options = array();
-  foreach (payment_statuses_info() as $status_info) {
-    $options[$status_info->status] = $status_info->title;
-  }
-  asort($options);
-
-  return $options;
 }
 
 /**

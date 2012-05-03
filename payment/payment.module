@@ -350,20 +350,6 @@ function payment_hook_info() {
 }
 
 /**
- * Implements hook_theme().
- */
-function payment_theme() {
-  $theme['payment_page_status_row'] = array(
-    'arguments' => array(
-      'status' => '',
-      'depth' => 0,
-    ),
-  );
-
-  return $theme;
-}
-
-/**
  * Implements hook_field_extra_fields().
  */
 function payment_field_extra_fields() {
