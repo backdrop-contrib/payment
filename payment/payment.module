@@ -441,6 +441,12 @@ function payment_entity_info() {
  */
 function payment_entity_property_info() {
   // Payment.
+  $properties['payment']['properties']['caller'] = array(
+    'description' => t("The machine-readable name of the 'context' that created the payment."),
+    'label' => t('Caller'),
+    'required' => TRUE,
+    'schema field' => 'caller',
+  );
   $properties['payment']['properties']['currency_code'] = array(
     'description' => t('A three-letter ISO 4217 currency code.'),
     'label' => t('Currency code'),

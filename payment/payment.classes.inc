@@ -25,6 +25,14 @@ class PaymentCommon {
 class Payment extends PaymentCommon {
 
   /**
+   * The machine name of the 'context' that created this Payment, such as the
+   * webshop.
+   *
+   * @var string
+   */
+  public $caller = '';
+
+  /**
    * Information about this payment that is specific to the 'context' that
    * created it, such as the webshop.
    *

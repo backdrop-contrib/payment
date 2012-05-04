@@ -58,6 +58,10 @@ function payment_schema() {
   );
   $schema['payment'] = array(
     'fields' => array(
+      'caller' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),
       'caller_data' => array(
         'type' => 'blob',
         'size' => 'big',
