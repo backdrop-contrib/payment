@@ -572,7 +572,7 @@ function payment_form_process_amount(array $element) {
   $element['#type'] = 'textfield';
   $element['#field_prefix'] = $element['#currency_code'];
   $description = NULL;
-  if ($element['#minimum_amount'] > 0) {
+  if ($element['#minimum_amount'] !== FALSE && $element['#minimum_amount'] > 0) {
     $description = t('The minimum amount is !amount.', array(
       '!amount' => payment_amount_human_readable($element['#minimum_amount'], $element['#currency_code']),
     ));
@@ -596,23 +596,25 @@ function payment_form_process_amount_validate(array $element, array &$form_state
     return;
   }
 
-  // Count the number of decimal marks.
-  $count_fragments = count(preg_split('#[.,]#', $value));
-
-  // Check for invalid characters.
-  if (preg_match('#[^\d.,]#', $value)) {
-    form_error($element, t('The amount can only consist of decimals and one decimal mark.'));
+  // Quickly check for invalid characters.
+  if (preg_match('#[^-\d.,]#', $value)) {
+    form_error($element, t('The amount can only consist of a minus sign, decimals and one decimal mark.'));
   }
-  // Check for multiple decimal marks.
-  elseif ($count_fragments > 2) {
-    form_error($element, t('The amount can only have one decimal mark.'));
+  // Do a final extensive check on the allowed format and allowed characters.
+  elseif (!preg_match('/^
+    -?    # One optional minus sign.
+    \d+?  # One or more digits.
+    [.,]? # One period or comma as optional decimal separator.
+    \d*   # Zero or more decimals.
+    $/x', $value)) {
+    form_error($element, t('The amount can only consist of digits, optionally preceded by a minus sign and optionally preceded, separated or succeeded by a decimal separator.'));
   }
   else {
     // Convert the value to a float.
     $amount = (float) $value;
 
     // Confirm the amount lies within the allowed range.
-    if ($amount < $element['#minimum_amount']) {
+    if ($element['#minimum_amount'] !== FALSE && $amount < $element['#minimum_amount']) {
       form_error($element, t('The minimum amount is !amount.', array(
         '!amount' => payment_amount_human_readable($element['#minimum_amount'], $element['#currency_code']),
       )));

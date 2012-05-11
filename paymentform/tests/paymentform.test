@@ -92,18 +92,6 @@ class PaymentformFieldTest extends PaymentformWebTestCase {
     catch (FieldValidationException $e) {
       $this->assertTrue($this->fieldValidationExceptionError($e, 'paymentform_line_item_amount_no_float'), $message);
     }
-    // Test that a negative amount is invalid.
-    $line_item_data = array(
-      'amount' => -1.0,
-    ) + $this->PaymentLineItemData;
-    $message = "The <em>Payment form</em> field's validation throws an error if the amount is negative";
-    try {
-      field_attach_validate('node', $node);
-      $this->assertTrue(FALSE, $message);
-    }
-    catch (FieldValidationException $e) {
-      $this->assertTrue($this->fieldValidationExceptionError($e, 'paymentform_line_item_amount_negative'), $message);
-    }
 
     // Test the machine name, which cannot be empty.
     $line_item_data = array(

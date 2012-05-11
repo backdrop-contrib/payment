@@ -556,8 +556,9 @@ function payment_element_info() {
     '#input' => TRUE,
     '#process' => array('payment_form_process_amount'),
     '#element_validate' => array('payment_form_process_amount_validate'),
-    // The minimum payment amount as a float that needs to be entered.
-    '#minimum_amount' => PAYMENT_MINIMUM_AMOUNT,
+    // The minimum payment amount as a float that needs to be entered. Use
+    // FALSE to omit.
+    '#minimum_amount' => FALSE,
     // The ISO 4217 currency code.
     '#currency_code' => 'XXX',
   );

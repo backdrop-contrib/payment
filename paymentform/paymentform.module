@@ -117,12 +117,6 @@ function paymentform_field_validate($entity_type, $entity, $field, $instance, $l
           'message' => t('The amount is no floating point.'),
         ) + $base;
       }
-      elseif ($line_item_data['amount'] < 0) {
-        $errors[$field['field_name']][$langcode][$delta][] = array(
-          'error' => 'paymentform_line_item_amount_negative',
-          'message' => t('The amount cannot be negative.'),
-        ) + $base;
-      }
 
       // Quantity.
       $base['property'] = 'quantity';

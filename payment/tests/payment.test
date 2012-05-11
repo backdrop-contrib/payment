@@ -659,14 +659,14 @@ class PaymentAmountFormElementTest extends PaymentWebTestCase {
       'amount' => $this->randomName(2),
     );
     $this->drupalPost('paymenttest-form-element-payment-amount', $values, t('Submit'));
-    $this->assertText(t('The amount can only consist of decimals and one decimal mark.'), 'Non-alphanumeric characters that are neither a period nor a comma throw a validation error.');
+    $this->assertText(t('The amount can only consist of a minus sign, decimals and one decimal mark.'), 'Non-numeric characters that are no period, comma, or minus sign throw a validation error.');
 
     // Test multiple decimal marks.
     $values =  array(
       'amount' => '49,.95',
     );
     $this->drupalPost('paymenttest-form-element-payment-amount', $values, t('Submit'));
-    $this->assertText(t('The amount can only have one decimal mark.'), 'Multiple decimal marks throw a validation error.');
+    $this->assertText(t('The amount can only consist of digits, optionally preceded by a minus sign and optionally preceded, separated or succeeded by a decimal separator.'), 'Multiple decimal marks throw a validation error.');
 
     // Test the minimum value.
     $values =  array(
