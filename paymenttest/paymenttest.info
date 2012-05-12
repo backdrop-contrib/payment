@@ -3,5 +3,6 @@ description = "Supports Payment's automated tests."
 core = 7.x
 dependencies[] = payment
 dependencies[] = views
+dependencies[] = xtools
 package = Payment
 hidden = TRUE
