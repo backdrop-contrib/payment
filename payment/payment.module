@@ -234,6 +234,11 @@ function payment_menu() {
       'access callback' => 'payment_method_access',
       'access arguments' => array('view'),
     ) + $base;
+    $items['user/%user/payment'] = array(
+      'title' => 'Payments',
+      'access callback' => 'payment_access',
+      'access arguments' => array('view'),
+    ) + $base;
   }
 
   return $items;
