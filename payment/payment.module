@@ -227,7 +227,8 @@ function payment_menu() {
   if (!module_exists('views')) {
     $items['admin/content/payment'] = array(
       'title' => 'Payments',
-      'access arguments' => array('payment.view.any'),
+      'access callback' => 'payment_access',
+      'access arguments' => array('view'),
     ) + $base;
     $items['admin/config/services/payment/method'] = array(
       'title' => 'Payment methods',
@@ -236,8 +237,7 @@ function payment_menu() {
     ) + $base;
     $items['user/%user/payment'] = array(
       'title' => 'Payments',
-      'access callback' => 'payment_access',
-      'access arguments' => array('view'),
+      'access arguments' => array('payment.view.own'),
     ) + $base;
   }
 
