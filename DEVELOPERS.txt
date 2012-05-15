@@ -55,6 +55,5 @@ all.
 TESTING
 -------
 
-If you need to test a module's info hook implementations, extend the class
-PaymentInfoHookTest and override the methods getInfo() and modules() to suit
-your needs. See the class PaymentMethodBasicInfoHookTest.
+Use PaymentWebTestCase::PaymentAssertPaymentHookReturnValue() to test a
+particular module's implementations of Payment hooks.
