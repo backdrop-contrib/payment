@@ -1,0 +1,8 @@
+name = Payment tests
+description = "Supports Payment Reference's automated tests."
+core = 7.x
+dependencies[] = paymentreference
+dependencies[] = xtools
+package = Payment
+hidden = TRUE
+files[] = tests/PaymentReferenceCoreHookReturnValueWebTestCase.test

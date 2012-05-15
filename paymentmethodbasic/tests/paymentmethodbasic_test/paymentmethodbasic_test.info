@@ -1,0 +1,8 @@
+name = Basic Payment Method tests
+description = "Supports Basic Payment Method's automated tests."
+core = 7.x
+dependencies[] = payment
+dependencies[] = xtools
+package = Payment
+hidden = TRUE
+files[] = tests/PaymentMethodBasicPaymentHookReturnValueWebTestCase.test

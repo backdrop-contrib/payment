@@ -599,8 +599,9 @@ class PaymentMethodUnavailable extends PaymentMethod {
   public $enabled = FALSE;
   public $name = 'payment_method_unavailable';
   public $module = 'payment';
-  // Use a negative ID, so it will not pass validation.
-  public $pmid = -1;
+  // Use 0, so the payment method can be used for payments, but will never
+  // collide with existing payment methods.
+  public $pmid = 0;
 
   function __construct() {
     $this->title_specific = $this->title_generic = t('Unavailable');

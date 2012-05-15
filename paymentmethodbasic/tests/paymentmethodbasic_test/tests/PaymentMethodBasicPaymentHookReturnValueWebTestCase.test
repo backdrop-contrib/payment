@@ -1,0 +1,20 @@
+<?php
+
+class PaymentMethodBasicPaymentHookReturnValueWebTestCase extends PaymentWebTestCase {
+
+  static function getInfo() {
+    return array(
+      'name' => "Basic Payment Method's implementations of Payment info hooks",
+      'group' => 'Basic Payment Method',
+      'dependencies' => array('payment', 'paymentmethodbasic', 'xtools'),
+    );
+  }
+
+  function setUp() {
+    parent::setUp(array('payment', 'paymentmethodbasic', 'xtools'));
+  }
+
+  function testCoreHookReturnValue() {
+    $this->PaymentAssertPaymentHookReturnValue('paymentmethodbasic');
+  }
+}

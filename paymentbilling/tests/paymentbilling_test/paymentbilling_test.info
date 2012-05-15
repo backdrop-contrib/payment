@@ -1,0 +1,8 @@
+name = Billing tests
+description = "Supports Billing's automated tests."
+core = 7.x
+dependencies[] = paymentbilling
+dependencies[] = xtools
+package = Payment
+hidden = TRUE
+files[] = tests/PaymentBillingCoreHookReturnValueWebTestCase.test

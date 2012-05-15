@@ -1,0 +1,13 @@
+name = Payment tests
+description = "Supports Payment's automated tests."
+core = 7.x
+dependencies[] = payment
+dependencies[] = xtools
+package = Payment
+hidden = TRUE
+files[] = tests/PaymentCoreHookReturnValueWebTestCase.test
+files[] = tests/PaymentEntityPermissionWebTestCase.test
+files[] = tests/PaymentMenuRouterItemPermissionWebTestCase.test
+files[] = tests/PaymentMethodEntityPermissionWebTestCase.test
+files[] = tests/PaymentMethodMenuRouterItemPermissionWebTestCase.test
+files[] = tests/PaymentPaymentHookReturnValueWebTestCase.test
