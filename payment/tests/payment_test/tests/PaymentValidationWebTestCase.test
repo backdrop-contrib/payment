@@ -1,0 +1,130 @@
+<?php
+
+/**
+ * Test payment validation.
+ */
+class PaymentValidationWebTestCase extends PaymentWebTestCase {
+
+  static function getInfo() {
+    return array(
+      'name' => 'Payment validation',
+      'group' => 'Payment',
+    );
+  }
+
+  /**
+   * Implements DrupalWebTestCase::setUp().
+   */
+  function setUp() {
+    parent::setUp('payment', 'paymentmethodbasic', 'payment_test');
+
+    // Set up a valid payment.
+    $this->payment_method = new PaymentMethod(array(
+      'controller' => payment_method_controller_load('PaymentMethodBasicController'),
+    ));
+    $this->payment_method->controller->currencies = array(
+      'XXX' => array(
+        'minimum' => 10,
+        'maximum' => 20,
+      ),
+    );
+    $this->payment = new Payment(array(
+      'currency_code' => 'XXX',
+      'finish_callback' => 'payment_test_finish_callback',
+      'method' => $this->payment_method,
+    ));
+    $this->payment->setLineItem(new PaymentLineItem(array(
+      'name' => 'payment_test',
+      'amount' => 15,
+    )));
+  }
+
+  /**
+   * Test payment validation.
+   */
+  function testPaymentValidation() {
+    // Test that a valid payment validates.
+    try {
+      $this->payment_method->validate($this->payment);
+      $valid = TRUE;
+    }
+    catch (PaymentValidationException $e) {
+      $valid = FALSE;
+    }
+    $this->assertTrue($valid, 'PaymentMethodController::validate() does not invalidate a valid payment.');
+
+    // Test that a payment without a currency code set invalidates.
+    $currency = $this->payment->currency_code;
+    $this->payment->currency_code = '';
+    try {
+      $this->payment_method->validate($this->payment);
+      $valid = TRUE;
+    }
+    catch (PaymentValidationMissingCurrencyException $e) {
+      $valid = FALSE;
+    }
+    $this->assertFalse($valid, 'PaymentMethodController::validate() invalidates a payment that has no currency set.');
+    $this->payment->currency_code = $currency;
+
+    // Test that a payment without a (callable) finish callback set
+    // invalidates.
+    $finish_callback = $this->payment->finish_callback;
+    $this->payment->finish_callback = '';
+    try {
+      $this->payment_method->validate($this->payment);
+      $valid = TRUE;
+    }
+    catch (PaymentValidationMissingFinishCallback $e) {
+      $valid = FALSE;
+    }
+    $this->assertFalse($valid, 'PaymentMethodController::validate() invalidates a payment that has no (callable) finish callback set.');
+    $this->payment->finish_callback = $finish_callback;
+
+    // Test that a payment with a total amount below PAYMENT_MINIMUM_AMOUNT
+    // invalidates.
+    $currencies = $this->payment_method->controller->currencies;
+    $this->payment_method->currencies = array();
+    $line_items = $this->payment->line_items;
+    $this->payment->line_items = array();
+    try {
+      $this->payment_method->validate($this->payment);
+      $valid = TRUE;
+    }
+    catch (PaymentValidationAmountBelowMinimumException $e) {
+      $valid = FALSE;
+    }
+    $this->assertFalse($valid, 'PaymentMethodController::validate() invalidates a payment of which the amount is below the default minimum of ' . PAYMENT_MINIMUM_AMOUNT . '.');
+    $this->payment_method->currencies = $currencies;
+    $this->payment->line_items = $line_items;
+
+    // Test that a payment with a total amount below its controller's minimum
+    // invalidates.
+    $line_items = $this->payment->line_items;
+    $this->payment->line_items = array();
+    try {
+      $this->payment_method->validate($this->payment);
+      $valid = TRUE;
+    }
+    catch (PaymentValidationAmountBelowMinimumException $e) {
+      $valid = FALSE;
+    }
+    $this->assertFalse($valid, "PaymentMethodController::validate() invalidates a payment of which the amount is below its controller's supported minimum.");
+    $this->payment->line_items = $line_items;
+
+    // Test that a payment with a total amount above its controller's maximum
+    // invalidates.
+    $this->payment->setLineItem(new PaymentLineItem(array(
+      'name' => 'payment_test2',
+      'amount' => 25,
+    )));
+    try {
+      $this->payment_method->validate($this->payment);
+      $valid = TRUE;
+    }
+    catch (PaymentValidationAmountExceedsMaximumException $e) {
+      $valid = FALSE;
+    }
+    $this->assertFalse($valid, "PaymentMethodController::validate() invalidates a payment of which the amount exceeds its controller's supported maximum.");
+    unset($this->payment->line_items['payment_test2']);
+  }
+}

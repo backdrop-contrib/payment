@@ -1,0 +1,26 @@
+<?php
+
+/**
+ * Test the paymentform field formatter.
+ */
+class PaymentformFieldFormatterWebTestCase extends PaymentformWebTestCase {
+
+  static function getInfo() {
+    return array(
+      'name' => 'Payment form field formatter',
+      'group' => 'Payment Form Field',
+    );
+  }
+
+  /**
+   * Test the paymentform field formatter.
+   */
+  function testPaymentformFieldFormatter() {
+    $node = $this->drupalCreateNode();
+    $node->field_paymentform[LANGUAGE_NONE][0] = $this->PaymentLineItemData;
+    node_save($node);
+    $this->drupalGet('node/' . $node->nid);
+    $elements = $this->xpath('//form[@id="payment-form"]');
+    $this->assertTrue(isset($elements[0]), 'The <em>Payment form</em> field formatter shows a payment form.');
+  }
+}

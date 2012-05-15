@@ -4,4 +4,3 @@ core = 7.x
 dependencies[] = payment
 package = Payment
 files[] = paymentmethodbasic.module
-files[] = tests/paymentmethodbasic.test

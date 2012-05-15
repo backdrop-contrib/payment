@@ -1,0 +1,52 @@
+<?php
+
+/**
+ * Tests action hook and callback invocations.
+ */
+class PaymentActionHookAndCallbackTestWebTestCase extends PaymentWebTestCase {
+
+  static function getInfo() {
+    return array(
+      'name' => 'Action hook and callback invocations',
+      'group' => 'Payment',
+    );
+  }
+
+  function setUp() {
+    parent::setUp('payment_test', 'paymentmethodbasic');
+  }
+
+  /**
+   * Test whether hook_payment_validate() is invoked.
+   */
+  function testActionHooksAndCallbacks() {
+    $payment_method = new PaymentMethod(array(
+      'controller' => payment_method_controller_load('PaymentMethodBasicController'),
+      'controller_data' => array(
+        'status' => PAYMENT_STATUS_SUCCESS,
+      ),
+    ));
+    $payment = new Payment(array(
+      'method' => $payment_method,
+      'finish_callback' => 'payment_test_finish_callback',
+    ));
+    $payment->setLineItem(new PaymentLineItem(array(
+      'name' => 'payment_test',
+      'amount' => 1,
+    )));
+    $validation = FALSE;
+    try {
+      $payment->payment_test_payment_validate = TRUE;
+      $payment_method->validate($payment);
+    }
+    catch (PaymentValidationException $e) {
+      $validation = $e->getMessage() == 'payment_test';
+    }
+    unset($payment->payment_test_payment_validate);
+    $this->assertTrue($validation, 'hook_payment_validate() is invoked when validating a payment before execution.');
+    $payment->execute();
+    $this->assertTrue(isset($payment->payment_test_payment_pre_execute), 'hook_payment_pre_execute() is invoked before executing a payment.');
+    $this->assertTrue(isset($payment->payment_test_payment_status_change), 'hook_payment_status_change() is invoked before executing a payment.');
+    $this->assertTrue(isset($payment->payment_test_finish_callback), 'The finish callback is invoked after executing a payment.');
+  }
+}

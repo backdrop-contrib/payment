@@ -1,0 +1,33 @@
+<?php
+
+/**
+ * Test unavailable payment methods and payment methods controllers.
+ */
+class PaymentUnavailableWebTestCase extends PaymentWebTestCase {
+
+  static function getInfo() {
+    return array(
+      'name' => 'Unavailable payment methods and payment method controllers',
+      'group' => 'Payment',
+    );
+  }
+
+  function setUp() {
+    parent::setUp('payment');
+  }
+
+  /**
+   * Test unavailable payment methods and payment method controllers.
+   */
+  function testUnavailable() {
+    // Set a non-existing controller;
+    $controller = new PaymentMethodController;
+    $controller->name = 'foo';
+    $payment = $this->paymentCreate(1, $this->paymentMethodCreate(1, $controller));
+    $payment = entity_load_single('payment', $payment->pid);
+    $this->assertEqual($payment->method->controller->name, 'PaymentMethodControllerUnavailable', 'When loading a payment method, if its controller unavailable, it is replaced by PaymentMethodControllerUnavailable.');
+    entity_delete('payment_method', $payment->method->pmid);
+    $payment = entity_load_single('payment', $payment->pid);
+    $this->assertTrue(is_a($payment->method, 'PaymentMethodUnavailable'), 'When loading a payment, if its payment method is unavailable, it is replaced by PaymentMethodUnavailable.');
+  }
+}

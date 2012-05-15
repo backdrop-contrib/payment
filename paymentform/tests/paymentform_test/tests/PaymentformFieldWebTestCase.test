@@ -1,69 +1,9 @@
 <?php
 
 /**
- * @file
- * Tests for paymentforms.module.
- */
-
-/**
- * Contains functionality shared by Paymentform test cases.
- */
-class PaymentformWebTestCase extends DrupalWebTestCase {
-
-  function setUp() {
-    // Set up required modules.
-    $modules = func_get_args();
-    if (isset($modules[0]) && is_array($modules[0])) {
-      $modules = $modules[0];
-    }
-    parent::setUp($modules + array('field', 'node', 'paymentform'));
-
-    // Field configuration.
-    $this->field_paymentform = field_create_field(array(
-      'field_name' => 'field_paymentform',
-      'type' => 'paymentform',
-      'cardinality' => 2,
-    ));
-    $this->field_paymentform_instance = field_create_instance(array(
-      'field_name' => 'field_paymentform',
-      'entity_type' => 'node',
-      'bundle' => 'page',
-      'widget' => array(
-        'type' => 'paymentform_line_item',
-      ),
-    ));
-    $this->PaymentLineItemData = array(
-      'amount' => 1.0,
-      'description' => 'foo',
-      'name' => 'bar',
-      'quantity' => 1,
-      'tax_rate' => 0.0,
-    );
-  }
-
-  /**
-   * Checks if a FieldValidationException contains a specified error code.
-   *
-   * @param FieldValidationException $e
-   * @param string $code
-   *
-   * @return boolean
-   */
-  function fieldValidationExceptionError(FieldValidationException $e, $code) {
-    $codes = array();
-    foreach ($e->errors['field_paymentform'][LANGUAGE_NONE][0] as $error) {
-      if ($error['error'] == $code) {
-        return TRUE;
-      }
-    }
-    return FALSE;
-  }
-}
-
-/**
  * Tests the paymentform field.
  */
-class PaymentformFieldTest extends PaymentformWebTestCase {
+class PaymentformFieldWebTestCase extends PaymentformWebTestCase {
 
   static function getInfo() {
     return array(
@@ -167,58 +107,5 @@ class PaymentformFieldTest extends PaymentformWebTestCase {
     $node = node_load($node->nid, NULL, TRUE);
     $diff = array_diff_assoc($node->field_paymentform[LANGUAGE_NONE][0], $this->PaymentLineItemData);
     $this->assertTrue(is_array($diff) && empty($diff), 'Payment line item data is saved and loaded correctly.');
-  }
-}
-
-/**
- * Tests the paymentform_line_item field widget.
- */
-class PaymentformLineItemFieldWidgetTest extends PaymentformWebTestCase {
-
-  static function getInfo() {
-    return array(
-      'name' => 'Payment line item field widget',
-      'group' => 'Payment Form Field',
-    );
-  }
-
-  function setUp() {
-    parent::setUp();
-    $web_user = $this->drupalCreateUser(array('create page content'));
-    $this->drupalLogin($web_user);
-  }
-
-  /**
-   * Test the widget's presence.
-   */
-  function testPaymentformLineItemFieldWidgetInputElements() {
-    $this->drupalGet('node/add/page');
-    $elements = $this->xpath('//div[@id="edit-field-paymentform-und-line-item-container-0"]');
-    $this->assertTrue(isset($elements[0]), 'The <em>Payment line item configuration</em> field widget shows the <em>payment_line_item</em> form element.');
-  }
-}
-
-/**
- * Test the paymentform field formatter.
- */
-class PaymentformFieldFormatterTest extends PaymentformWebTestCase {
-
-  static function getInfo() {
-    return array(
-      'name' => 'Payment form field formatter',
-      'group' => 'Payment Form Field',
-    );
-  }
-
-  /**
-   * Test the paymentform field formatter.
-   */
-  function testPaymentformFieldFormatter() {
-    $node = $this->drupalCreateNode();
-    $node->field_paymentform[LANGUAGE_NONE][0] = $this->PaymentLineItemData;
-    node_save($node);
-    $this->drupalGet('node/' . $node->nid);
-    $elements = $this->xpath('//form[@id="payment-form"]');
-    $this->assertTrue(isset($elements[0]), 'The <em>Payment form</em> field formatter shows a payment form.');
   }
 }
