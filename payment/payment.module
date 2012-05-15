@@ -74,6 +74,7 @@ function payment_menu() {
   // Payment pages.
   $items['payment/%entity_object'] = array(
     'load arguments' => array('payment'),
+    'title' => 'Payment',
     'title callback' => 'payment_title',
     'title arguments' => array(1),
     'page callback' => 'payment_page_payment_view',
@@ -147,6 +148,7 @@ function payment_menu() {
     'page arguments' => array('payment_form_payment_method', 5),
     'access callback' => 'payment_method_access',
     'access arguments' => array('update', 5),
+    'title' => 'Payment method',
     'title callback' => 'payment_method_title',
     'title arguments' => array(5),
     'file' => 'payment.ui.inc',

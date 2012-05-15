@@ -10,6 +10,7 @@
  */
 function paymentreference_menu() {
   $item['paymentreference/finish'] = array(
+    'title' => 'Payment reference finished',
     'load arguments' => array('payment'),
     'page callback' => 'paymentreference_page_finish',
     'access callback' => TRUE,
@@ -17,6 +18,7 @@ function paymentreference_menu() {
   );
   $item['paymentreference/pay/%paymentreference_instance/%/%'] = array(
     'load arguments' => array(3, 4),
+    'title' => 'Add a payment reference',
     'title callback' => 'paymentreference_instance_title',
     'title arguments' => array(2),
     'page callback' => 'paymentreference_page',
