@@ -64,7 +64,7 @@ class PaymentLineItemFormElementWebTestCase extends PaymentWebTestCase {
    * Test an AJAX submission.
    */
   function testAJAXSubmission() {
-    $this->drupalPostAJAX('payment_test-form-element-payment-line-item', array(), 'payment-line-item', NULL, array(), array(), 'payment_test-form-payment-line-item');
+    $this->drupalPostAJAX('payment_test-form-element-payment-line-item', array(), 'payment-line-item', NULL, array(), array(), 'payment-test-form-payment-line-item');
     $this->LineItemElements(1);
     $this->SubmitButton(FALSE);
   }
