@@ -5,4 +5,4 @@ dependencies[] = paymentbilling
 dependencies[] = xtools
 package = Payment
 hidden = TRUE
-files[] = tests/PaymentBillingCoreHookReturnValueWebTestCase.test
+files[] = tests/PaymentBillingInfoHookReturnValueWebTestCase.test

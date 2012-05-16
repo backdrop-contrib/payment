@@ -1,10 +1,10 @@
 <?php
 
-class PaymentMethodBasicPaymentHookReturnValueWebTestCase extends PaymentWebTestCase {
+class PaymentMethodBasicInfoHookReturnValueWebTestCase extends PaymentWebTestCase {
 
   static function getInfo() {
     return array(
-      'name' => "Basic Payment Method's implementations of Payment info hooks",
+      'name' => "Basic Payment Method's implementations of info hooks",
       'group' => 'Basic Payment Method',
       'dependencies' => array('payment', 'paymentmethodbasic', 'xtools'),
     );
@@ -15,6 +15,6 @@ class PaymentMethodBasicPaymentHookReturnValueWebTestCase extends PaymentWebTest
   }
 
   function testCoreHookReturnValue() {
-    $this->PaymentAssertPaymentHookReturnValue('paymentmethodbasic');
+    $this->XtoolsAssertInfoHookReturnValue('paymentmethodbasic', array('payment'));
   }
 }

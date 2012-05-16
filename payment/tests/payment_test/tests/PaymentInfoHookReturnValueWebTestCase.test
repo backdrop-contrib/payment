@@ -1,10 +1,10 @@
 <?php
 
-class PaymentCoreHookReturnValueWebTestCase extends PaymentWebTestCase {
+class PaymentInfoHookReturnValueWebTestCase extends XtoolsWebTestCase {
 
   static function getInfo() {
     return array(
-      'name' => "Payment's implementations of Drupal core info hooks",
+      'name' => "Payment's implementations of info hooks",
       'group' => 'Payment',
       'dependencies' => array('payment', 'xtools'),
     );
@@ -15,6 +15,6 @@ class PaymentCoreHookReturnValueWebTestCase extends PaymentWebTestCase {
   }
 
   function testCoreHookReturnValue() {
-    $this->XtoolsAssertCoreHookReturnValue('payment');
+    $this->XtoolsAssertInfoHookReturnValue('payment', array('drupal', 'payment', 'xtools'));
   }
 }

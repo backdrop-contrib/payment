@@ -41,3 +41,14 @@ function payment_xtools_blueprint_info() {
 
   return $blueprints;
 }
+
+/**
+ * Implements hook_xtools_info_hook_info().
+ */
+function payment_xtools_info_hook_info() {
+  return array(
+    new XtoolsInfoHookInfo('payment_line_item_info', 'hook_payment_line_item_info'),
+    new XtoolsInfoHookInfo('payment_method_controller_info', 'hook_payment_method_controller_info'),
+    new XtoolsInfoHookInfo('payment_status_info', 'hook_payment_status_info'),
+  );
+}

@@ -5,4 +5,4 @@ dependencies[] = payment
 dependencies[] = xtools
 package = Payment
 hidden = TRUE
-files[] = tests/PaymentMethodBasicPaymentHookReturnValueWebTestCase.test
+files[] = tests/PaymentMethodBasicInfoHookReturnValueWebTestCase.test

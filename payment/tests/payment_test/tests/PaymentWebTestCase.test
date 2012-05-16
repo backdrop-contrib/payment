@@ -55,15 +55,4 @@ class PaymentWebTestCase extends XtoolsWebTestCase {
 
     return $payment_method;
   }
-
-  /**
-   * Test a module's implementations of Payment hooks.
-   */
-  function PaymentAssertPaymentHookReturnValue($module) {
-    $this->XtoolsAssertHookReturnValue($module, array(
-      'payment_line_item_info' => 'hook_payment_line_item_info',
-      'payment_method_controller_info' => 'hook_payment_method_controller_info',
-      'payment_status_info' => 'hook_payment_status_info',
-    ));
-  }
 }

@@ -4,7 +4,7 @@ class PaymentFormCoreHookReturnValueWebTestCase extends PaymentWebTestCase {
 
   static function getInfo() {
     return array(
-      'name' => "Payment Form Field's implementations of Drupal core info hooks",
+      'name' => "Payment Form Field's implementations of info hooks",
       'group' => 'Payment Form Field',
       'dependencies' => array('paymentform', 'xtools'),
     );
@@ -15,6 +15,6 @@ class PaymentFormCoreHookReturnValueWebTestCase extends PaymentWebTestCase {
   }
 
   function testCoreHookReturnValue() {
-    $this->XtoolsAssertCoreHookReturnValue('paymentform');
+    $this->XtoolsAssertInfoHookReturnValue('paymentform', array('drupal'));
   }
 }
