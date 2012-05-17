@@ -27,7 +27,7 @@ function payment_schema() {
       ),
       'name' => array(
         'type' => 'varchar',
-        'length' => '255',
+        'length' => 255,
       ),
       'pid' => array(
         'description' => 'The {payment}.pid this line item belongs to.',
@@ -123,7 +123,7 @@ function payment_schema() {
     'fields' => array(
       'status' => array(
         'type' => 'varchar',
-        'length' => '255',
+        'length' => 255,
       ),
       'created' => array(
         'type' => 'int',
