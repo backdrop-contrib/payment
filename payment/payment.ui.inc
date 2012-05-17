@@ -57,11 +57,13 @@ function payment_page_payment_view(Payment $payment) {
  * @param array $form
  * @param array $form_state
  * @param Payment $payment
+ * @param array $pmids
+ *   The PMIDs of the payment methods the user is allowed to choose from.
  *
  * @return array
  *   A render array.
  */
-function payment_form(array $form, array &$form_state, Payment $payment) {
+function payment_form(array $form, array &$form_state, Payment $payment, array $pmids = array()) {
   $form_state['payment'] = $payment;
   $form['status'] = array(
     '#access' => !empty($payment->pid),
@@ -78,6 +80,7 @@ function payment_form(array $form, array &$form_state, Payment $payment) {
     '#type' => 'payment_method',
     '#title' => t('Payment method'),
     '#required' => TRUE,
+    '#pmids' => $pmids,
   );
   $form['actions'] = array(
     '#type' => 'actions',
