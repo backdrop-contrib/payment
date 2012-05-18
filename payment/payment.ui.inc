@@ -815,37 +815,77 @@ function payment_form_process_method(array $element, array &$form_state, array &
   $payment = $form_state['payment'];
 
   $element['#tree'] = TRUE;
+
+  // Get available payment methods.
   $pmid_options = array();
   $pmids = empty($element['#pmids']) ? FALSE : $element['#pmids'];
   foreach ($payment->availablePaymentMethods(entity_load('payment_method', $pmids)) as $payment_method) {
     // Cast the PMID to a string or the AJAX callback won't work.
     $pmid_options[(string) $payment_method->pmid] = $payment_method->title_generic;
   }
-  $form['#prefix'] = '<div id="payment-method-wrapper">';
-  $form['#suffix'] = '</div>';
-  $element['pmid'] = array(
-    '#type' => 'select',
-    '#title' => isset($element['#title']) ? $element['#title'] : NULL,
-    '#options' => $pmid_options,
-    '#default_value' => isset($payment->method) ? $payment->method->pmid : NULL,
-    '#empty_value' => 'select',
-    '#required' => $element['#required'],
-    '#ajax' => array(
-      'callback' => 'payment_form_process_method_submit_ajax_callback',
-      'effect' => 'fade',
-      'event' => 'change',
-      'wrapper' => 'payment-method-wrapper',
-    ),
-    // Disable the selector for non-JS pages. This means that if we're
-    // executing an AJAX callback, _triggering_element_name is set and we leave
-    // the element enabled.
-    '#disabled' => !empty($payment->method) && !isset($form_state['input']['_triggering_element_name']),
-    '#attached' => array(
-      'js' => array(drupal_get_path('module', 'payment') . '/js/payment.js'),
-    ),
-    '#id' => 'payment-method-pmid',
-  );
-  $element += payment_form_process_method_controller_payment_configuration($element, $form_state);
+
+  // There are no available payment methods.
+  if (count($pmid_options) == 0) {
+    $form['#disabled'] = TRUE;
+    $element['pmid_title'] = array(
+      '#type' => 'item',
+      '#title' => isset($element['#title']) ? $element['#title'] : NULL,
+      '#markup' => t('There are no available payment methods.'),
+    );
+  }
+  // There is one available payment method.
+  elseif (count($pmid_options) == 1) {
+    $pmids = array_keys($pmid_options);
+    $element['pmid'] = array(
+      '#type' => 'value',
+      '#value' => $pmids[0],
+    );
+    $element['pmid_title'] = array(
+      '#type' => 'item',
+      '#title' => isset($element['#title']) ? $element['#title'] : NULL,
+      '#markup' => $pmid_options[$pmids[0]],
+    );
+    $element['payment_method_controller_payment_configuration'] = payment_method_controller_form_callback($element, $form_state, $payment->method->controller, 'payment', 'build');
+  }
+  // There are multiple available payment methods.
+  else {
+    $form['#prefix'] = '<div id="payment-method-wrapper">';
+    $form['#suffix'] = '</div>';
+    $element['pmid'] = array(
+      '#type' => 'select',
+      '#title' => isset($element['#title']) ? $element['#title'] : NULL,
+      '#options' => $pmid_options,
+      '#default_value' => isset($payment->method) ? $payment->method->pmid : NULL,
+      '#empty_value' => 'select',
+      '#required' => $element['#required'],
+      '#ajax' => array(
+        'callback' => 'payment_form_process_method_submit_ajax_callback',
+        'effect' => 'fade',
+        'event' => 'change',
+        'wrapper' => 'payment-method-wrapper',
+      ),
+      // Disable the selector for non-JS pages. This means that if we're
+      // executing an AJAX callback, _triggering_element_name is set and we leave
+      // the element enabled.
+      '#disabled' => !empty($payment->method) && !isset($form_state['input']['_triggering_element_name']),
+      '#attached' => array(
+        'js' => array(drupal_get_path('module', 'payment') . '/js/payment.js'),
+      ),
+      '#id' => 'payment-method-pmid',
+    );
+    if ($payment->method) {
+      $element['change'] = array(
+        '#type' => 'submit',
+        '#value' => t('Change payment method'),
+        '#submit' => array('payment_form_process_method_submit'),
+        '#limit_validation_errors' => array(),
+        '#attributes' => array(
+          'class' => array('js-hide')
+        ),
+      );
+      $element['payment_method_controller_payment_configuration'] = payment_method_controller_form_callback($element, $form_state, $payment->method->controller, 'payment', 'build');
+    }
+  }
 
   // The element itself has no input, only its children, so mark it not
   // required to prevent validation errors.
@@ -877,35 +917,6 @@ function payment_form_process_method_submit(array $form, array &$form_state) {
   unset($pmid);
   $form_state['payment']->method = NULL;
   $form_state['rebuild'] = TRUE;
-}
-
-/**
- * Return a payment's method controller's form elements to configure a payment.
- *
- * @param array $element
- *   The payment_method element that is the parent of the elements to create.
- * @param array $form_state
- *
- * @return array
- */
-function payment_form_process_method_controller_payment_configuration(array $element, array &$form_state) {
-  $payment = $form_state['payment'];
-
-  $elements = array();
-  if ($payment->method) {
-    $elements['change'] = array(
-      '#type' => 'submit',
-      '#value' => t('Change payment method'),
-      '#submit' => array('payment_form_process_method_submit'),
-      '#limit_validation_errors' => array(),
-      '#attributes' => array(
-        'class' => array('js-hide')
-      ),
-    );
-    $elements['payment_method_controller_payment_configuration'] = payment_method_controller_form_callback($element, $form_state, $payment->method->controller, 'payment', 'build');
-  }
-
-  return $elements;
 }
 
 /**

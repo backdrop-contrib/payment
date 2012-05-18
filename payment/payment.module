@@ -555,7 +555,10 @@ function payment_element_info() {
     '#input' => TRUE,
     '#process' => array('payment_form_process_method'),
     '#element_validate' => array('payment_form_process_method_validate'),
-    // An array with IDs of the allowed payment methods. Leave empty to allow all.
+    // An array with IDs of the allowed payment methods. Leave empty to allow
+    // all. If just a single value is given, or if only ony payment method is
+    // valid, the element will not expand to a select list, but will appear to
+    // the user as if there only is one payment method available at all.
     '#pmids' => array(),
   );
   // An element to collect a payment amount and convert it to a float.
