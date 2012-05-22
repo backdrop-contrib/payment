@@ -212,7 +212,7 @@ function payment_menu() {
   $items['admin/config/services/payment/status'] = array(
     'title' => 'Payment statuses',
     'page callback' => 'payment_page_status',
-    'access arguments' => array('payment.status.view'),
+    'access arguments' => array('payment.payment_status.view'),
     'file' => 'payment.ui.inc',
     'weight' => 1,
   );
@@ -239,7 +239,7 @@ function payment_menu() {
     ) + $base;
     $items['user/%user/payment'] = array(
       'title' => 'Payments',
-      'access arguments' => array('payment.view.own'),
+      'access arguments' => array('payment.payment.view.own'),
     ) + $base;
   }
 
@@ -272,55 +272,55 @@ function payment_permission() {
       'title' => t('Administer rule configurations'),
       'restrict access' => TRUE,
     ),
-    'payment.administer' => array(
+    'payment.payment.administer' => array(
       'title' => t('Administer payment configuration'),
     ),
-    'payment.view.any' => array(
+    'payment.payment.view.any' => array(
       'title' => t('View any payment'),
     ),
-    'payment.view.own' => array(
+    'payment.payment.view.own' => array(
       'title' => t('View own payments'),
     ),
-    'payment.update.any' => array(
+    'payment.payment.update.any' => array(
       'title' => t('Update any payment'),
     ),
-    'payment.update.own' => array(
+    'payment.payment.update.own' => array(
       'title' => t('Update own payments'),
     ),
-    'payment.delete.any' => array(
+    'payment.payment.delete.any' => array(
       'title' => t('Delete any payment'),
     ),
-    'payment.delete.own' => array(
+    'payment.payment.delete.own' => array(
       'title' => t('Delete own payments'),
     ),
-    'payment.method.update.any' => array(
+    'payment.payment_method.update.any' => array(
       'title' => t('Update any payment method'),
       'restrict access' => TRUE,
     ),
-    'payment.method.update.own' => array(
+    'payment.payment_method.update.own' => array(
       'title' => t('Update own payment methods'),
     ),
-    'payment.method.delete.any' => array(
+    'payment.payment_method.delete.any' => array(
       'title' => t('Delete any payment method'),
     ),
-    'payment.method.delete.own' => array(
+    'payment.payment_method.delete.own' => array(
       'title' => t('Delete own payment methods'),
     ),
-    'payment.method.view.any' => array(
+    'payment.payment_method.view.any' => array(
       'title' => t('View any payment method'),
       'restrict access' => TRUE,
     ),
-    'payment.method.view.own' => array(
+    'payment.payment_method.view.own' => array(
       'title' => t('View own payment methods'),
     ),
-    'payment.status.view' => array(
+    'payment.payment_status.view' => array(
       'title' => t('View payment status overview'),
     ),
   );
   $controllers = payment_method_controller_load_multiple();
   unset($controllers['PaymentMethodControllerUnavailable']);
   foreach ($controllers as $controller) {
-    $permissions['payment.method.create.' . $controller->name] = array(
+    $permissions['payment.payment_method.create.' . $controller->name] = array(
       'title' => t('Create %controller_title payment methods', array(
         '%controller_title' => $controller->title,
       )),
@@ -416,7 +416,7 @@ function payment_entity_info() {
         'label' => t('Payment'),
         'admin' => array(
           'path' => 'admin/config/services/payment/payment',
-          'access arguments' => array('payment.administer'),
+          'access arguments' => array('payment.payment.administer'),
         ),
       ),
     ),
@@ -836,7 +836,7 @@ function payment_access($operation, Payment $payment = NULL, $account = NULL) {
     case 'view':
     case 'update';
     case 'delete':
-      return user_access('payment.' . $operation . '.any', $account) || $payment && user_access('payment.' . $operation . '.own', $account) && $account->uid = $payment->uid;
+      return user_access('payment.payment.' . $operation . '.any', $account) || $payment && user_access('payment.payment.' . $operation . '.own', $account) && $account->uid = $payment->uid;
   }
   return FALSE;
 }
@@ -896,7 +896,7 @@ function payment_method_access($operation, PaymentMethod $payment_method = NULL,
 
   switch ($operation) {
     case 'create':
-      return $payment_method && user_access('payment.method.create.' . $payment_method->controller->name, $account);
+      return $payment_method && user_access('payment.payment_method.create.' . $payment_method->controller->name, $account);
     case 'enable':
       return $payment_method && $payment_method->enabled == FALSE && payment_method_access('update', $payment_method, $account);
     case 'disable':
@@ -906,7 +906,7 @@ function payment_method_access($operation, PaymentMethod $payment_method = NULL,
     case 'view':
     case 'update':
     case 'delete':
-      return user_access('payment.method.' . $operation . '.any', $account) || $payment_method && user_access('payment.method.' . $operation . '.own', $account) && $payment_method->uid == $account->uid;
+      return user_access('payment.payment_method.' . $operation . '.any', $account) || $payment_method && user_access('payment.payment_method.' . $operation . '.own', $account) && $payment_method->uid == $account->uid;
   }
   return FALSE;
 }

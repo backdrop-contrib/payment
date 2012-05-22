@@ -25,21 +25,21 @@ class PaymentEntityPermissionWebTestCase extends PaymentWebTestCase {
     ));
 
     // Update a payment that belongs to user 1.
-    $this->XtoolsAssertEntityPermission($payment_1, 'Payment', 'payment_access', 'update', array('payment.update.any'));
+    $this->XtoolsAssertEntityPermission($payment_1, 'Payment', 'payment_access', 'update', array('payment.payment.update.any'));
 
     // Update a payment that belongs to user 2.
-    $this->XtoolsAssertEntityPermission($payment_2, 'Payment', 'payment_access', 'update', array('payment.update.own'));
+    $this->XtoolsAssertEntityPermission($payment_2, 'Payment', 'payment_access', 'update', array('payment.payment.update.own'));
 
     // Delete a payment that belongs to user 1.
-    $this->XtoolsAssertEntityPermission($payment_1, 'Payment', 'payment_access', 'delete', array('payment.delete.any'));
+    $this->XtoolsAssertEntityPermission($payment_1, 'Payment', 'payment_access', 'delete', array('payment.payment.delete.any'));
 
     // Delete a payment that belongs to user 2.
-    $this->XtoolsAssertEntityPermission($payment_2, 'Payment', 'payment_access', 'delete', array('payment.delete.own'));
+    $this->XtoolsAssertEntityPermission($payment_2, 'Payment', 'payment_access', 'delete', array('payment.payment.delete.own'));
 
     // View a payment that belongs to user 1.
-    $this->XtoolsAssertEntityPermission($payment_1, 'Payment', 'payment_access', 'view', array('payment.view.any'));
+    $this->XtoolsAssertEntityPermission($payment_1, 'Payment', 'payment_access', 'view', array('payment.payment.view.any'));
 
     // View a payment that belongs to user 2.
-    $this->XtoolsAssertEntityPermission($payment_2, 'Payment', 'payment_access', 'view', array('payment.view.own'));
+    $this->XtoolsAssertEntityPermission($payment_2, 'Payment', 'payment_access', 'view', array('payment.payment.view.own'));
   }
 }

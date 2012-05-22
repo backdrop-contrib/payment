@@ -72,7 +72,7 @@ function payment_form(array $form, array &$form_state, Payment $payment, array $
     '#options' => payment_status_options(),
     '#default_value' => $payment->getStatus()->status,
     '#required' => TRUE,
-    '#description' => t('Updating a payment status manually can disrupt automatic payment processing.') . (user_access('payment.status.view') ? ' ' . l(t('Payment status overview.'), 'admin/config/services/payment/status') : ''),
+    '#description' => t('Updating a payment status manually can disrupt automatic payment processing.') . (user_access('payment.payment_status.view') ? ' ' . l(t('Payment status overview.'), 'admin/config/services/payment/status') : ''),
   );
   $form['line_items'] = payment_line_items($payment);
   $form['payment_method'] = array(
