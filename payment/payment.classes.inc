@@ -392,7 +392,7 @@ class PaymentEntityController extends EntityAPIController {
     // Add all data to the payments.
     foreach ($queried_entities as $payment) {
       $payment->statuses = $status_items[$payment->pid];
-      $payment->line_items = $line_items[$payment->pid];
+      $payment->line_items = isset($line_items[$payment->pid]) ? $line_items[$payment->pid] : array();
       $payment->method = $methods[$payment->pmid];
       unset($payment->pmid);
     }
