@@ -345,8 +345,8 @@ function paymentreference_field_insert($entity_type, $entity, array $field, arra
  * Implements hook_ENTITY_TYPE_ACTION().
  */
 function paymentreference_payment_insert(Payment $payment) {
-  if (!empty($payment->caller_data['paymentreference'])) {
-    paymentreference_insert($payment->caller_data['entity_type'], $payment->caller_data['bundle'], $payment->caller_data['field_name'], $payment->pid);
+  if (!empty($payment->context_data['paymentreference'])) {
+    paymentreference_insert($payment->context_data['entity_type'], $payment->context_data['bundle'], $payment->context_data['field_name'], $payment->pid);
   }
 }
 
@@ -460,7 +460,7 @@ function paymentreference_instance_title(array $instance) {
  */
 function paymentreference_page(array $instance) {
   $payment = new Payment(array(
-    'caller_data' => array(
+    'context_data' => array(
       'paymentreference' => TRUE,
       'entity_type' => $instance['entity_type'],
       'bundle' => $instance['bundle'],

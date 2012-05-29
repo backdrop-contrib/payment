@@ -25,20 +25,20 @@ class PaymentCommon {
 class Payment extends PaymentCommon {
 
   /**
-   * The machine name of the 'context' that created this Payment, such as the
-   * webshop.
+   * The machine name of the context that created this Payment, such as the
+   * webshop module.
    *
    * @var string
    */
-  public $caller = '';
+  public $context = '';
 
   /**
-   * Information about this payment that is specific to the 'context' that
-   * created it, such as the webshop.
+   * Information about this payment that is specific to the context that
+   * created it, such as the webshop module.
    *
    * @var array
    */
-  public $caller_data = array();
+  public $context_data = array();
 
   /**
    * The Unix datetime the payment was created.
@@ -68,7 +68,7 @@ class Payment extends PaymentCommon {
    *   The Payment object.
    * The callback does not need to return anything and is free to redirect the
    * user or display something.
-   * Use Payment::caller_data to pass on arbitrary data to the finish callback.
+   * Use Payment::context_data to pass on arbitrary data to the finish callback.
    *
    * @var string
    */
