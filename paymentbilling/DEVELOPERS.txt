@@ -1,6 +1,0 @@
-API
----
-PaymentMethodController::billing should be an array with any of the values
-"postal_address" or "email_address" to indicate that the controller requires
-payments to have this information in order to process them. Use
-paymentbilling_extract() to get billing information from a Payment.
