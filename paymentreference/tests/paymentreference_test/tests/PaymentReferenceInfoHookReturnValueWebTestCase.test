@@ -15,6 +15,6 @@ class PaymentReferenceInfoHookReturnValueWebTestCase extends PaymentWebTestCase 
   }
 
   function testCoreHookReturnValue() {
-    $this->XtoolsAssertInfoHookReturnValue('paymentreference', array('drupal'));
+    $this->XtoolsAssertInfoHookReturnValue(array('paymentreference', 'paymentreference_test'), array('drupal'));
   }
 }

@@ -15,6 +15,6 @@ class PaymentInfoHookReturnValueWebTestCase extends XtoolsWebTestCase {
   }
 
   function testCoreHookReturnValue() {
-    $this->XtoolsAssertInfoHookReturnValue('payment', array('drupal', 'payment', 'xtools'));
+    $this->XtoolsAssertInfoHookReturnValue(array('payment', 'payment_test'), array('drupal', 'payment', 'xtools'));
   }
 }
