@@ -1,0 +1,20 @@
+<?php
+
+class PaymentCallablesWebTestCase extends XtoolsWebTestCase {
+
+  static function getInfo() {
+    return array(
+      'name' => "Callables",
+      'group' => 'Payment',
+      'dependencies' => array('payment', 'payment_test', 'xtools'),
+    );
+  }
+
+  function setUp() {
+    parent::setUp(array('xtools'));
+  }
+
+  function testCallables() {
+    $this->XtoolsAssertCallables(array('payment', 'payment_test'), array('drupal', 'payment', 'xtools'));
+  }
+}

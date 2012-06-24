@@ -6,6 +6,6 @@ dependencies[] = xtools
 package = Payment
 hidden = TRUE
 files[] = tests/PaymentformFieldWebTestCase.test
-files[] = tests/PaymentformInfoHookReturnValueWebTestCase.test
+files[] = tests/PaymentformCallablesWebTestCase.test
 files[] = tests/PaymentformLineItemFieldWidgetWebTestCase.test
 files[] = tests/PaymentformWebTestCase.test

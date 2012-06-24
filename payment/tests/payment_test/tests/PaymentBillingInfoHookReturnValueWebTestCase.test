@@ -1,20 +1,20 @@
 <?php
 
-class PaymentBillingCoreHookReturnValueWebTestCase extends PaymentWebTestCase {
+class PaymentBillingCallablesWebTestCase extends PaymentWebTestCase {
 
   static function getInfo() {
     return array(
-      'name' => "Billing's implementations of Drupal core info hooks",
+      'name' => "Callables",
       'group' => 'Billing',
       'dependencies' => array('paymentbilling', 'xtools'),
     );
   }
 
   function setUp() {
-    parent::setUp(array('paymentbilling', 'xtools'));
+    parent::setUp(array('xtools'));
   }
 
-  function testCoreHookReturnValue() {
-    $this->XtoolsAssertCoreHookReturnValue('paymentbilling');
+  function testCallables() {
+    $this->XtoolsAssertCallables('paymentbilling');
   }
 }

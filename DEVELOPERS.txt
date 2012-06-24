@@ -55,5 +55,5 @@ all.
 TESTING
 -------
 
-Use XtoolsWebTestCase::XtoolsAssertInfoHookReturnValue($module, array('payment'))
-to test a particular module's implementations of Payment hooks.
+Use XtoolsWebTestCase::XtoolsAssertCallables(array($module), array('payment'))
+to test a particular module's implementations of Payment hooks and callbacks.
