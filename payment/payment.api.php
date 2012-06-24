@@ -30,7 +30,7 @@ function hook_payment_status_info() {
  *
  * @return NULL
  */
-function hook_payment_status_info_alter(&$statuses_info) {
+function hook_payment_status_info_alter(array &$statuses_info) {
   $statuses_info[PAYMENT_STATUS_FAILED]->title = 'Something went wrong!';
 }
 
@@ -59,7 +59,7 @@ function hook_payment_method_controller_info() {
  *   Keys are payment controller aliases, values are actual payment method
  *   controller class names.
  */
-function hook_payment_method_controller_info_alter(&$controllers_info) {
+function hook_payment_method_controller_info_alter(array &$controllers_info) {
   // Remvove a payment method controller.
   unset($controllers_info['FooPaymentMethodController']);
 
@@ -101,7 +101,7 @@ function hook_payment_line_item_info() {
  * @param array $line_items_info
  *   An array with PaymentLineItemInfo objects, keyed by PaymentLineItemInfo::name.
  */
-function hook_payment_line_item_info_alter(&$line_items_info) {
+function hook_payment_line_item_info_alter(array &$line_items_info) {
   // Set a callback for a line item.
   $line_items_info['foo_fee_credit_card']['callback'] = 'foo_payment_line_item_get';
 }

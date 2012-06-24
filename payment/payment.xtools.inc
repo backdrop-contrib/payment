@@ -50,11 +50,87 @@ function payment_xtools_callable_type_info() {
     new XtoolsCallableTypeHook('payment_line_item_info', array(
       'blueprint' => new XtoolsBlueprintInfo('hook_payment_line_item_info'),
     )),
+    new XtoolsCallableTypeHook('payment_line_item_info_alter', array(
+      'signature' => new XtoolsSignatureInfo('hook_payment_line_item_info_alter'),
+    )),
     new XtoolsCallableTypeHook('payment_method_controller_info', array(
       'blueprint' => new XtoolsBlueprintInfo('hook_payment_method_controller_info'),
+    )),
+    new XtoolsCallableTypeHook('payment_method_controller_info_alter', array(
+      'signature' => new XtoolsSignatureInfo('hook_payment_method_controller_info_alter'),
+    )),
+    new XtoolsCallableTypeHook('payment_pre_execute', array(
+      'signature' => new XtoolsSignatureInfo('hook_payment_pre_execute'),
+    )),
+    new XtoolsCallableTypeHook('payment_status_change', array(
+      'signature' => new XtoolsSignatureInfo('hook_payment_status_change'),
     )),
     new XtoolsCallableTypeHook('payment_status_info', array(
       'blueprint' => new XtoolsBlueprintInfo('hook_payment_status_info'),
     )),
+    new XtoolsCallableTypeHook('payment_status_info_alter', array(
+      'signature' => new XtoolsSignatureInfo('hook_payment_status_info_alter'),
+    )),
+    new XtoolsCallableTypeHook('payment_validate', array(
+      'signature' => new XtoolsSignatureInfo('hook_payment_validate'),
+    )),
   );
+}
+
+/**
+ * Implements hook_xtools_signature_info().
+ */
+function payment_xtools_signature_info() {
+  $signatures['hook_payment_line_item_info_alter'] = new XtoolsSignature(array(
+    new XtoolsSignatureParameter(array(
+      'name' => 'line_items_info',
+      'reference' => TRUE,
+      'type' => 'array',
+    )),
+  ));
+  $signatures['hook_payment_method_controller_info_alter'] = new XtoolsSignature(array(
+    new XtoolsSignatureParameter(array(
+      'name' => 'controllers_info',
+      'reference' => TRUE,
+      'type' => 'array',
+    )),
+  ));
+  $signatures['hook_payment_pre_execute'] = new XtoolsSignature(array(
+    new XtoolsSignatureParameter(array(
+      'name' => 'payment',
+      'type' => 'Payment',
+    )),
+  ));
+  $signatures['hook_payment_status_change'] = new XtoolsSignature(array(
+    new XtoolsSignatureParameter(array(
+      'name' => 'payment',
+      'type' => 'Payment',
+    )),
+    new XtoolsSignatureParameter(array(
+      'name' => 'previous_status_item',
+      'type' => 'PaymentStatusItem',
+    )),
+  ));
+  $signatures['hook_payment_status_info_alter'] = new XtoolsSignature(array(
+    new XtoolsSignatureParameter(array(
+      'name' => 'statuses_info',
+      'reference' => TRUE,
+      'type' => 'array',
+    )),
+  ));
+  $signatures['hook_payment_validate'] = new XtoolsSignature(array(
+    new XtoolsSignatureParameter(array(
+      'name' => 'payment',
+      'type' => 'Payment',
+    )),
+    new XtoolsSignatureParameter(array(
+      'name' => 'payment_method',
+      'type' => 'PaymentMethod',
+    )),
+    new XtoolsSignatureParameter(array(
+      'name' => 'strict',
+    )),
+  ));
+
+  return $signatures;
 }
