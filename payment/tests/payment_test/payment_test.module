@@ -11,6 +11,7 @@
 function payment_test_menu() {
   // @see PaymentLineItemFormElementWebTestCase
   $items['payment_test-form-element-payment-line-item'] = array(
+    'title' => 'Test the payment_line_item form element',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('payment_test_form_payment_line_item'),
     'access callback' => TRUE,
@@ -19,6 +20,7 @@ function payment_test_menu() {
   // The second URL path argument is an optional float value specifying a
   // minimum amount.
   $items['payment_test-form-element-payment-amount'] = array(
+    'title' => 'Test the payment_amount form element',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('payment_test_form_payment_amount'),
     'access callback' => TRUE,
