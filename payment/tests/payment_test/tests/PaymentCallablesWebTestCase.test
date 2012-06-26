@@ -6,7 +6,7 @@ class PaymentCallablesWebTestCase extends XtoolsWebTestCase {
     return array(
       'name' => "Callables",
       'group' => 'Payment',
-      'dependencies' => array('payment', 'payment_test', 'xtools'),
+      'dependencies' => array('payment', 'payment_test', 'views', 'xtools'),
     );
   }
 
@@ -15,6 +15,6 @@ class PaymentCallablesWebTestCase extends XtoolsWebTestCase {
   }
 
   function testCallables() {
-    $this->XtoolsAssertCallables(array('payment', 'payment_test'), array('drupal', 'payment', 'xtools'));
+    $this->XtoolsAssertCallables(array('payment', 'payment_test'), array('drupal', 'payment', 'views', 'xtools'));
   }
 }
