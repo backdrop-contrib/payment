@@ -596,7 +596,7 @@ function payment_element_info() {
  */
 function payment_views_api() {
   return array(
-    'api' => 3,
+    'api' => '2',
     'path' => drupal_get_path('module', 'payment') . '/views',
   );
 }
