@@ -845,6 +845,10 @@ function payment_form_process_method(array $element, array &$form_state, array &
       '#title' => isset($element['#title']) ? $element['#title'] : NULL,
       '#markup' => $pmid_options[$pmids[0]],
     );
+    // Default to the only available payment method.
+    if (!$payment->method || $payment->method->pid != $pmids[0]) {
+      $payment->method = entity_load_single('payment_method', $pmids[0]);
+    }
     $element['payment_method_controller_payment_configuration'] = payment_method_controller_form_callback($element, $form_state, $payment->method->controller, 'payment', 'build');
   }
   // There are multiple available payment methods.
