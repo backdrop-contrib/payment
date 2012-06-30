@@ -109,29 +109,60 @@ function payment_view_payments() {
   $handler->display->display_options['relationships']['pid_line_item']['table'] = 'payment';
   $handler->display->display_options['relationships']['pid_line_item']['field'] = 'pid_line_item';
   $handler->display->display_options['relationships']['pid_line_item']['required'] = 0;
-  /* Field: Payment: Last updated date and time */
-  $handler->display->display_options['fields']['updated']['id'] = 'updated';
-  $handler->display->display_options['fields']['updated']['table'] = 'payment';
-  $handler->display->display_options['fields']['updated']['field'] = 'updated';
-  $handler->display->display_options['fields']['updated']['label'] = 'Last updated';
-  $handler->display->display_options['fields']['updated']['alter']['alter_text'] = 0;
-  $handler->display->display_options['fields']['updated']['alter']['make_link'] = 0;
-  $handler->display->display_options['fields']['updated']['alter']['absolute'] = 0;
-  $handler->display->display_options['fields']['updated']['alter']['external'] = 0;
-  $handler->display->display_options['fields']['updated']['alter']['replace_spaces'] = 0;
-  $handler->display->display_options['fields']['updated']['alter']['trim_whitespace'] = 0;
-  $handler->display->display_options['fields']['updated']['alter']['nl2br'] = 0;
-  $handler->display->display_options['fields']['updated']['alter']['word_boundary'] = 1;
-  $handler->display->display_options['fields']['updated']['alter']['ellipsis'] = 1;
-  $handler->display->display_options['fields']['updated']['alter']['strip_tags'] = 0;
-  $handler->display->display_options['fields']['updated']['alter']['trim'] = 0;
-  $handler->display->display_options['fields']['updated']['alter']['html'] = 0;
-  $handler->display->display_options['fields']['updated']['element_label_colon'] = 1;
-  $handler->display->display_options['fields']['updated']['element_default_classes'] = 1;
-  $handler->display->display_options['fields']['updated']['hide_empty'] = 0;
-  $handler->display->display_options['fields']['updated']['empty_zero'] = 0;
-  $handler->display->display_options['fields']['updated']['hide_alter_empty'] = 0;
-  $handler->display->display_options['fields']['updated']['date_format'] = 'long';
+  /* Relationship: Payment: Last status item */
+  $handler->display->display_options['relationships']['psiid_last']['id'] = 'psiid_last';
+  $handler->display->display_options['relationships']['psiid_last']['table'] = 'payment';
+  $handler->display->display_options['relationships']['psiid_last']['field'] = 'psiid_last';
+  $handler->display->display_options['relationships']['psiid_last']['required'] = 1;
+  /* Field: Payment status item: Creation date and time */
+  $handler->display->display_options['fields']['created']['id'] = 'created';
+  $handler->display->display_options['fields']['created']['table'] = 'payment_status_item';
+  $handler->display->display_options['fields']['created']['field'] = 'created';
+  $handler->display->display_options['fields']['created']['relationship'] = 'psiid_last';
+  $handler->display->display_options['fields']['created']['label'] = 'Last update';
+  $handler->display->display_options['fields']['created']['alter']['alter_text'] = 0;
+  $handler->display->display_options['fields']['created']['alter']['make_link'] = 0;
+  $handler->display->display_options['fields']['created']['alter']['absolute'] = 0;
+  $handler->display->display_options['fields']['created']['alter']['external'] = 0;
+  $handler->display->display_options['fields']['created']['alter']['replace_spaces'] = 0;
+  $handler->display->display_options['fields']['created']['alter']['trim_whitespace'] = 0;
+  $handler->display->display_options['fields']['created']['alter']['nl2br'] = 0;
+  $handler->display->display_options['fields']['created']['alter']['word_boundary'] = 1;
+  $handler->display->display_options['fields']['created']['alter']['ellipsis'] = 1;
+  $handler->display->display_options['fields']['created']['alter']['more_link'] = 0;
+  $handler->display->display_options['fields']['created']['alter']['strip_tags'] = 0;
+  $handler->display->display_options['fields']['created']['alter']['trim'] = 0;
+  $handler->display->display_options['fields']['created']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['created']['element_label_colon'] = 1;
+  $handler->display->display_options['fields']['created']['element_default_classes'] = 1;
+  $handler->display->display_options['fields']['created']['hide_empty'] = 0;
+  $handler->display->display_options['fields']['created']['empty_zero'] = 0;
+  $handler->display->display_options['fields']['created']['hide_alter_empty'] = 1;
+  $handler->display->display_options['fields']['created']['date_format'] = 'long';
+  /* Field: Payment status item: Status title */
+  $handler->display->display_options['fields']['title']['id'] = 'title';
+  $handler->display->display_options['fields']['title']['table'] = 'payment_status_item';
+  $handler->display->display_options['fields']['title']['field'] = 'title';
+  $handler->display->display_options['fields']['title']['relationship'] = 'psiid_last';
+  $handler->display->display_options['fields']['title']['label'] = 'Status';
+  $handler->display->display_options['fields']['title']['alter']['alter_text'] = 0;
+  $handler->display->display_options['fields']['title']['alter']['make_link'] = 0;
+  $handler->display->display_options['fields']['title']['alter']['absolute'] = 0;
+  $handler->display->display_options['fields']['title']['alter']['external'] = 0;
+  $handler->display->display_options['fields']['title']['alter']['replace_spaces'] = 0;
+  $handler->display->display_options['fields']['title']['alter']['trim_whitespace'] = 0;
+  $handler->display->display_options['fields']['title']['alter']['nl2br'] = 0;
+  $handler->display->display_options['fields']['title']['alter']['word_boundary'] = 1;
+  $handler->display->display_options['fields']['title']['alter']['ellipsis'] = 1;
+  $handler->display->display_options['fields']['title']['alter']['more_link'] = 0;
+  $handler->display->display_options['fields']['title']['alter']['strip_tags'] = 0;
+  $handler->display->display_options['fields']['title']['alter']['trim'] = 0;
+  $handler->display->display_options['fields']['title']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['title']['element_label_colon'] = 1;
+  $handler->display->display_options['fields']['title']['element_default_classes'] = 1;
+  $handler->display->display_options['fields']['title']['hide_empty'] = 0;
+  $handler->display->display_options['fields']['title']['empty_zero'] = 0;
+  $handler->display->display_options['fields']['title']['hide_alter_empty'] = 1;
   /* Field: Payment: Currency code */
   $handler->display->display_options['fields']['currency_code']['id'] = 'currency_code';
   $handler->display->display_options['fields']['currency_code']['table'] = 'payment';
@@ -226,11 +257,12 @@ function payment_view_payments() {
   $handler->display->display_options['fields']['operations']['hide_empty'] = 0;
   $handler->display->display_options['fields']['operations']['empty_zero'] = 0;
   $handler->display->display_options['fields']['operations']['hide_alter_empty'] = 1;
-  /* Sort criterion: Payment: Last updated date and time */
-  $handler->display->display_options['sorts']['updated']['id'] = 'updated';
-  $handler->display->display_options['sorts']['updated']['table'] = 'payment';
-  $handler->display->display_options['sorts']['updated']['field'] = 'updated';
-  $handler->display->display_options['sorts']['updated']['order'] = 'DESC';
+  /* Sort criterion: Payment status item: Creation date and time */
+  $handler->display->display_options['sorts']['created']['id'] = 'created';
+  $handler->display->display_options['sorts']['created']['table'] = 'payment_status_item';
+  $handler->display->display_options['sorts']['created']['field'] = 'created';
+  $handler->display->display_options['sorts']['created']['relationship'] = 'psiid_last';
+  $handler->display->display_options['sorts']['created']['order'] = 'DESC';
 
   /* Display: Administration page */
   $handler = $view->new_display('page', 'Administration page', 'page_1');
@@ -238,29 +270,55 @@ function payment_view_payments() {
   $handler->display->display_options['access']['type'] = 'perm';
   $handler->display->display_options['access']['perm'] = 'payment.payment.view.any';
   $handler->display->display_options['defaults']['fields'] = FALSE;
-  /* Field: Payment: Last updated date and time */
-  $handler->display->display_options['fields']['updated']['id'] = 'updated';
-  $handler->display->display_options['fields']['updated']['table'] = 'payment';
-  $handler->display->display_options['fields']['updated']['field'] = 'updated';
-  $handler->display->display_options['fields']['updated']['label'] = 'Last updated';
-  $handler->display->display_options['fields']['updated']['alter']['alter_text'] = 0;
-  $handler->display->display_options['fields']['updated']['alter']['make_link'] = 0;
-  $handler->display->display_options['fields']['updated']['alter']['absolute'] = 0;
-  $handler->display->display_options['fields']['updated']['alter']['external'] = 0;
-  $handler->display->display_options['fields']['updated']['alter']['replace_spaces'] = 0;
-  $handler->display->display_options['fields']['updated']['alter']['trim_whitespace'] = 0;
-  $handler->display->display_options['fields']['updated']['alter']['nl2br'] = 0;
-  $handler->display->display_options['fields']['updated']['alter']['word_boundary'] = 1;
-  $handler->display->display_options['fields']['updated']['alter']['ellipsis'] = 1;
-  $handler->display->display_options['fields']['updated']['alter']['strip_tags'] = 0;
-  $handler->display->display_options['fields']['updated']['alter']['trim'] = 0;
-  $handler->display->display_options['fields']['updated']['alter']['html'] = 0;
-  $handler->display->display_options['fields']['updated']['element_label_colon'] = 1;
-  $handler->display->display_options['fields']['updated']['element_default_classes'] = 1;
-  $handler->display->display_options['fields']['updated']['hide_empty'] = 0;
-  $handler->display->display_options['fields']['updated']['empty_zero'] = 0;
-  $handler->display->display_options['fields']['updated']['hide_alter_empty'] = 0;
-  $handler->display->display_options['fields']['updated']['date_format'] = 'long';
+  /* Field: Payment status item: Creation date and time */
+  $handler->display->display_options['fields']['created']['id'] = 'created';
+  $handler->display->display_options['fields']['created']['table'] = 'payment_status_item';
+  $handler->display->display_options['fields']['created']['field'] = 'created';
+  $handler->display->display_options['fields']['created']['relationship'] = 'psiid_last';
+  $handler->display->display_options['fields']['created']['label'] = 'Last update';
+  $handler->display->display_options['fields']['created']['alter']['alter_text'] = 0;
+  $handler->display->display_options['fields']['created']['alter']['make_link'] = 0;
+  $handler->display->display_options['fields']['created']['alter']['absolute'] = 0;
+  $handler->display->display_options['fields']['created']['alter']['external'] = 0;
+  $handler->display->display_options['fields']['created']['alter']['replace_spaces'] = 0;
+  $handler->display->display_options['fields']['created']['alter']['trim_whitespace'] = 0;
+  $handler->display->display_options['fields']['created']['alter']['nl2br'] = 0;
+  $handler->display->display_options['fields']['created']['alter']['word_boundary'] = 1;
+  $handler->display->display_options['fields']['created']['alter']['ellipsis'] = 1;
+  $handler->display->display_options['fields']['created']['alter']['more_link'] = 0;
+  $handler->display->display_options['fields']['created']['alter']['strip_tags'] = 0;
+  $handler->display->display_options['fields']['created']['alter']['trim'] = 0;
+  $handler->display->display_options['fields']['created']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['created']['element_label_colon'] = 1;
+  $handler->display->display_options['fields']['created']['element_default_classes'] = 1;
+  $handler->display->display_options['fields']['created']['hide_empty'] = 0;
+  $handler->display->display_options['fields']['created']['empty_zero'] = 0;
+  $handler->display->display_options['fields']['created']['hide_alter_empty'] = 1;
+  $handler->display->display_options['fields']['created']['date_format'] = 'long';
+  /* Field: Payment status item: Status title */
+  $handler->display->display_options['fields']['title']['id'] = 'title';
+  $handler->display->display_options['fields']['title']['table'] = 'payment_status_item';
+  $handler->display->display_options['fields']['title']['field'] = 'title';
+  $handler->display->display_options['fields']['title']['relationship'] = 'psiid_last';
+  $handler->display->display_options['fields']['title']['label'] = 'Status';
+  $handler->display->display_options['fields']['title']['alter']['alter_text'] = 0;
+  $handler->display->display_options['fields']['title']['alter']['make_link'] = 0;
+  $handler->display->display_options['fields']['title']['alter']['absolute'] = 0;
+  $handler->display->display_options['fields']['title']['alter']['external'] = 0;
+  $handler->display->display_options['fields']['title']['alter']['replace_spaces'] = 0;
+  $handler->display->display_options['fields']['title']['alter']['trim_whitespace'] = 0;
+  $handler->display->display_options['fields']['title']['alter']['nl2br'] = 0;
+  $handler->display->display_options['fields']['title']['alter']['word_boundary'] = 1;
+  $handler->display->display_options['fields']['title']['alter']['ellipsis'] = 1;
+  $handler->display->display_options['fields']['title']['alter']['more_link'] = 0;
+  $handler->display->display_options['fields']['title']['alter']['strip_tags'] = 0;
+  $handler->display->display_options['fields']['title']['alter']['trim'] = 0;
+  $handler->display->display_options['fields']['title']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['title']['element_label_colon'] = 1;
+  $handler->display->display_options['fields']['title']['element_default_classes'] = 1;
+  $handler->display->display_options['fields']['title']['hide_empty'] = 0;
+  $handler->display->display_options['fields']['title']['empty_zero'] = 0;
+  $handler->display->display_options['fields']['title']['hide_alter_empty'] = 1;
   /* Field: Payment: Currency code */
   $handler->display->display_options['fields']['currency_code']['id'] = 'currency_code';
   $handler->display->display_options['fields']['currency_code']['table'] = 'payment';
@@ -368,29 +426,55 @@ function payment_view_payments() {
   $handler->display->display_options['access']['type'] = 'perm';
   $handler->display->display_options['access']['perm'] = 'payment.payment.view.own';
   $handler->display->display_options['defaults']['fields'] = FALSE;
-  /* Field: Payment: Last updated date and time */
-  $handler->display->display_options['fields']['updated']['id'] = 'updated';
-  $handler->display->display_options['fields']['updated']['table'] = 'payment';
-  $handler->display->display_options['fields']['updated']['field'] = 'updated';
-  $handler->display->display_options['fields']['updated']['label'] = 'Last updated';
-  $handler->display->display_options['fields']['updated']['alter']['alter_text'] = 0;
-  $handler->display->display_options['fields']['updated']['alter']['make_link'] = 0;
-  $handler->display->display_options['fields']['updated']['alter']['absolute'] = 0;
-  $handler->display->display_options['fields']['updated']['alter']['external'] = 0;
-  $handler->display->display_options['fields']['updated']['alter']['replace_spaces'] = 0;
-  $handler->display->display_options['fields']['updated']['alter']['trim_whitespace'] = 0;
-  $handler->display->display_options['fields']['updated']['alter']['nl2br'] = 0;
-  $handler->display->display_options['fields']['updated']['alter']['word_boundary'] = 1;
-  $handler->display->display_options['fields']['updated']['alter']['ellipsis'] = 1;
-  $handler->display->display_options['fields']['updated']['alter']['strip_tags'] = 0;
-  $handler->display->display_options['fields']['updated']['alter']['trim'] = 0;
-  $handler->display->display_options['fields']['updated']['alter']['html'] = 0;
-  $handler->display->display_options['fields']['updated']['element_label_colon'] = 1;
-  $handler->display->display_options['fields']['updated']['element_default_classes'] = 1;
-  $handler->display->display_options['fields']['updated']['hide_empty'] = 0;
-  $handler->display->display_options['fields']['updated']['empty_zero'] = 0;
-  $handler->display->display_options['fields']['updated']['hide_alter_empty'] = 0;
-  $handler->display->display_options['fields']['updated']['date_format'] = 'long';
+  /* Field: Payment status item: Creation date and time */
+  $handler->display->display_options['fields']['created']['id'] = 'created';
+  $handler->display->display_options['fields']['created']['table'] = 'payment_status_item';
+  $handler->display->display_options['fields']['created']['field'] = 'created';
+  $handler->display->display_options['fields']['created']['relationship'] = 'psiid_last';
+  $handler->display->display_options['fields']['created']['label'] = 'Last update';
+  $handler->display->display_options['fields']['created']['alter']['alter_text'] = 0;
+  $handler->display->display_options['fields']['created']['alter']['make_link'] = 0;
+  $handler->display->display_options['fields']['created']['alter']['absolute'] = 0;
+  $handler->display->display_options['fields']['created']['alter']['external'] = 0;
+  $handler->display->display_options['fields']['created']['alter']['replace_spaces'] = 0;
+  $handler->display->display_options['fields']['created']['alter']['trim_whitespace'] = 0;
+  $handler->display->display_options['fields']['created']['alter']['nl2br'] = 0;
+  $handler->display->display_options['fields']['created']['alter']['word_boundary'] = 1;
+  $handler->display->display_options['fields']['created']['alter']['ellipsis'] = 1;
+  $handler->display->display_options['fields']['created']['alter']['more_link'] = 0;
+  $handler->display->display_options['fields']['created']['alter']['strip_tags'] = 0;
+  $handler->display->display_options['fields']['created']['alter']['trim'] = 0;
+  $handler->display->display_options['fields']['created']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['created']['element_label_colon'] = 1;
+  $handler->display->display_options['fields']['created']['element_default_classes'] = 1;
+  $handler->display->display_options['fields']['created']['hide_empty'] = 0;
+  $handler->display->display_options['fields']['created']['empty_zero'] = 0;
+  $handler->display->display_options['fields']['created']['hide_alter_empty'] = 1;
+  $handler->display->display_options['fields']['created']['date_format'] = 'long';
+  /* Field: Payment status item: Status title */
+  $handler->display->display_options['fields']['title']['id'] = 'title';
+  $handler->display->display_options['fields']['title']['table'] = 'payment_status_item';
+  $handler->display->display_options['fields']['title']['field'] = 'title';
+  $handler->display->display_options['fields']['title']['relationship'] = 'psiid_last';
+  $handler->display->display_options['fields']['title']['label'] = 'Status';
+  $handler->display->display_options['fields']['title']['alter']['alter_text'] = 0;
+  $handler->display->display_options['fields']['title']['alter']['make_link'] = 0;
+  $handler->display->display_options['fields']['title']['alter']['absolute'] = 0;
+  $handler->display->display_options['fields']['title']['alter']['external'] = 0;
+  $handler->display->display_options['fields']['title']['alter']['replace_spaces'] = 0;
+  $handler->display->display_options['fields']['title']['alter']['trim_whitespace'] = 0;
+  $handler->display->display_options['fields']['title']['alter']['nl2br'] = 0;
+  $handler->display->display_options['fields']['title']['alter']['word_boundary'] = 1;
+  $handler->display->display_options['fields']['title']['alter']['ellipsis'] = 1;
+  $handler->display->display_options['fields']['title']['alter']['more_link'] = 0;
+  $handler->display->display_options['fields']['title']['alter']['strip_tags'] = 0;
+  $handler->display->display_options['fields']['title']['alter']['trim'] = 0;
+  $handler->display->display_options['fields']['title']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['title']['element_label_colon'] = 1;
+  $handler->display->display_options['fields']['title']['element_default_classes'] = 1;
+  $handler->display->display_options['fields']['title']['hide_empty'] = 0;
+  $handler->display->display_options['fields']['title']['empty_zero'] = 0;
+  $handler->display->display_options['fields']['title']['hide_alter_empty'] = 1;
   /* Field: Payment: Currency code */
   $handler->display->display_options['fields']['currency_code']['id'] = 'currency_code';
   $handler->display->display_options['fields']['currency_code']['table'] = 'payment';
@@ -519,7 +603,9 @@ function payment_view_payments() {
     t('There are no payments yet.'),
     t('Payment method'),
     t('Line items'),
-    t('Last updated'),
+    t('Last status item'),
+    t('Last update'),
+    t('Status'),
     t('Broken handler payment.amount'),
     t('[currency_code] [amount]'),
     t('Title (generic)'),

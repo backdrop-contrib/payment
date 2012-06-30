@@ -460,12 +460,6 @@ function payment_entity_property_info() {
     'required' => TRUE,
     'schema field' => 'currency_code',
   );
-  $properties['payment']['properties']['created'] = array(
-    'label' => t('Creation date and time'),
-    'required' => TRUE,
-    'schema field' => 'created',
-    'type' => 'date',
-  );
   $properties['payment']['properties']['description'] = array(
     'label' => t('Description'),
     'schema field' => 'description',
@@ -496,17 +490,20 @@ function payment_entity_property_info() {
     'schema field' => 'pmid',
     'type' => 'integer',
   );
+  // The psiid_last property is actually required, but not marked as such,
+  // because a payment and its last payment status are interdependent through
+  // their pid and psiid/psiid_last properties.
+  $properties['payment']['properties']['psiid_last'] = array(
+    'description' => t("The ID of the payment's most recent status item."),
+    'label' => t('Last status item ID'),
+    'schema field' => 'psiid_last',
+  );
   $properties['payment']['properties']['uid'] = array(
     'label' => 'User ID',
     'description' => t('The ID of the user this payment belongs to.'),
     'required' => TRUE,
     'schema field' => 'uid',
     'type' => 'integer',
-  );
-  $properties['payment']['properties']['updated'] = array(
-    'label' => t('Last updated date and time'),
-    'schema field' => 'updated',
-    'type' => 'date',
   );
 
   // Payment method.

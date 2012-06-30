@@ -41,13 +41,6 @@ class Payment extends PaymentCommon {
   public $context_data = array();
 
   /**
-   * The Unix datetime the payment was created.
-   *
-   * @var integer
-   */
-  public $created = 0;
-
-  /**
    * The ISO 4217 currency code of the payment amount.
    *
    * @var string
@@ -122,13 +115,6 @@ class Payment extends PaymentCommon {
   public $uid = 0;
 
   /**
-   * The Unix datetime the payment was last updated.
-   *
-   * @var integer
-   */
-  public $updated = 0;
-
-  /**
    * Constructor.
    *
    * @param array $properties
@@ -144,9 +130,6 @@ class Payment extends PaymentCommon {
 
     if (!$this->uid) {
       $this->uid = $user->uid;
-    }
-    if (!$this->created) {
-      $this->created = time();
     }
     if (!$this->statuses) {
       // We purposefully avoid Payment::setStatus(), because this is the
@@ -340,11 +323,9 @@ class PaymentEntityController extends EntityAPIController {
     foreach ($entities as $payment) {
       // Cast non-string scalars to their original types, because some backends
       // store/return all variables as strings.
-      $payment->created = (int) $payment->created;
       $payment->expired = (int) $payment->expired;
       $payment->pid = (int) $payment->pid;
       $payment->uid = (int) $payment->uid;
-      $payment->updated = (int) $payment->updated;
     }
 
     return $entities;
@@ -407,7 +388,6 @@ class PaymentEntityController extends EntityAPIController {
     $payment = $entity;
 
     // Save the payment.
-    $payment->updated = time();
     $payment->pmid = $payment->method->pmid;
     $return = parent::save($payment, $transaction);
     unset($payment->pmid);
@@ -432,12 +412,23 @@ class PaymentEntityController extends EntityAPIController {
     }
 
     // Save the payment's status items.
+    $psiid_last_update = FALSE;
     foreach ($payment->statuses as $status_item) {
       // Statuses cannot be edited, so only save the ones without a PSIID set.
       if (!$status_item->psiid) {
         $status_item->pid = $payment->pid;
         drupal_write_record('payment_status_item', $status_item);
+        $psiid_last_update = $status_item->psiid;
       }
+    }
+    if ($psiid_last_update !== FALSE) {
+      $payment->psiid_last = $psiid_last_update;
+      db_update('payment')
+        ->fields(array(
+          'psiid_last' => $psiid_last_update,
+        ))
+        ->condition('pid', $payment->pid)
+        ->execute();
     }
 
     return $return;
