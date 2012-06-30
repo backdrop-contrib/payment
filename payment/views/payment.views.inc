@@ -291,7 +291,7 @@ function payment_views_data_alter(&$data) {
         'handler' => 'views_handler_sort',
       ),
       'filter' => array(
-        'handler' => 'views_handler_filter_string',
+        'handler' => 'PaymentViewsHandlerFilterPaymentStatusItemStatus',
       ),
       'argument' => array(
         'handler' => 'views_handler_argument_string',
