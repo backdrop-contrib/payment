@@ -239,6 +239,7 @@ function payment_views_data_alter(&$data) {
       'handler' => 'views_handler_argument_string',
     ),
   );
+  $data['payment_method']['title_specific']['filter']['handler'] = 'PaymentViewsHandlerFilterPaymentMethodTitle';
   $data['payment_method']['operations'] = array(
     'title' => t('Operations'),
     'real field' => 'pmid',

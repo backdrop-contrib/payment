@@ -169,7 +169,7 @@ function payment_rules_condition_info() {
       'pmids' => array(
         'type' => 'list<text>',
         'label' => t('Payment methods'),
-        'options list' => 'payment_rules_options_list_payment_uses_payment_method',
+        'options list' => 'payment_method_options',
         'restriction' => 'input',
       ),
     ),
@@ -315,19 +315,6 @@ function payment_rules_options_list_payment_line_item_name() {
  */
 function payment_rules_action_payment_line_item_delete(Payment $payment, $name) {
   unset($payment->line_items[$name]);
-}
-
-/**
- * Implements Rules options list callback for
- * payment_rules_condition_payment_uses_payment_method.
- */
-function payment_rules_options_list_payment_uses_payment_method() {
-  $options = array();
-  foreach (entity_load('payment_method') as $payment_method) {
-    $options[$payment_method->pmid] = $payment_method->title_specific;
-  }
-
-  return $options;
 }
 
 /**

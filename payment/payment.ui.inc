@@ -1039,3 +1039,18 @@ function _payment_status_options_level(array $hierarchy, $depth) {
 
   return $options;
 }
+
+/**
+ * Return payment methods for use in form elements.
+ *
+ * @return array
+ *   Keys are payment method IDs. Values are payment method specific titles.
+ */
+function payment_method_options() {
+  $options = array();
+  foreach (entity_load('payment_method') as $payment_method) {
+    $options[$payment_method->pmid] = $payment_method->title_specific;
+  }
+
+  return $options;
+}
