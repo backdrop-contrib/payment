@@ -71,9 +71,6 @@ function payment_schema() {
         'type' => 'varchar',
         'length' => 3,
       ),
-      'expired' => array(
-        'type' => 'int',
-      ),
       'finish_callback' => array(
         'type' => 'varchar',
         'length' => 255,

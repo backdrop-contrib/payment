@@ -48,13 +48,6 @@ class Payment extends PaymentCommon {
   public $currency_code = 'XXX';
 
   /**
-   * The Unix datetime the payment expires.
-   *
-   * @var integer
-   */
-  public $expired = 0;
-
-  /**
    * The name of a function to call when payment execution is completed,
    * regardless of the payment status. It receives one argument:
    * - $payment Payment
@@ -323,7 +316,6 @@ class PaymentEntityController extends EntityAPIController {
     foreach ($entities as $payment) {
       // Cast non-string scalars to their original types, because some backends
       // store/return all variables as strings.
-      $payment->expired = (int) $payment->expired;
       $payment->pid = (int) $payment->pid;
       $payment->uid = (int) $payment->uid;
     }

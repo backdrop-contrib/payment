@@ -464,11 +464,6 @@ function payment_entity_property_info() {
     'label' => t('Description'),
     'schema field' => 'description',
   );
-  $properties['payment']['properties']['expired'] = array(
-    'label' => t('Expiration date and time'),
-    'schema field' => 'expired',
-    'type' => 'date',
-  );
   $properties['payment']['properties']['finish_callback'] = array(
     'description' => t('The name of the function to call once payment processing is completed.'),
     'label' => t('Finish callback'),
