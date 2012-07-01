@@ -164,7 +164,14 @@ function paymentform_field_validate($entity_type, $entity, $field, $instance, $l
  * Implements hook_field_widget_error().
  */
 function paymentform_field_widget_error($element, $error, $form, &$form_state) {
-  form_error($element['line_item']['container_' . $error['delta']][$error['property']], $error['message']);
+  // This is a form-element specific error.
+  if (isset($error['delta']) && isset($error['property'])) {
+    form_error($element['line_item']['container_' . $error['delta']][$error['property']], $error['message']);
+  }
+  // This is a field-wide error.
+  else {
+    form_error($element['line_item'], $error['message']);
+  }
 }
 
 /**
