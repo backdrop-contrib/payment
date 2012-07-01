@@ -414,6 +414,63 @@ function payment_view_payments() {
   $handler->display->display_options['fields']['operations']['hide_empty'] = 0;
   $handler->display->display_options['fields']['operations']['empty_zero'] = 0;
   $handler->display->display_options['fields']['operations']['hide_alter_empty'] = 1;
+  $handler->display->display_options['defaults']['filters'] = FALSE;
+  /* Filter criterion: Payment status item: Creation date and time */
+  $handler->display->display_options['filters']['created']['id'] = 'created';
+  $handler->display->display_options['filters']['created']['table'] = 'payment_status_item';
+  $handler->display->display_options['filters']['created']['field'] = 'created';
+  $handler->display->display_options['filters']['created']['relationship'] = 'psiid_last';
+  $handler->display->display_options['filters']['created']['operator'] = 'between';
+  $handler->display->display_options['filters']['created']['group'] = 1;
+  $handler->display->display_options['filters']['created']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['created']['expose']['operator_id'] = 'created_op';
+  $handler->display->display_options['filters']['created']['expose']['label'] = 'Last updated between';
+  $handler->display->display_options['filters']['created']['expose']['operator'] = 'created_op';
+  $handler->display->display_options['filters']['created']['expose']['identifier'] = 'updated';
+  $handler->display->display_options['filters']['created']['expose']['remember'] = 1;
+  $handler->display->display_options['filters']['created']['expose']['multiple'] = FALSE;
+  /* Filter criterion: Payment status item: Status code */
+  $handler->display->display_options['filters']['status']['id'] = 'status';
+  $handler->display->display_options['filters']['status']['table'] = 'payment_status_item';
+  $handler->display->display_options['filters']['status']['field'] = 'status';
+  $handler->display->display_options['filters']['status']['relationship'] = 'psiid_last';
+  $handler->display->display_options['filters']['status']['group'] = 1;
+  $handler->display->display_options['filters']['status']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['status']['expose']['operator_id'] = 'status_op';
+  $handler->display->display_options['filters']['status']['expose']['label'] = 'Current status';
+  $handler->display->display_options['filters']['status']['expose']['operator'] = 'status_op';
+  $handler->display->display_options['filters']['status']['expose']['identifier'] = 'status';
+  $handler->display->display_options['filters']['status']['expose']['remember'] = 1;
+  $handler->display->display_options['filters']['status']['expose']['multiple'] = 1;
+  $handler->display->display_options['filters']['status']['expose']['reduce'] = 0;
+  /* Filter criterion: Payment line item: Amount */
+  $handler->display->display_options['filters']['amount']['id'] = 'amount';
+  $handler->display->display_options['filters']['amount']['table'] = 'payment_line_item';
+  $handler->display->display_options['filters']['amount']['field'] = 'amount';
+  $handler->display->display_options['filters']['amount']['relationship'] = 'pid_line_item';
+  $handler->display->display_options['filters']['amount']['operator'] = 'between';
+  $handler->display->display_options['filters']['amount']['group'] = 1;
+  $handler->display->display_options['filters']['amount']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['amount']['expose']['operator_id'] = 'amount_op';
+  $handler->display->display_options['filters']['amount']['expose']['label'] = 'Total amount between';
+  $handler->display->display_options['filters']['amount']['expose']['operator'] = 'amount_op';
+  $handler->display->display_options['filters']['amount']['expose']['identifier'] = 'amount';
+  $handler->display->display_options['filters']['amount']['expose']['remember'] = 1;
+  $handler->display->display_options['filters']['amount']['expose']['multiple'] = FALSE;
+  /* Filter criterion: Payment method: Title (specific) */
+  $handler->display->display_options['filters']['title_specific']['id'] = 'title_specific';
+  $handler->display->display_options['filters']['title_specific']['table'] = 'payment_method';
+  $handler->display->display_options['filters']['title_specific']['field'] = 'title_specific';
+  $handler->display->display_options['filters']['title_specific']['relationship'] = 'pmid';
+  $handler->display->display_options['filters']['title_specific']['group'] = 1;
+  $handler->display->display_options['filters']['title_specific']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['title_specific']['expose']['operator_id'] = 'title_specific_op';
+  $handler->display->display_options['filters']['title_specific']['expose']['label'] = 'Payment method';
+  $handler->display->display_options['filters']['title_specific']['expose']['operator'] = 'title_specific_op';
+  $handler->display->display_options['filters']['title_specific']['expose']['identifier'] = 'payment_method';
+  $handler->display->display_options['filters']['title_specific']['expose']['remember'] = 1;
+  $handler->display->display_options['filters']['title_specific']['expose']['multiple'] = 1;
+  $handler->display->display_options['filters']['title_specific']['expose']['reduce'] = 0;
   $handler->display->display_options['path'] = 'admin/content/payment';
   $handler->display->display_options['menu']['type'] = 'normal';
   $handler->display->display_options['menu']['title'] = 'Payments';
@@ -614,6 +671,9 @@ function payment_view_payments() {
     t('Amount'),
     t('[currency_code] [amount_total]'),
     t('Unavailable'),
+    t('Last updated between'),
+    t('Current status'),
+    t('Total amount between'),
     t('User\'s own payments'),
     t('All'),
   );
