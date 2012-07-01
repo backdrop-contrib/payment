@@ -655,6 +655,11 @@ function payment_form_process_line_item(array $element, array &$form_state, arra
     $line_items = array_merge($line_items, array_fill(0, $diff, NULL));
   }
 
+  // Apply cardinality limit.
+  if ($element['#cardinality'] > 0) {
+    $line_items = array_slice($line_items, 0, $element['#cardinality']);
+  }
+
   // Build the line items.
   foreach ($line_items as $delta => $line_item) {
     $required = $delta == 0 && $element['#required'];
