@@ -31,6 +31,18 @@ function paymentreference_menu() {
 }
 
 /**
+ * Implements hook_page_alter().
+ */
+function paymentreference_page_alter(&$page) {
+  if (arg(0) == 'paymentreference') {
+    $skip_regions = array_diff(element_children($page), array('content'));
+    foreach ($skip_regions as $skip_region) {
+      $page[$skip_region]['#access'] = FALSE;
+    }
+  }
+}
+
+/**
  * Implements menu wildcard loader to load a field instance.
  *
  * @param string $entity_type
