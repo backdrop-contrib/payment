@@ -251,14 +251,16 @@ function payment_menu() {
  */
 function payment_menu_alter(&$items) {
   // Make "Manage fields" the default local task.
-  $items['admin/config/services/payment/payment'] = array(
-    'title' => 'Payments',
-    'type' => MENU_NORMAL_ITEM,
-  ) + $items['admin/config/services/payment/payment/fields'];
-  $items['admin/config/services/payment/payment/fields'] = array(
-    'title' => 'Manage fields',
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-  );
+  if (module_exists('field_ui')) {
+    $items['admin/config/services/payment/payment'] = array(
+      'title' => 'Payments',
+      'type' => MENU_NORMAL_ITEM,
+    ) + $items['admin/config/services/payment/payment/fields'];
+    $items['admin/config/services/payment/payment/fields'] = array(
+      'title' => 'Manage fields',
+      'type' => MENU_DEFAULT_LOCAL_TASK,
+    );
+  }
 }
 
 /**
