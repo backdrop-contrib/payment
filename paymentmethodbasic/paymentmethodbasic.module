@@ -121,16 +121,12 @@ class PaymentMethodBasicController extends PaymentMethodController {
 function paymentmethodbasic_payment_method_configuration_form_elements(array $form, array &$form_state) {
   $controller_data = $form_state['payment_method']->controller_data;
 
-  $options = array();
-  foreach (payment_statuses_info() as $status_info) {
-    $options[$status_info->status] = $status_info->title;
-  }
   $elements['status'] = array(
     '#type' => 'select',
     '#title' => t('Final payment status'),
     '#description' => t('The status to give a payment after being processed by this payment method.'),
     '#default_value' => isset($controller_data['status']) ? $controller_data['status'] : PAYMENT_STATUS_SUCCESS,
-    '#options' => $options,
+    '#options' => payment_status_options(),
   );
   $elements['message'] = array(
     '#type' => 'text_format',
