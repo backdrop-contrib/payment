@@ -1099,9 +1099,23 @@ class PaymentLineItemInfo extends PaymentCommon {
 }
 
 /**
+ * A Payment-related exception.
+ */
+class PaymentException extends Exception {
+
+  /**
+   * Implements Exception::__construct().
+   */
+  function __construct($message = '', $code = 0, Exception $previous = NULL) {
+    parent::__construct($message, $code, $previous);
+    payment_debug($this->getMessage(), $this->getFile(), $this->getLine());
+  }
+}
+
+/**
  * Exception thrown if a payment is not valid.
  */
-class PaymentValidationException extends Exception {}
+class PaymentValidationException extends PaymentException {}
 
 /**
  * Exception thrown if a payment's total amount is below the required minimum.

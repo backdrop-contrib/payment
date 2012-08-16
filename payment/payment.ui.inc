@@ -1059,3 +1059,16 @@ function payment_method_options() {
 
   return $options;
 }
+
+/**
+ * Implements form build callback: global configuration form.
+ */
+function payment_form_global_configuration(array $form, array &$form_state) {
+  $form['payment_debug'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Log and display every <em>Payment</em> exception (<code>PaymentException</code>).'),
+    '#default_value' => variable_get('payment_debug', TRUE),
+  );
+
+  return system_settings_form($form);
+}

@@ -124,6 +124,15 @@ function payment_menu() {
     'file path' => drupal_get_path('module', 'system'),
   );
 
+  // Global configuration.
+  $items['admin/config/services/payment/global'] = array(
+    'title' => 'Global configuration',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('payment_form_global_configuration'),
+    'access arguments' => array('payment.global.administer'),
+    'file' => 'payment.ui.inc',
+  );
+
   // Payment method administration.
   $items['admin/config/services/payment/method/add'] = array(
     'title' => 'Add payment method',
@@ -270,6 +279,9 @@ function payment_menu_alter(&$items) {
  */
 function payment_permission() {
   $permissions = array(
+    'payment.global.administer' => array(
+      'title' => t('Administer global Payment configuration'),
+    ),
     'payment.rules.administer' => array(
       'title' => t('Administer rule configurations'),
       'restrict access' => TRUE,
@@ -919,4 +931,55 @@ function payment_method_access($operation, PaymentMethod $payment_method = NULL,
  */
 function payment_method_access_token($token, $operation, PaymentMethod $payment_method = NULL, $account = NULL) {
   return drupal_valid_token($token, 'payment') && payment_method_access($operation, $payment_method, $account);
+}
+
+/**
+ * Log/show a debugging message.
+ *
+ * @param string $message
+ *   The unstranslated US English message to process.
+ * @param string $file
+ *   The path to the file the message originates from.
+ * @param integer $line
+ *   The number of the line within $file the message originates from.
+ *
+ * @return NULL
+ */
+function payment_debug($message, $file = '', $line = 0) {
+  if (variable_get('payment_debug', TRUE)) {
+    // Make sure we have file and line information.
+    if (!$file || !$line) {
+      // Get the backtrace as fast as possible.
+      if (version_compare(phpversion(), '5.3.6') == -1) {
+        $backtrace = debug_backtrace(FALSE);
+      }
+      elseif (version_compare(phpversion(), '5.4.0') > -1) {
+        $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 0);
+      }
+      else {
+        $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+      }
+
+      // Distill the caller's file and line information from the backtrace.
+      $caller = _drupal_get_last_caller($backtrace);
+      if (!$file) {
+        $file = $caller['file'];
+      }
+      if (!$line) {
+        $line = $caller['line'];
+      }
+    }
+
+    // Process the actual message.
+    $link = l(t('Do not log or display Payment debugging messages'), 'admin/config/services/payment/global');
+    $string = 'Debug: %message on line !line in @file (!hide).';
+    $string_arguments = array(
+      '%message' => $message,
+      '!line' => $line,
+      '@file' => $file,
+      '!hide' => $link,
+    );
+    drupal_set_message(t($string, $string_arguments));
+    watchdog('Payment', $string, $string_arguments);
+  }
 }
