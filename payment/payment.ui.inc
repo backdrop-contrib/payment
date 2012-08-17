@@ -910,11 +910,13 @@ function payment_form_process_method_validate(array $element, array &$form_state
   $pmid = drupal_array_get_nested_value($form_state['values'], array_merge($element['#parents'], array('pmid')));
   if ($pmid) {
     $payment = $form_state['payment'];
+    // Another payment method was selected, so rebuild the form.
     if (!$payment->method || $payment->method->pmid != $pmid) {
       $form_state['rebuild'] = TRUE;
-      $payment->method = entity_load_single('payment_method', $pmid);
-      payment_method_controller_form_callback($element, $form_state, $payment->method->controller, 'payment', 'validate');
     }
+    // Let the payment method validate form data.
+    $payment->method = entity_load_single('payment_method', $pmid);
+    payment_method_controller_form_callback($element, $form_state, $payment->method->controller, 'payment', 'validate');
   }
 }
 
