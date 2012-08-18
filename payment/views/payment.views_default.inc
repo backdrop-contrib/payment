@@ -472,10 +472,11 @@ function payment_view_payments() {
   $handler->display->display_options['filters']['title_specific']['expose']['multiple'] = 1;
   $handler->display->display_options['filters']['title_specific']['expose']['reduce'] = 0;
   $handler->display->display_options['path'] = 'admin/content/payment';
-  $handler->display->display_options['menu']['type'] = 'normal';
+  $handler->display->display_options['menu']['type'] = 'tab';
   $handler->display->display_options['menu']['title'] = 'Payments';
   $handler->display->display_options['menu']['weight'] = '0';
   $handler->display->display_options['menu']['name'] = 'management';
+  $handler->display->display_options['menu']['context'] = 0;
 
   /* Display: User's own payments */
   $handler = $view->new_display('page', 'User\'s own payments', 'page_2');
