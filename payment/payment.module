@@ -376,7 +376,7 @@ function payment_hook_info() {
 function payment_field_extra_fields() {
   $field['payment']['payment'] = array(
     'form' => array(
-      'line_items' => array(
+      'payment_line_items' => array(
         'label' => t('Line items'),
         'weight' => 0,
       ),
@@ -384,13 +384,13 @@ function payment_field_extra_fields() {
         'label' => t('Payment method selection and configuration'),
         'weight' => 0,
       ),
-      'status' => array(
+      'payment_status' => array(
         'label' => t('Status'),
         'weight' => 0,
       ),
     ),
     'display' => array(
-      'line_items' => array(
+      'payment_line_items' => array(
         'label' => t('Line items'),
         'weight' => 0,
       ),
@@ -398,7 +398,7 @@ function payment_field_extra_fields() {
         'label' => t('Payment method (generic title)'),
         'weight' => 0,
       ),
-      'status_items' => array(
+      'payment_status_items' => array(
         'label' => t('Status items'),
         'weight' => 0,
       ),

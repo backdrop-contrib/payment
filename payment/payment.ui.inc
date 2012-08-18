@@ -65,7 +65,7 @@ function payment_page_payment_view(Payment $payment) {
  */
 function payment_form(array $form, array &$form_state, Payment $payment, array $pmids = array()) {
   $form_state['payment'] = $payment;
-  $form['status'] = array(
+  $form['payment_status'] = array(
     '#access' => !empty($payment->pid),
     '#type' => 'select',
     '#title' => t('Status'),
@@ -74,7 +74,7 @@ function payment_form(array $form, array &$form_state, Payment $payment, array $
     '#required' => TRUE,
     '#description' => t('Updating a payment status manually can disrupt automatic payment processing.') . (user_access('payment.payment_status.view') ? ' ' . l(t('Payment status overview.'), 'admin/config/services/payment/status') : ''),
   );
-  $form['line_items'] = payment_line_items($payment);
+  $form['payment_line_items'] = payment_line_items($payment);
   $form['payment_method'] = array(
     '#access' => empty($payment->pid),
     '#type' => 'payment_method',

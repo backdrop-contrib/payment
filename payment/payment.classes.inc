@@ -433,8 +433,8 @@ class PaymentEntityController extends EntityAPIController {
     $build = parent::view($entities, $view_mode, $langcode, $page);
     foreach ($build['payment'] as &$payment_build) {
       $payment = $payment_build['#entity'];
-      $payment_build['line_items'] = payment_line_items($payment);
-      $payment_build['status_items'] = payment_status_items($payment);
+      $payment_build['payment_line_items'] = payment_line_items($payment);
+      $payment_build['payment_status_items'] = payment_status_items($payment);
       $payment_build['payment_method'] = array(
         '#type' => 'item',
         '#title' => t('Payment method'),
