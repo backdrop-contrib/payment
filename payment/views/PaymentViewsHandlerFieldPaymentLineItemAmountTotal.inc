@@ -8,7 +8,7 @@
 /**
  * Views field handler for a payment method's controller description.
  */
-class PaymentViewsHandlerFieldPaymentLineItemAmountTotal  extends views_handler_field {
+class PaymentViewsHandlerFieldPaymentLineItemAmountTotal  extends views_handler_field_numeric {
 
   /**
    * Implements views_handler_field::query().

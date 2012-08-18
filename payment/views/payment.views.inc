@@ -69,7 +69,8 @@ function payment_views_data_alter(&$data) {
     'amount' => array(
       'title' => t('Amount'),
       'field' => array(
-        'handler' => 'views_handler_field',
+        'handler' => 'views_handler_field_numeric',
+        'float' => TRUE,
         'click sortable' => TRUE,
       ),
       'sort' => array(
@@ -86,6 +87,7 @@ function payment_views_data_alter(&$data) {
       'title' => t('Total amount'),
       'field' => array(
         'handler' => 'PaymentViewsHandlerFieldPaymentLineItemAmountTotal',
+        'float' => TRUE,
         'click sortable' => TRUE,
       ),
       'sort' => array(
@@ -124,16 +126,16 @@ function payment_views_data_alter(&$data) {
         'handler' => 'views_handler_sort',
       ),
       'filter' => array(
-        'handler' => 'views_handler_filter_numeric',
+        'handler' => 'views_handler_filter_string',
       ),
       'argument' => array(
-        'handler' => 'views_handler_argument_numeric',
+        'handler' => 'views_handler_argument_string',
       ),
     ),
     'pid' => array(
       'title' => t('Payment ID'),
       'field' => array(
-        'handler' => 'views_handler_field',
+        'handler' => 'views_handler_field_numeric',
         'click sortable' => TRUE,
       ),
       'sort' => array(
@@ -156,7 +158,7 @@ function payment_views_data_alter(&$data) {
     'quantity' => array(
       'title' => t('Quantity'),
       'field' => array(
-        'handler' => 'views_handler_field',
+        'handler' => 'views_handler_field_numeric',
         'click sortable' => TRUE,
       ),
       'sort' => array(
@@ -172,7 +174,8 @@ function payment_views_data_alter(&$data) {
     'tax_rate' => array(
       'title' => t('Tax rate'),
       'field' => array(
-        'handler' => 'views_handler_field',
+        'handler' => 'views_handler_field_numeric',
+        'float' => TRUE,
         'click sortable' => TRUE,
       ),
       'sort' => array(
@@ -301,7 +304,7 @@ function payment_views_data_alter(&$data) {
     'pid' => array(
       'title' => t('Payment ID'),
       'field' => array(
-        'handler' => 'views_handler_field',
+        'handler' => 'views_handler_field_numeric',
         'click sortable' => TRUE,
       ),
       'sort' => array(
@@ -323,7 +326,7 @@ function payment_views_data_alter(&$data) {
     'psiid' => array(
       'title' => t('Payment status item ID'),
       'field' => array(
-        'handler' => 'views_handler_field',
+        'handler' => 'views_handler_field_numeric',
         'click sortable' => TRUE,
       ),
       'sort' => array(
