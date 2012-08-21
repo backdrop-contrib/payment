@@ -160,7 +160,7 @@ class Payment extends PaymentCommon {
     }
     // This is only called if the payment execution didn't redirect the user
     // offsite. Otherwise it's the payment method return page's responsibility.
-    $this->finish(FALSE);
+    $this->finish();
   }
 
   /**
