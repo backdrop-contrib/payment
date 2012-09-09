@@ -839,8 +839,8 @@ function payment_form_process_line_item_validate(array $element, array &$form_st
     }
 
     // Validate tax rate.
-    if (preg_match('#\D#', $line_item_data['tax_rate'])) {
-      form_error($element, t('Tax rate should be a positive integer.'));
+    if (!is_numeric(str_replace(',', '.', $line_item_data['tax_rate'])) || $line_item_data['tax_rate'] < 0) {
+      form_error($element, t('Tax rate must be a positive percentage.'));
     }
     else {
       $line_item_data['tax_rate'] /= 100;

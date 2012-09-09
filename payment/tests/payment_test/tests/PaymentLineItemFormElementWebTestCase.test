@@ -113,11 +113,32 @@ class PaymentLineItemFormElementWebTestCase extends PaymentWebTestCase {
     $this->drupalPost('payment_test-form-element-payment-line-item', $values, t('Submit'));
     $this->assertText(t('Quantity should be a positive integer.'), 'A non-integer amount throws a validation error.');
 
-    // Test a non-integer tax rate.
+    // Test a non-numeric tax rate.
     $values =  array(
       'line_item[container_0][tax_rate]' => $this->randomName(2),
     );
     $this->drupalPost('payment_test-form-element-payment-line-item', $values, t('Submit'));
-    $this->assertText(t('Tax rate should be a positive integer.'), 'A non-integer tax rate throws a validation error.');
+    $this->assertFieldByXPath('//input[@id="edit-line-item-container-0-tax-rate" and contains(@class, "error")]', NULL, 'A non-numeric tax rate throws a validation error.');
+
+    // Test a negative tax rate.
+    $values =  array(
+      'line_item[container_0][tax_rate]' => '-10',
+    );
+    $this->drupalPost('payment_test-form-element-payment-line-item', $values, t('Submit'));
+    $this->assertFieldByXPath('//input[@id="edit-line-item-container-0-tax-rate" and contains(@class, "error")]', NULL, 'A negative tax rate throws a validation error.');
+
+    // Test a float tax rate that uses a period.
+    $values =  array(
+      'line_item[container_0][tax_rate]' => '19.6',
+    );
+    $this->drupalPost('payment_test-form-element-payment-line-item', $values, t('Submit'));
+    $this->assertFieldByXPath('//input[@id="edit-line-item-container-0-tax-rate" and not(contains(@class, "error"))]', NULL, 'A float tax rate that includes a period is valid.');
+
+    // Test a float tax rate that uses a comma.
+    $values =  array(
+      'line_item[container_0][tax_rate]' => '19,6',
+    );
+    $this->drupalPost('payment_test-form-element-payment-line-item', $values, t('Submit'));
+    $this->assertFieldByXPath('//input[@id="edit-line-item-container-0-tax-rate" and not(contains(@class, "error"))]', NULL, 'A float tax rate that includes a comma is valid.');
   }
 }
