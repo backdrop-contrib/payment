@@ -191,15 +191,19 @@ class Payment extends PaymentCommon {
   /**
    * Get line items.
    *
-   * @param string $name
+   * @param string $name (optional)
    *   The requested line item(s)'s machine name, as possibly defined in
-   *   hook_payment_line_item_info().
+   *   hook_payment_line_item_info(). If $name is NULL, then all line items
+   *   will be returned.
    *
    * @return array
    *   An array with matching PaymentLineItem objects.
    */
-  function getLineItems($name) {
-    if ($line_item_info = payment_line_item_info($name)) {
+  function getLineItems($name = NULL) {
+    if (is_null($name)) {
+      return payment_line_item_get_all($name, $this);
+    }
+    elseif ($line_item_info = payment_line_item_info($name)) {
       return call_user_func($line_item_info->callback, $name, $this);
     }
     else {
