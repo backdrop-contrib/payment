@@ -133,7 +133,7 @@ function paymentreference_field_instance_settings_form($field, $instance) {
       '#required' => TRUE,
     );
     $form['amount'] = array(
-      '#type' => 'paymentform_amount',
+      '#type' => 'payment_amount',
       '#title' => t('Amount'),
       '#default_value' => $instance['settings']['amount'],
       '#required' => TRUE,
@@ -404,10 +404,12 @@ function paymentreference_available($pid, $uid) {
 function paymentreference_load($entity_type, $bundle, $field_name, $uid) {
   $query = db_select('paymentreference', 'pr');
   $query->addJoin('INNER', 'payment', 'p', 'p.pid = pr.pid');
+  $query->addJoin('INNER', 'payment_status_item', 'psi', 'p.psiid_last = psi.psiid');
   $query->fields('pr', array('pid'))
     ->condition('entity_type', $entity_type)
     ->condition('bundle', $bundle)
     ->condition('field_name', $field_name)
+    ->condition('status', array_merge(payment_status_info(PAYMENT_STATUS_SUCCESS)->descendants(), array(PAYMENT_STATUS_SUCCESS)))
     ->condition('uid', $uid);
   $pid = $query->execute()->fetchField();
 

@@ -989,6 +989,7 @@ function payment_form_process_method_validate(array $element, array &$form_state
     $payment = $form_state['payment'];
     // Another payment method was selected, so rebuild the form.
     if (!$payment->method || $payment->method->pmid != $pmid) {
+      $payment->method = entity_load_single('payment_method', $pmid);
       $form_state['rebuild'] = TRUE;
     }
   }

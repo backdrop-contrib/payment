@@ -944,10 +944,43 @@ class PaymentStatusInfo extends PaymentCommon {
   function ancestors() {
     $ancestors = array($this->parent);
     if ($this->parent) {
-      $ancestors += payment_status_info($this->parent)->ancestors();
+      $ancestors = array_merge($ancestors, payment_status_info($this->parent)->ancestors());
     }
 
     return array_unique($ancestors);
+  }
+
+  /**
+   * Get this payment status's children.
+   *
+   * @return array
+   *   The machine names of this status's children.
+   */
+  function children() {
+    $children = array();
+    foreach (payment_statuses_info() as $status_info) {
+      if ($status_info->parent == $this->status) {
+        $children[] = $status_info->status;
+      }
+    }
+
+    return $children;
+  }
+
+  /**
+   * Get this payment status's descendants.
+   *
+   * @return array
+   *   The machine names of this status's descendants.
+   */
+  function descendants() {
+    $children = $this->children();
+    $descendants = $children;
+    foreach ($children as $child) {
+      $descendants = array_merge($descendants, payment_status_info($child)->descendants());
+    }
+
+    return array_unique($descendants);
   }
 }
 
