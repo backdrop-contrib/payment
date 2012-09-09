@@ -839,11 +839,12 @@ function payment_form_process_line_item_validate(array $element, array &$form_st
     }
 
     // Validate tax rate.
-    if (!is_numeric(str_replace(',', '.', $line_item_data['tax_rate'])) || $line_item_data['tax_rate'] < 0) {
+    $tax_rate = str_replace(',', '.', $line_item_data['tax_rate']);
+    if (!is_numeric($tax_rate) || $tax_rate < 0) {
       form_error($element, t('Tax rate must be a positive percentage.'));
     }
     else {
-      $line_item_data['tax_rate'] /= 100;
+      $line_item_data['tax_rate'] = $tax_rate / 100;
     }
 
     // Convert the raw input to a PaymentLineItem object.
