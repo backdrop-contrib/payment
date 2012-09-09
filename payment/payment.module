@@ -51,7 +51,7 @@ define('PAYMENT_LINE_ITEM_TOKEN_PREFIX', 'line_item-');
 /**
  * The absolute minimum payment amount.
  */
-define('PAYMENT_MINIMUM_AMOUNT', 0.001);
+define('PAYMENT_MINIMUM_AMOUNT', 1E-10);
 
 /**
  * Implements hook_init().
