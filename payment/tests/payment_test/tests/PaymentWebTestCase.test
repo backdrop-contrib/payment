@@ -16,6 +16,7 @@ class PaymentWebTestCase extends XtoolsWebTestCase {
     $payment_method = $payment_method ? $payment_method : new PaymentMethodUnavailable;
     $payment = new Payment(array(
       'currency_code' => 'XXX',
+      'description' => 'This is the payment description',
       'finish_callback' => 'payment_test_finish_callback',
       'method' => $payment_method,
       'uid' => $uid,

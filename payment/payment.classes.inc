@@ -48,6 +48,14 @@ class Payment extends PaymentCommon {
   public $currency_code = 'XXX';
 
   /**
+   * The general description of this payment. Not to be confused with line item
+   * descriptions.
+   *
+   * @var string
+   */
+  public $description = '';
+
+  /**
    * The name of a function to call when payment execution is completed,
    * regardless of the payment status. It receives one argument:
    * - $payment Payment
@@ -852,6 +860,14 @@ class PaymentMethodController {
       throw new PaymentValidationUnsupportedCurrencyException(t('The currency is not supported by this payment method.'));
     }
 
+    // Confirm the payment's description is set and valid.
+    if (empty($payment->description)) {
+      throw new PaymentValidationDescriptionMissing(t('The payment description is not set.'));
+    }
+    elseif (drupal_strlen($payment->description) > 255) {
+      throw new PaymentValidationDescriptionTooLong(t('The payment description exceeds 255 characters.'));
+    }
+
     // Confirm the finish callback is set and the function exists.
     if (empty($payment->finish_callback) || !function_exists($payment->finish_callback)) {
       throw new PaymentValidationMissingFinishCallback(t('The finish callback is not set or not callable.'));
@@ -1180,3 +1196,13 @@ class PaymentValidationUnsupportedCurrencyException extends PaymentValidationExc
  * does not exist.
  */
 class PaymentValidationMissingFinishCallback extends PaymentValidationException {}
+
+/**
+ * Exception thrown if a payment's description is missing.
+ */
+class PaymentValidationDescriptionMissing extends PaymentValidationException {}
+
+/**
+ * Exception thrown if a payment's description is too long.
+ */
+class PaymentValidationDescriptionTooLong extends PaymentValidationException {}

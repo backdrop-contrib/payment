@@ -481,6 +481,7 @@ function paymentreference_page(array $instance) {
       'field_name' => $instance['field_name'],
     ),
     'currency_code' => $instance['settings']['currency_code'],
+    'description' => $instance['label'],
     'finish_callback' => 'paymentreference_payment_finish',
   ));
   // @todo Description should be US English, but can be anything.

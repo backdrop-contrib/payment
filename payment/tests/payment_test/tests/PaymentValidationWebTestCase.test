@@ -55,6 +55,30 @@ class PaymentValidationWebTestCase extends PaymentWebTestCase {
     }
     $this->assertFalse($valid, 'PaymentMethodController::validate() invalidates a payment that has no currency set.');
 
+    // Test that a payment without a description invalidates.
+    try {
+      $payment = $this->paymentCreate(1, $this->payment_method);
+      unset($payment->description);
+      $this->payment_method->validate($payment);
+      $valid = TRUE;
+    }
+    catch (PaymentValidationDescriptionMissing $e) {
+      $valid = FALSE;
+    }
+    $this->assertFalse($valid, 'PaymentMethodController::validate() invalidates a payment that has no description.');
+
+    // Test that a payment without a description invalidates.
+    try {
+      $payment = $this->paymentCreate(1, $this->payment_method);
+      $payment->description = str_repeat('a', 300);
+      $this->payment_method->validate($payment);
+      $valid = TRUE;
+    }
+    catch (PaymentValidationDescriptionTooLong $e) {
+      $valid = FALSE;
+    }
+    $this->assertFalse($valid, 'PaymentMethodController::validate() invalidates a payment of which the description is too long.');
+
     // Test that a payment without a (callable) finish callback set
     // invalidates.
     try {

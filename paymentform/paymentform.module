@@ -190,6 +190,7 @@ function paymentform_field_formatter_view($entity_type, $entity, $field, $instan
   if ($display['type'] == 'paymentform') {
     $payment = new Payment(array(
       'currency_code' => $instance['settings']['currency_code'],
+      'description' => $instance['label'],
       'finish_callback' => 'paymentform_payment_finish',
     ));
     foreach ($items as $line_item_data) {

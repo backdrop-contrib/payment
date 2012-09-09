@@ -71,6 +71,10 @@ function payment_schema() {
         'type' => 'varchar',
         'length' => 3,
       ),
+      'description' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),
       'finish_callback' => array(
         'type' => 'varchar',
         'length' => 255,
