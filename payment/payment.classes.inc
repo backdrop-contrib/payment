@@ -861,7 +861,7 @@ class PaymentMethodController {
     $minimum = isset($currencies[$payment->currency_code]['minimum']) ? $currencies[$payment->currency_code]['minimum'] : PAYMENT_MINIMUM_AMOUNT;
     if ($payment->totalAmount(TRUE) < $minimum) {
       throw new PaymentValidationAmountBelowMinimumException(t('The amount should be higher than !minimum.', array(
-        '!minumum' => payment_amount_human_readable($minimum, $payment->currency_code),
+        '!minimum' => payment_amount_human_readable($minimum, $payment->currency_code),
       )));
     }
 
