@@ -265,7 +265,7 @@ function payment_view_payments() {
   $handler->display->display_options['sorts']['created']['order'] = 'DESC';
 
   /* Display: Administration page */
-  $handler = $view->new_display('page', 'Administration page', 'page_1');
+  $handler = $view->new_display('page', 'Administration page', 'administration_page');
   $handler->display->display_options['defaults']['access'] = FALSE;
   $handler->display->display_options['access']['type'] = 'perm';
   $handler->display->display_options['access']['perm'] = 'payment.payment.view.any';
@@ -479,7 +479,7 @@ function payment_view_payments() {
   $handler->display->display_options['menu']['context'] = 0;
 
   /* Display: User's own payments */
-  $handler = $view->new_display('page', 'User\'s own payments', 'page_2');
+  $handler = $view->new_display('page', 'User\'s own payments', 'user_page');
   $handler->display->display_options['defaults']['access'] = FALSE;
   $handler->display->display_options['access']['type'] = 'perm';
   $handler->display->display_options['access']['perm'] = 'payment.payment.view.own';
@@ -671,6 +671,8 @@ function payment_view_payments() {
     t('Administration page'),
     t('Amount'),
     t('[currency_code] [amount_total]'),
+    t('.'),
+    t(','),
     t('Unavailable'),
     t('Last updated between'),
     t('Current status'),
