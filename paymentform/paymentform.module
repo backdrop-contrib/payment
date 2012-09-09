@@ -196,7 +196,7 @@ function paymentform_field_formatter_view($entity_type, $entity, $field, $instan
       $payment->setLineItem(new PaymentLineItem($line_item_data));
     }
 
-    return drupal_get_form('payment_form', $payment);
+    return drupal_get_form('payment_form_standalone', $payment);
   }
 }
 

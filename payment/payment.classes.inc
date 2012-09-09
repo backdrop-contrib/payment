@@ -768,7 +768,7 @@ class PaymentMethodController {
    * to it in the validate callback. The payment will be saved automatically
    * using entity_save().
    *
-   * The function accepts its parent payment_method element and &$form_state as
+   * The function accepts its parent form element and &$form_state as
    * parameters. It should return an array of form elements.
    *
    * @see payment_element_info()
@@ -793,8 +793,8 @@ class PaymentMethodController {
    * validate callback. The payment method will be saved automatically using
    * entity_save().
    *
-   * The function accepts the same arguments as payment_form_method(). It
-   * should return an array of form elements.
+   * The function accepts its parent form element and &$form_state as
+   * parameters. It should return an array of form elements.
    *
    * @see payment_form_payment_method()
    * @see paymentmethodbasic_payment_method_configuration_form_elements()

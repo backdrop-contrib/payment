@@ -488,7 +488,7 @@ function paymentreference_page(array $instance) {
     'name' => 'paymentreference',
   )));
 
-  return drupal_get_form('payment_form', $payment);
+  return drupal_get_form('payment_form_standalone', $payment);
 }
 
 /**

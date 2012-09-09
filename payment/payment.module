@@ -93,7 +93,7 @@ function payment_menu() {
   $items['payment/%entity_object/edit'] = array(
     'load arguments' => array('payment'),
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('payment_form', 1),
+    'page arguments' => array('payment_form_standalone', 1),
     'access callback' => 'payment_access',
     'access arguments' => array('update', 1),
     'title' => 'Edit',
@@ -592,6 +592,16 @@ function payment_element_info() {
     '#currency_code' => 'XXX',
     // The number of values this element allows. Enter 0 for unlimited.
     '#cardinality' => 0,
+  );
+  // Placeholder element for a payment method controller's payment or payment
+  // method form elements callback. Using this element ensures the callbacks
+  // receive enough contextual information.
+  $elements['payment_form_context'] = array(
+    '#process' => array('payment_form_process_context'),
+    // The class name of the payment method controller whose callbacks to call.
+    '#payment_method_controller_name' => '',
+    // Either "payment" or "payment_method".
+    '#callback_type' => '',
   );
 
   return $elements;

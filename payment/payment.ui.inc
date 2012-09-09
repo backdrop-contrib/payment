@@ -52,7 +52,89 @@ function payment_page_payment_view(Payment $payment) {
 }
 
 /**
+ * Builds common elements for a payment add/edit form.
+ *
+ * Note that this is not a form build callback and that this function was not
+ * designed to be called using drupal_get_form(). Instead, create a real form
+ * build callback that calls this function directly.
+ *
+ * @see payment_form_standalone()
+ * @see hook_payment_form_alter()
+ *
+ * @param array $form_state
+ * @param Payment $payment
+ * @param array $pmids
+ *   The PMIDs of the payment methods the user is allowed to choose from.
+ *
+ * @return array
+ *   Form information with the following keys:
+ *   - elements: the form's (renderable) elements.
+ *   - submit: an array of form #submit callbacks.
+ */
+function payment_form_embedded(array &$form_state, Payment $payment, array $pmids = array()) {
+  $form_state['payment'] = $payment;
+
+  $elements['#element_validate'] = array('payment_form_embedded_validate');
+  $elements['payment_status'] = array(
+    '#access' => !payment_status_is_or_has_ancestor($payment->getStatus()->status, PAYMENT_STATUS_NEW),
+    '#type' => 'select',
+    '#title' => t('Status'),
+    '#options' => payment_status_options(),
+    '#default_value' => $payment->getStatus()->status,
+    '#required' => TRUE,
+    '#description' => t('Updating a payment status manually can disrupt automatic payment processing.') . (user_access('payment.payment_status.view') ? ' ' . l(t('Payment status overview.'), 'admin/config/services/payment/status') : ''),
+  );
+  $elements['payment_line_items'] = payment_line_items($payment);
+  $elements['payment_method'] = array(
+    '#access' => payment_status_is_or_has_ancestor($payment->getStatus()->status, PAYMENT_STATUS_NEW),
+    '#type' => 'payment_method',
+    '#title' => t('Payment method'),
+    '#required' => TRUE,
+    '#pmids' => $pmids,
+  );
+  field_attach_form('payment', $payment, $elements, $form_state);
+
+  $submit = array('payment_form_embedded_submit');
+  drupal_alter('payment_form', $elements, $form_state, $submit);
+
+  return array(
+    'elements' => $elements,
+    'submit' => $submit,
+  );
+}
+
+/**
+ * Implements form validate callback for payment_form_embedded().
+ */
+function payment_form_embedded_validate(array $form, array &$form_state) {
+  $payment = $form_state['payment'];
+  field_attach_form_validate('payment', $payment, $form, $form_state);
+  field_attach_submit('payment', $payment, $form, $form_state);
+
+  if (empty($form_state['rebuild']) && $payment->method) {
+    try {
+      $payment->method->validate($payment);
+    }
+    catch (PaymentValidationException $e) {
+      form_set_error('payment_method', $e->getMessage());
+    }
+  }
+}
+
+/**
+ * Implements form submit callback for payment_form_embedded().
+ */
+function payment_form_embedded_submit(array $form, array &$form_state) {
+  $form_state['payment']->setStatus(new PaymentStatusItem($form_state['values']['payment_status']));
+}
+
+/**
  * Implements form build callback: the payment add/edit form.
+ *
+ * To alter the payment form in general, see hook_payment_form_alter().
+ *
+ * @see payment_form_embedded()
+ * @see hook_payment_form_alter()
  *
  * @param array $form
  * @param array $form_state
@@ -63,25 +145,10 @@ function payment_page_payment_view(Payment $payment) {
  * @return array
  *   A render array.
  */
-function payment_form(array $form, array &$form_state, Payment $payment, array $pmids = array()) {
-  $form_state['payment'] = $payment;
-  $form['payment_status'] = array(
-    '#access' => !empty($payment->pid),
-    '#type' => 'select',
-    '#title' => t('Status'),
-    '#options' => payment_status_options(),
-    '#default_value' => $payment->getStatus()->status,
-    '#required' => TRUE,
-    '#description' => t('Updating a payment status manually can disrupt automatic payment processing.') . (user_access('payment.payment_status.view') ? ' ' . l(t('Payment status overview.'), 'admin/config/services/payment/status') : ''),
-  );
-  $form['payment_line_items'] = payment_line_items($payment);
-  $form['payment_method'] = array(
-    '#access' => empty($payment->pid),
-    '#type' => 'payment_method',
-    '#title' => t('Payment method'),
-    '#required' => TRUE,
-    '#pmids' => $pmids,
-  );
+function payment_form_standalone(array $form, array &$form_state, Payment $payment, array $pmids = array()) {
+  $form_info = payment_form_embedded($form_state, $payment, $pmids);
+  $form = $form_info['elements'];
+  $form['#submit'] = array_merge($form_info['submit'], array('payment_form_standalone_submit'));
   $form['actions'] = array(
     '#type' => 'actions',
   );
@@ -97,49 +164,30 @@ function payment_form(array $form, array &$form_state, Payment $payment, array $
       '#access' => payment_access('delete', $payment),
     );
   }
-  field_attach_form('payment', $payment, $form, $form_state);
 
   return $form;
 }
 
 /**
- * Implements form validate callback for payment_form().
- */
-function payment_form_validate(array $form, array &$form_state) {
-  $payment = $form_state['payment'];
-  field_attach_form_validate('payment', $payment, $form, $form_state);
-
-  if (empty($form_state['rebuild']) && $payment->method) {
-    try {
-      $payment->method->validate($payment);
-    }
-    catch (PaymentValidationException $e) {
-      form_set_error('payment_method', $e->getMessage());
-    }
-  }
-}
-
-/**
  * Implements form submit callback for payment_form().
  */
-function payment_form_submit(array $form, array &$form_state) {
+function payment_form_standalone_submit(array $form, array &$form_state) {
   $payment = $form_state['payment'];
-  $new = empty($payment->pid);
 
-  // Process submitted values.
-  $payment->setStatus(new PaymentStatusItem($form_state['values']['status']));
-  field_attach_submit('payment', $payment, $form, $form_state);
-
+  // Save the payment.
   entity_save('payment', $payment);
-  if (payment_access('view', $payment)) {
-    $form_state['redirect'] = 'payment/' . $payment->pid;
+
+  // Execute the payment.
+  if ($payment->getStatus()->status == PAYMENT_STATUS_NEW) {
+    $payment->execute();
+  }
+  if (payment_status_is_or_has_ancestor($payment->getStatus()->status, PAYMENT_STATUS_FAILED)) {
+    $form_state['rebuild'] = TRUE;
   }
 
-  if ($new) {
-    $payment->execute();
-    if (payment_status_has_ancestor($payment->getStatus()->status, PAYMENT_STATUS_FAILED)) {
-      $form_state['rebuild'] = TRUE;
-    }
+  // Redirect the user.
+  if (payment_access('view', $payment)) {
+    $form_state['redirect'] = 'payment/' . $payment->pid;
   }
 }
 
@@ -310,7 +358,11 @@ function payment_form_payment_method(array $form, array &$form_state, PaymentMet
     '#autocomplete_path' => 'user/autocomplete', 
     '#required' => TRUE,
   );
-  $form['controller_form'] = payment_method_controller_form_callback($form, $form_state, $payment_method->controller, 'payment_method', 'build');
+  $form['controller_form'] = array(
+    '#type' => 'payment_form_context',
+    '#payment_method_controller_name' => $payment_method->controller->name,
+    '#callback_type' => 'payment_method',
+  );
   $form['actions'] = array(
     '#type' => 'actions',
   );
@@ -340,7 +392,6 @@ function payment_form_payment_method_validate(array $form, array &$form_state) {
       '%name' => $values['owner'],
     )));
   }
-  payment_method_controller_form_callback($form, $form_state, $form_state['payment_method']->controller, 'payment_method', 'validate');
 }
 
 /**
@@ -566,6 +617,21 @@ function payment_page_method_clone(PaymentMethod $payment_method) {
   )));
 
   return drupal_get_form('payment_form_payment_method', $payment_method);
+}
+
+
+/**
+ * Implements form process callback for a payment_form_context element.
+ */
+function payment_form_process_context(array $element, array &$form_state, array $form) {
+  if ($build_callback = payment_method_controller_form_callback(payment_method_controller_load($element['#payment_method_controller_name']), $element['#callback_type'], 'build')) {
+    $element = array_merge($element, $build_callback($element, $form_state));
+  }
+  if ($validate_callback = payment_method_controller_form_callback(payment_method_controller_load($element['#payment_method_controller_name']), $element['#callback_type'], 'validate')) {
+    $element['#element_validate'] = array($validate_callback);
+  }
+
+  return $element;
 }
 
 /**
@@ -845,16 +911,23 @@ function payment_form_process_method(array $element, array &$form_state, array &
       '#type' => 'value',
       '#value' => $pmids[0],
     );
-    $element['pmid_title'] = array(
-      '#type' => 'item',
-      '#title' => isset($element['#title']) ? $element['#title'] : NULL,
-      '#markup' => $pmid_options[$pmids[0]],
-    );
+    if (isset($element['#title'])) {
+      $element['pmid_title'] = array(
+        '#type' => 'item',
+        '#title' => $element['#title'],
+        '#markup' => $pmid_options[$pmids[0]],
+      );
+    }
     // Default to the only available payment method.
-    if (!$payment->method || $payment->method->pid != $pmids[0]) {
+    if (!$payment->method || $payment->method->pmid != $pmids[0]) {
       $payment->method = entity_load_single('payment_method', $pmids[0]);
     }
-    $element['payment_method_controller_payment_configuration'] = payment_method_controller_form_callback($element, $form_state, $payment->method->controller, 'payment', 'build');
+
+    $element['payment_method_controller_payment_configuration'] = array(
+      '#type' => 'payment_form_context',
+      '#payment_method_controller_name' => $payment_method->controller->name,
+      '#callback_type' => 'payment',
+    );
   }
   // There are multiple available payment methods.
   else {
@@ -892,7 +965,11 @@ function payment_form_process_method(array $element, array &$form_state, array &
           'class' => array('js-hide')
         ),
       );
-      $element['payment_method_controller_payment_configuration'] = payment_method_controller_form_callback($element, $form_state, $payment->method->controller, 'payment', 'build');
+      $element['payment_method_controller_payment_configuration'] = array(
+        '#type' => 'payment_form_context',
+        '#payment_method_controller_name' => $payment->method->controller->name,
+        '#callback_type' => 'payment',
+      );
     }
   }
 
@@ -914,9 +991,6 @@ function payment_form_process_method_validate(array $element, array &$form_state
     if (!$payment->method || $payment->method->pmid != $pmid) {
       $form_state['rebuild'] = TRUE;
     }
-    // Let the payment method validate form data.
-    $payment->method = entity_load_single('payment_method', $pmid);
-    payment_method_controller_form_callback($element, $form_state, $payment->method->controller, 'payment', 'validate');
   }
 }
 
@@ -940,18 +1014,16 @@ function payment_form_process_method_submit_ajax_callback(array $form, array &$f
 /**
  * Call one of a payment method controller's form callbacks.
  *
- * @param array $form
- * @param array $form_state
  * @param PaymentMethodController $controller
  * @param string $callback
  *   Either "payment" or "payment_method".
  * @param string $operation
  *   Either "build" or "validate".
  *
- * @return mixed
- *   The callback's return value.
+ * @return string
+ *   The callback function's name.
  */
-function payment_method_controller_form_callback(array $form, array &$form_state, PaymentMethodController $controller, $callback, $operation) {
+function payment_method_controller_form_callback(PaymentMethodController $controller, $callback, $operation) {
   $property = $callback . '_configuration_form_elements_callback';
   switch ($operation) {
     case 'build':
@@ -961,9 +1033,8 @@ function payment_method_controller_form_callback(array $form, array &$form_state
       $function = $controller->$property . '_validate';
       break;
   }
-  if (function_exists($function)) {
-    return $function($form, $form_state);
-  }
+
+  return isset($function) && function_exists($function) ? $function : FALSE;
 }
 
 /**

@@ -47,6 +47,9 @@ function payment_xtools_blueprint_info() {
  */
 function payment_xtools_callable_type_info() {
   return array(
+    new XtoolsCallableTypeHook('payment_form_alter', array(
+      'signature' => new XtoolsSignaturePlaceholder('hook_payment_form_alter'),
+    )),
     new XtoolsCallableTypeHook('payment_line_item_info', array(
       'blueprint' => new XtoolsBlueprintPlaceholder('hook_payment_line_item_info'),
     )),
@@ -81,6 +84,23 @@ function payment_xtools_callable_type_info() {
  * Implements hook_xtools_signature_info().
  */
 function payment_xtools_signature_info() {
+  $signatures['hook_payment_form_alter'] = new XtoolsSignature(array(
+    new XtoolsSignatureParameter(array(
+      'name' => 'elements',
+      'reference' => TRUE,
+      'type' => 'array',
+    )),
+    new XtoolsSignatureParameter(array(
+      'name' => 'form_state',
+      'reference' => TRUE,
+      'type' => 'array',
+    )),
+    new XtoolsSignatureParameter(array(
+      'name' => 'submit',
+      'reference' => TRUE,
+      'type' => 'array',
+    )),
+  ));
   $signatures['hook_payment_line_item_info_alter'] = new XtoolsSignature(array(
     new XtoolsSignatureParameter(array(
       'name' => 'line_items_info',

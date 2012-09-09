@@ -161,3 +161,21 @@ function hook_payment_pre_execute(Payment $payment) {
  *   Whether the payment and/or the payment method are valid.
  */
 function hook_payment_validate(Payment $payment, PaymentMethod $payment_method, $strict) {}
+
+/**
+ * Alter the payment form.
+ *
+ * Because the payment form is not always used through drupal_get_form(), you
+ * should use this hook, rather than hook_form_alter() or
+ * hook_form_FORM_ID_alter() to make changes to the payment form.
+ *
+ * @param array $elements
+ *   The array of form elements that are part of the payment form. Note that
+ *   the top-level array is NOT a form.
+ * @param array $form_state
+ * @param array $submit
+ *   An array with the names of form submit callbacks that should be called upon form submission.
+ *
+ * @return NULL
+ */
+function hook_payment_form_alter(array &$elements, array &$form_state, array &$submit) {}

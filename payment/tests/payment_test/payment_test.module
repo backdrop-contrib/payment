@@ -30,6 +30,15 @@ function payment_test_menu() {
 }
 
 /**
+ * Implements hook_payment_form_alter().
+ */
+function payment_payment_form_alter(array &$elements, array &$form_state, array &$submit) {
+  // @see PaymentActionHookAndCallbackWebTestCase.
+  $elements['payment_test'] = TRUE;
+  $submit[] = 'payment_test';
+}
+
+/**
  * Implements hook_payment_line_item_info().
  */
 function payment_test_payment_line_item_info() {

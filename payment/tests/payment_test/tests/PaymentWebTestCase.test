@@ -12,7 +12,7 @@ class PaymentWebTestCase extends XtoolsWebTestCase {
    *
    * @return Payment
    */
-  function paymentCreate($uid, PaymentMethod $payment_method = NULL) {
+  static function paymentCreate($uid, PaymentMethod $payment_method = NULL) {
     $payment_method = $payment_method ? $payment_method : new PaymentMethodUnavailable;
     $payment = new Payment(array(
       'currency_code' => 'XXX',
@@ -41,8 +41,8 @@ class PaymentWebTestCase extends XtoolsWebTestCase {
    *
    * @return PaymentMethod
    */
-  function paymentMethodCreate($uid, PaymentMethodController $controller = NULL) {
-    $name = $this->randomName();
+  static function paymentMethodCreate($uid, PaymentMethodController $controller = NULL) {
+    $name = self::randomName();
     $controller = $controller ? $controller : payment_method_controller_load('PaymentMethodControllerUnavailable');
     $payment_method = new PaymentMethod(array(
       'controller' => $controller,
