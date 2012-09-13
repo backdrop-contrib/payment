@@ -597,6 +597,7 @@ function payment_element_info() {
   // method form elements callback. Using this element ensures the callbacks
   // receive enough contextual information.
   $elements['payment_form_context'] = array(
+    '#tree' => TRUE,
     '#process' => array('payment_form_process_context'),
     // The class name of the payment method controller whose callbacks to call.
     '#payment_method_controller_name' => '',
