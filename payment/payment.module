@@ -627,7 +627,7 @@ function payment_views_api() {
  *   An array with PaymentStatusInfo objects for all available statuses.
  */
 function payment_statuses_info() {
-  static $statuses_info = NULL;
+  $statuses_info = &drupal_static(__FUNCTION__);
 
   if (!$statuses_info) {
     $statuses_info = array();
@@ -667,7 +667,7 @@ function payment_status_info($status, $unknown = FALSE) {
  *   An array with PaymentLineItemInfo objects, keyed by PaymentLineItemInfo::name.
  */
 function payment_line_items_info() {
-  static $line_items_info = NULL;
+  $line_items_info = &drupal_static(__FUNCTION__);
 
   if (is_null($line_items_info)) {
     $line_items_info = array();
@@ -735,7 +735,7 @@ function payment_status_is_or_has_ancestor($status, $ancestor_status) {
  *   controllers.
  */
 function payment_method_controllers_info() {
-  static $controllers_info = NULL;
+  $controllers_info = &drupal_static(__FUNCTION__);
 
   if (!$controllers_info) {
     $controllers_info = module_invoke_all('payment_method_controller_info');
