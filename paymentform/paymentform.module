@@ -188,7 +188,12 @@ function paymentform_field_is_empty($item, array $field) {
  */
 function paymentform_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
   if ($display['type'] == 'paymentform') {
+    list($entity_id) = entity_extract_ids($entity_type, $entity);
     $payment = new Payment(array(
+      'context_data' => array(
+        'entity_type' => $entity_type,
+        'entity_id' => $entity_id,
+      ),
       'currency_code' => $instance['settings']['currency_code'],
       'description' => $instance['label'],
       'finish_callback' => 'paymentform_payment_finish',
@@ -217,6 +222,12 @@ function paymentform_payment_finish(Payment $payment) {
   elseif (payment_status_is_or_has_ancestor($payment->getStatus()->status, PAYMENT_STATUS_FAILED)) {
     drupal_set_message(t('Your payment failed.') . $view);
   }
+
+  $entity = entity_load_single($payment->context_data['entity_type'], $payment->context_data['entity_id']);
+  if ($uri = entity_uri($payment->context_data['entity_type'], $entity)) {
+    drupal_goto($uri['path'], $uri['options']);
+  }
+  drupal_goto('<front>');
 }
 
 
