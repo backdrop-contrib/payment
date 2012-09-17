@@ -1,8 +1,9 @@
 name = Basic Payment Method tests
 description = "Supports Basic Payment Method's automated tests."
 core = 7.x
-dependencies[] = payment
+dependencies[] = paymentmethodbasic
 dependencies[] = xtools
 package = Payment
 hidden = TRUE
 files[] = tests/PaymentmethodbasicCallablesWebTestCase.test
+files[] = tests/PaymentMethodBasicTestPaymentMethodBasicControllerWebTestCase.test

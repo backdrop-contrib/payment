@@ -30,9 +30,8 @@ if ($entity_type == 'payment_method') {
       $result = $query->execute();
       while ($data = $result->fetchAssoc()) {
         $payment_method = $entities[$data['pmid']];
-        foreach ($data as $property => $value) {
-          $payment_method->controller_data[$property] = $value;
-        }
+        $payment_method->controller_data = (array) $data;
+        unset($payment_method->controller_data['pmid']);
       }
     }
   }
@@ -142,10 +141,11 @@ function paymentmethodbasic_payment_method_configuration_form_elements(array $fo
  * Implements form validate callback for
  * paymentmethodbasic_payment_method_configuration_form_elements().
  */
-function paymentmethodbasic_payment_method_configuration_form_elements_validate(array $form, array &$form_state) {
-  $form_state['payment_method']->controller_data['message'] = $form_state['values']['message']['value'];
-  $form_state['payment_method']->controller_data['status'] = $form_state['values']['status'];
-  $form_state['payment_method']->controller_data['text_format'] = $form_state['values']['message']['format'];
+function paymentmethodbasic_payment_method_configuration_form_elements_validate(array $element, array &$form_state) {
+  $values = drupal_array_get_nested_value($form_state['values'], $element['#parents']);
+  $form_state['payment_method']->controller_data['message'] = $values['message']['value'];
+  $form_state['payment_method']->controller_data['status'] = $values['status'];
+  $form_state['payment_method']->controller_data['text_format'] = $values['message']['format'];
 }
 
 /**
