@@ -303,6 +303,15 @@ function payment_method_form_add($controller) {
 }
 
 /**
+ * Implements menu title callback.
+ */
+function payment_method_form_add_title(PaymentMethodController $controller) {
+  return t('Add @controller_title payment method', array(
+    '@controller_title' => $controller->title,
+  ));
+}
+
+/**
  * Implements form build callback: the payment method add/edit form.
  *
  * @see payment_forms()

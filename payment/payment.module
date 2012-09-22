@@ -139,11 +139,13 @@ function payment_menu() {
     'page callback' => 'payment_page_payment_method_add_select_controller',
     'access callback' => 'payment_page_payment_method_add_select_controller_access',
     'file' => 'payment.ui.inc',
-    'type' => MENU_LOCAL_ACTION,
+    'type' => MENU_NORMAL_ITEM | MENU_LOCAL_ACTION,
     'weight' => 1,
   );
   $items['admin/config/services/payment/method/add/%payment_method_controller'] = array(
     'title' => 'Add payment method',
+    'title callback' => 'payment_method_form_add_title',
+    'title arguments' => array(6),
     'page callback' => 'payment_method_form_add',
     'page arguments' => array(6),
     'access callback' => 'payment_method_form_add_access',
