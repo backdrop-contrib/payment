@@ -88,6 +88,13 @@ function payment_schema() {
         'default' => 0,
         'not null' => TRUE,
       ),
+      'psiid_first' => array(
+        'description' => "The {payment_status_item}.psiid of this payment's first status item.",
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'default' => 0,
+        'not null' => TRUE,
+      ),
       'psiid_last' => array(
         'description' => "The {payment_status_item}.psiid of this payment's most recent status item.",
         'type' => 'int',
@@ -113,6 +120,12 @@ function payment_schema() {
         'table' => 'payment_status_item',
         'columns' => array(
           'psiid_last' => 'psiid',
+        ),
+      ),
+      'psiid_first' => array(
+        'table' => 'payment_status_item',
+        'columns' => array(
+          'psiid_first' => 'psiid',
         ),
       ),
       'uid' => array(
@@ -225,4 +238,22 @@ function payment_schema() {
   );
 
   return $schema;
+}
+
+/**
+ * Adds the psiid_first field to {payment}.
+ */
+function payment_update_7100(&$sandbox) {
+  // Add the new field.
+  db_add_field('payment', 'psiid_first', array(
+    'type' => 'int',
+    'unsigned' => TRUE,
+    'default' => 0,
+    'not null' => TRUE,
+  ));
+  // Populate the field by simply saving it, because a payment's missing
+  // psiid_first or psiid_last information is updated automatically.
+  foreach (entity_load('payment') as $payment) {
+    entity_save('payment', $payment);
+  }
 }

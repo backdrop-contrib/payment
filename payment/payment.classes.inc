@@ -416,23 +416,27 @@ class PaymentEntityController extends EntityAPIController {
     }
 
     // Save the payment's status items.
-    $psiid_last_update = FALSE;
     foreach ($payment->statuses as $status_item) {
       // Statuses cannot be edited, so only save the ones without a PSIID set.
       if (!$status_item->psiid) {
         $status_item->pid = $payment->pid;
         drupal_write_record('payment_status_item', $status_item);
-        $psiid_last_update = $status_item->psiid;
       }
     }
-    if ($psiid_last_update !== FALSE) {
-      $payment->psiid_last = $psiid_last_update;
-      db_update('payment')
-        ->fields(array(
-          'psiid_last' => $psiid_last_update,
-        ))
+    $fields = array();
+    if (empty($payment->psiid_first)) {
+      $payment->psiid_first = reset($payment->statuses)->psiid;
+      $fields['psiid_first'] = $payment->psiid_first;
+    }
+    if (empty($payment->psiid_last)) {
+      $payment->psiid_last = end($payment->statuses)->psiid;
+      $fields['psiid_last'] = $payment->psiid_last;
+    }
+    if ($fields) {
+      $query = db_update('payment')
         ->condition('pid', $payment->pid)
-        ->execute();
+        ->fields($fields);
+        $query->execute();
     }
 
     return $return;

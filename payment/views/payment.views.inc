@@ -41,6 +41,13 @@ function payment_views_data_alter(&$data) {
     'handler' => 'views_handler_relationship',
     'label' => t('Payment method'),
   );
+  $data['payment']['psiid_first']['relationship'] = array(
+    'title' => t('First status item'),
+    'base' => 'payment_status_item',
+    'base field' => 'psiid',
+    'handler' => 'views_handler_relationship',
+    'label' => t('First status item'),
+  );
   $data['payment']['psiid_last']['relationship'] = array(
     'title' => t('Last status item'),
     'base' => 'payment_status_item',
