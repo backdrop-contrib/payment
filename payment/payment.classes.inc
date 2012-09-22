@@ -888,6 +888,23 @@ class PaymentMethodController {
       )));
     }
   }
+
+  /**
+   * Returns an array with the names of all available payment method
+   * controllers that inherit of this one.
+   *
+   * return array
+   */
+  static function descendants() {
+    $descendants = array();
+    foreach (payment_method_controllers_info() as $controller_name) {
+      if (is_subclass_of($controller_name, get_called_class())) {
+        $descendants[] = $controller_name;
+      }
+    }
+
+    return $descendants;
+  }
 }
 
 /**
