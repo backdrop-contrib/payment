@@ -935,7 +935,7 @@ class PaymentMethodControllerUnavailable extends PaymentMethodController {
    * Implements PaymentMethodController::validate().
    */
   function validate(Payment $payment, PaymentMethod $payment_method, $strict) {
-    throw new PaymentValidationException;
+    throw new PaymentValidationException(t('This payment method type is unavailable.'));
   }
 }
 
