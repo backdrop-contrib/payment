@@ -273,6 +273,18 @@ function payment_menu_alter(&$items) {
 }
 
 /**
+ * Implements hook_modules_uninstalled().
+ */
+function payment_modules_uninstalled(array $modules) {
+  db_update('payment_method')
+    ->condition('controller_class_name', payment_method_controllers_info(), 'NOT IN')
+    ->fields(array(
+      'controller_class_name' => 'PaymentMethodControllerUnavailable',
+    ))
+    ->execute();
+}
+
+/**
  * Implements hook_permission().
  *
  * @see payment_method_access()
