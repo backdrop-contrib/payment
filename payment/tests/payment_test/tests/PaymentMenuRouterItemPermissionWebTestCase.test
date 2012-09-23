@@ -15,7 +15,10 @@ class PaymentMenuRouterItemPermissionWebTestCase extends PaymentWebTestCase {
   }
 
   function testPaymentMenuRouterItemPermissions() {
-    $payment = $this->paymentCreate(2, $this->paymentMethodCreate(2, payment_method_controller_load('PaymentMethodBasicController')));
+    $payment_method = $this->paymentMethodCreate(2, payment_method_controller_load('PaymentMethodBasicController'));
+    entity_save('payment_method', $payment_method);
+    $payment = $this->paymentCreate(2, $payment_method);
+    entity_save('payment', $payment);
 
     // Test the global configuration page.
     $this->XtoolsAssertMenuRouterItemPermission('admin/config/services/payment/global', array('payment.global.administer'));

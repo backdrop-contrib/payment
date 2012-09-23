@@ -23,7 +23,10 @@ class PaymentUnavailableWebTestCase extends PaymentWebTestCase {
     // Set a non-existing controller;
     $controller = new PaymentMethodController;
     $controller->name = 'foo';
-    $payment = $this->paymentCreate(1, $this->paymentMethodCreate(1, $controller));
+    $payment_method = $this->paymentMethodCreate(1, $controller);
+    entity_save('payment_method', $payment_method);
+    $payment = $this->paymentCreate(1, $payment_method);
+    entity_save('payment', $payment);
     $payment = entity_load_single('payment', $payment->pid);
     $this->assertEqual($payment->method->controller->name, 'PaymentMethodControllerUnavailable', 'When loading a payment method, if its controller unavailable, it is replaced by PaymentMethodControllerUnavailable.');
     entity_delete('payment_method', $payment->method->pmid);

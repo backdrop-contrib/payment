@@ -16,7 +16,9 @@ class PaymentMethodMenuRouterItemPermissionWebTestCase extends PaymentWebTestCas
 
   function testPaymentMethodMenuRouterItemPermissions() {
     $payment_method_1 = $this->paymentMethodCreate(1, payment_method_controller_load('PaymentMethodBasicController'));
+    entity_save('payment_method', $payment_method_1);
     $payment_method_2 = $this->paymentMethodCreate(2, payment_method_controller_load('PaymentMethodBasicController'));
+    entity_save('payment_method', $payment_method_2);
 
     // Test the payment method overview (Views disabled).
     $this->XtoolsAssertMenuRouterItemPermission('admin/config/services/payment/method', array('payment.payment_method.view.any'), array(), 'Views disabled');
