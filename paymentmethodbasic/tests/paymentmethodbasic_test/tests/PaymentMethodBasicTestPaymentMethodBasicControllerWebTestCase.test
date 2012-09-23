@@ -84,7 +84,6 @@ class PaymentMethodBasicTestPaymentMethodBasicControllerWebTestCase extends Paym
       'controller_form[message][value]' => 'bar',
       'controller_form[status]' => PAYMENT_STATUS_FAILED,
       'controller_form[message][format]' => 'filtered_html',
-      
     ), t('Save'));
     $payment_method = entity_load_single('payment_method', 1);
     $reference = array(
