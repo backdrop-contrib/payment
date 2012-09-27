@@ -41,19 +41,53 @@ function payment_views_data_alter(&$data) {
     'handler' => 'views_handler_relationship',
     'label' => t('Payment method'),
   );
-  $data['payment']['psiid_first']['relationship'] = array(
-    'title' => t('First status item'),
-    'base' => 'payment_status_item',
-    'base field' => 'psiid',
-    'handler' => 'views_handler_relationship',
-    'label' => t('First status item'),
+  $data['payment']['psiid_first'] = array(
+    'title' => t('First status item ID'),
+    'field' => array(
+      'handler' => 'views_handler_field_numeric',
+      'float' => TRUE,
+      'click sortable' => TRUE,
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_numeric',
+    ),
+    'relationship' => array(
+      'title' => t('First status item'),
+      'base' => 'payment_status_item',
+      'base field' => 'psiid',
+      'handler' => 'views_handler_relationship',
+      'label' => t('First status item'),
+    ),
   );
-  $data['payment']['psiid_last']['relationship'] = array(
-    'title' => t('Last status item'),
-    'base' => 'payment_status_item',
-    'base field' => 'psiid',
-    'handler' => 'views_handler_relationship',
-    'label' => t('Last status item'),
+  $data['payment']['psiid_last'] = array(
+    'title' => t('Last status item ID'),
+    'field' => array(
+      'handler' => 'views_handler_field_numeric',
+      'float' => TRUE,
+      'click sortable' => TRUE,
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_numeric',
+    ),
+    'relationship' => array(
+      'title' => t('Last status item'),
+      'base' => 'payment_status_item',
+      'base field' => 'psiid',
+      'handler' => 'views_handler_relationship',
+      'label' => t('Last status item'),
+    ),
   );
   $data['payment']['uid']['relationship'] = array(
     'title' => t('User'),

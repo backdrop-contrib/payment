@@ -513,20 +513,6 @@ function payment_entity_property_info() {
     'schema field' => 'pmid',
     'type' => 'integer',
   );
-  // The psiid_first and psiid_last properties are actually required, but not
-  // marked as such, because a payment and its first and last payment statuses
-  // are interdependent through their pid and psiid/psiid_first/psiid_last
-  // properties.
-  $properties['payment']['properties']['psiid_first'] = array(
-    'description' => t("The ID of the payment's oldest status item."),
-    'label' => t('First status item ID'),
-    'schema field' => 'psiid_first',
-  );
-  $properties['payment']['properties']['psiid_last'] = array(
-    'description' => t("The ID of the payment's most recent status item."),
-    'label' => t('Last status item ID'),
-    'schema field' => 'psiid_last',
-  );
   $properties['payment']['properties']['uid'] = array(
     'label' => 'User ID',
     'description' => t('The ID of the user this payment belongs to.'),
