@@ -113,7 +113,7 @@ class Payment extends PaymentCommon {
    *
    * @var integer
    */
-  public $uid = 0;
+  public $uid = NULL;
 
   /**
    * Constructor.
@@ -129,7 +129,7 @@ class Payment extends PaymentCommon {
 
     parent::__construct($properties);
 
-    if (!$this->uid) {
+    if (is_null($this->uid)) {
       $this->uid = $user->uid;
     }
     if (!$this->statuses) {
@@ -550,7 +550,7 @@ class PaymentMethod extends PaymentCommon {
    *
    * @var integer
    */
-  public $uid = 0;
+  public $uid = NULL;
 
   /**
    * Implements PaymentCommon::__construct().
@@ -560,7 +560,7 @@ class PaymentMethod extends PaymentCommon {
 
     parent::__construct($properties);
 
-    if (!$this->uid) {
+    if (is_null($this->uid)) {
       $this->uid = $user->uid;
     }
   }
