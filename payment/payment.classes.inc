@@ -451,7 +451,7 @@ class PaymentEntityController extends EntityAPIController {
       $payment_build['payment_method'] = array(
         '#type' => 'item',
         '#title' => t('Payment method'),
-        '#markup' => $payment->method->title_generic,
+        '#markup' => check_plain($payment->method->title_generic),
       );
     }
 
@@ -751,7 +751,7 @@ class PaymentMethodController {
   public $currencies = array();
 
   /**
-   * A human-readable description of this payment method controller.
+   * A human-readable plain text description of this payment method controller.
    *
    * @var string
    */
@@ -817,7 +817,7 @@ class PaymentMethodController {
   public $payment_method_configuration_form_elements_callback = '';
 
   /**
-   * The human-readable title.
+   * The human-readable plain text title.
    *
    * @var array
    */
@@ -942,7 +942,7 @@ class PaymentMethodControllerUnavailable extends PaymentMethodController {
 class PaymentStatusInfo extends PaymentCommon {
 
   /**
-   * A US English human-readable description.
+   * A US English human-readable plain text description.
    *
    * @var string
    */
@@ -963,7 +963,7 @@ class PaymentStatusInfo extends PaymentCommon {
   public $status = '';
 
   /**
-   * A US English human-readable title.
+   * A US English human-readable plain text title.
    *
    * @var string
    */
@@ -1162,7 +1162,7 @@ class PaymentLineItemInfo extends PaymentCommon {
   public $name = '';
 
   /**
-   * The human-readable title.
+   * The human-readable plain text title.
    *
    * @var string
    */

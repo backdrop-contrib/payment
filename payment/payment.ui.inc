@@ -326,7 +326,7 @@ function payment_form_payment_method(array $form, array &$form_state, PaymentMet
   $form['controller'] = array(
     '#type' => 'item',
     '#title' => t('Type'),
-    '#markup' => check_plain($payment_method->controller->title),
+    '#markup' => $payment_method->controller->title,
   );
   $form['enabled'] = array(
     '#type' => 'checkbox',
@@ -902,7 +902,7 @@ function payment_form_process_method(array $element, array &$form_state, array &
   $pmids = empty($element['#pmids']) ? FALSE : $element['#pmids'];
   foreach ($payment->availablePaymentMethods(entity_load('payment_method', $pmids)) as $payment_method) {
     // Cast the PMID to a string or the AJAX callback won't work.
-    $pmid_options[(string) $payment_method->pmid] = $payment_method->title_generic;
+    $pmid_options[(string) $payment_method->pmid] = check_plain($payment_method->title_generic);
   }
 
   // There are no available payment methods.
@@ -1138,7 +1138,7 @@ function _payment_status_options_level(array $hierarchy, $depth) {
 function payment_method_options() {
   $options = array();
   foreach (entity_load('payment_method') as $payment_method) {
-    $options[$payment_method->pmid] = $payment_method->title_specific;
+    $options[$payment_method->pmid] = check_plain($payment_method->title_specific);
   }
 
   return $options;
