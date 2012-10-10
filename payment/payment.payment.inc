@@ -39,6 +39,21 @@ function payment_payment_status_info() {
       'parent' => PAYMENT_STATUS_MONEY_NOT_TRANSFERRED,
     )),
     new PaymentStatusInfo(array(
+      'status' => PAYMENT_STATUS_CANCELLED,
+      'title' => t('Cancelled'),
+      'parent' => PAYMENT_STATUS_FAILED,
+    )),
+    new PaymentStatusInfo(array(
+      'status' => PAYMENT_STATUS_EXPIRED,
+      'title' => t('Expired'),
+      'parent' => PAYMENT_STATUS_FAILED,
+    )),
+    new PaymentStatusInfo(array(
+      'status' => PAYMENT_STATUS_AUTHORIZATION_FAILED,
+      'title' => t('Authorization failed'),
+      'parent' => PAYMENT_STATUS_FAILED,
+    )),
+    new PaymentStatusInfo(array(
       'status' => PAYMENT_STATUS_NEW,
       'title' => t('Created'),
       'parent' => PAYMENT_STATUS_MONEY_NOT_TRANSFERRED,

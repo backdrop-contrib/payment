@@ -44,6 +44,21 @@ define('PAYMENT_STATUS_SUCCESS', 'payment_status_success');
 define('PAYMENT_STATUS_FAILED', 'payment_status_failed');
 
 /**
+ * A payment that was cancelled by the payer.
+ */
+define('PAYMENT_STATUS_CANCELLED', 'payment_status_cancelled');
+
+/**
+ * A payment that expired due to inactivity.
+ */
+define('PAYMENT_STATUS_EXPIRED', 'payment_status_expired');
+
+/**
+ * A payment for which payer authorization failed.
+ */
+define('PAYMENT_STATUS_AUTHORIZATION_FAILED', 'payment_status_authorization_failed');
+
+/**
  * The prefix for payment line item tokens.
  */
 define('PAYMENT_LINE_ITEM_TOKEN_PREFIX', 'line_item-');
