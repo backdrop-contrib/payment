@@ -1140,6 +1140,7 @@ function payment_method_options() {
   foreach (entity_load('payment_method') as $payment_method) {
     $options[$payment_method->pmid] = check_plain($payment_method->title_specific);
   }
+  sort($options);
 
   return $options;
 }
