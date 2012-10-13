@@ -405,6 +405,7 @@ class PaymentEntityController extends EntityAPIController {
         ))
         ->fields(array(
           'amount' => $line_item->amount,
+          'amount_total' => $line_item->amount * $line_item->quantity * ($line_item->tax_rate + 1),
           'description' => $line_item->description,
           'description_arguments' => serialize($line_item->description_arguments),
           'name' => $line_item->name,

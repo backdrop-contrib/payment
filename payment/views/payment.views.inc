@@ -127,7 +127,7 @@ function payment_views_data_alter(&$data) {
     'amount_total' => array(
       'title' => t('Total amount'),
       'field' => array(
-        'handler' => 'PaymentViewsHandlerFieldPaymentLineItemAmountTotal',
+        'handler' => 'views_handler_field_numeric',
         'float' => TRUE,
         'click sortable' => TRUE,
       ),

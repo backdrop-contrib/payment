@@ -15,6 +15,10 @@ function payment_schema() {
         'type' => 'float',
         'size' => 'big',
       ),
+      'amount_total' => array(
+        'type' => 'float',
+        'size' => 'big',
+      ),
       'description' => array(
         'type' => 'varchar',
         'length' => 255,
@@ -253,6 +257,22 @@ function payment_update_7100(&$sandbox) {
   ));
   // Populate the field by simply saving it, because a payment's missing
   // psiid_first or psiid_last information is updated automatically.
+  foreach (entity_load('payment') as $payment) {
+    entity_save('payment', $payment);
+  }
+}
+
+/**
+ * Adds the amount_total field to {payment_line_item}.
+ */
+function payment_update_7101(&$sandbox) {
+  // Add the new field.
+  db_add_field('payment_line_item', 'amount_total', array(
+    'type' => 'float',
+    'size' => 'big',
+  ));
+  // Populate the field by simply saving it, because a line items's missing
+  // amount_total information is updated automatically.
   foreach (entity_load('payment') as $payment) {
     entity_save('payment', $payment);
   }
