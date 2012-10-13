@@ -120,6 +120,10 @@ function payment_view_payments() {
   $handler->display->display_options['relationships']['psiid_last']['table'] = 'payment';
   $handler->display->display_options['relationships']['psiid_last']['field'] = 'psiid_last';
   $handler->display->display_options['relationships']['psiid_last']['required'] = TRUE;
+  /* Relationship: Payment: User */
+  $handler->display->display_options['relationships']['uid']['id'] = 'uid';
+  $handler->display->display_options['relationships']['uid']['table'] = 'payment';
+  $handler->display->display_options['relationships']['uid']['field'] = 'uid';
   /* Field: Payment status item: Creation date and time */
   $handler->display->display_options['fields']['created']['id'] = 'created';
   $handler->display->display_options['fields']['created']['table'] = 'payment_status_item';
@@ -216,6 +220,12 @@ function payment_view_payments() {
   $handler->display->display_options['fields']['title_specific']['label'] = 'Payment method';
   $handler->display->display_options['fields']['title_specific']['empty'] = 'Unavailable';
   $handler->display->display_options['fields']['title_specific']['hide_alter_empty'] = FALSE;
+  /* Field: User: Name */
+  $handler->display->display_options['fields']['name']['id'] = 'name';
+  $handler->display->display_options['fields']['name']['table'] = 'users';
+  $handler->display->display_options['fields']['name']['field'] = 'name';
+  $handler->display->display_options['fields']['name']['relationship'] = 'uid';
+  $handler->display->display_options['fields']['name']['label'] = 'User';
   /* Field: Payment: Operations */
   $handler->display->display_options['fields']['operations']['id'] = 'operations';
   $handler->display->display_options['fields']['operations']['table'] = 'payment';
@@ -278,6 +288,22 @@ function payment_view_payments() {
   $handler->display->display_options['filters']['title_specific']['expose']['identifier'] = 'payment_method';
   $handler->display->display_options['filters']['title_specific']['expose']['remember'] = TRUE;
   $handler->display->display_options['filters']['title_specific']['expose']['multiple'] = TRUE;
+  /* Filter criterion: User: Name */
+  $handler->display->display_options['filters']['uid']['id'] = 'uid';
+  $handler->display->display_options['filters']['uid']['table'] = 'users';
+  $handler->display->display_options['filters']['uid']['field'] = 'uid';
+  $handler->display->display_options['filters']['uid']['relationship'] = 'uid';
+  $handler->display->display_options['filters']['uid']['value'] = '';
+  $handler->display->display_options['filters']['uid']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['uid']['expose']['operator_id'] = 'uid_op';
+  $handler->display->display_options['filters']['uid']['expose']['label'] = 'User';
+  $handler->display->display_options['filters']['uid']['expose']['operator'] = 'uid_op';
+  $handler->display->display_options['filters']['uid']['expose']['identifier'] = 'uid';
+  $handler->display->display_options['filters']['uid']['expose']['remember_roles'] = array(
+    2 => '2',
+    1 => 0,
+    3 => 0,
+  );
   $handler->display->display_options['path'] = 'admin/content/payment';
   $handler->display->display_options['menu']['type'] = 'tab';
   $handler->display->display_options['menu']['title'] = 'Payments';
@@ -368,6 +394,7 @@ function payment_view_payments() {
     t('Payment method'),
     t('Line items'),
     t('Last status item'),
+    t('User'),
     t('Last update'),
     t('Status'),
     t('Broken handler payment.amount'),
