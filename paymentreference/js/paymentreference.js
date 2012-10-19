@@ -3,8 +3,7 @@
    * Refresh this window's opener's payment references.
    */
   $(document).ready(function() {
-    regex = new RegExp('^' + Drupal.settings.basePath + 'paymentreference/finish');
-    if (regex.test(window.location.pathname) && window.opener) {
+    if (window.opener && window.opener.Drupal.PaymentreferenceRefreshButtons) {
       window.opener.Drupal.PaymentreferenceRefreshButtons();
     }
   });
