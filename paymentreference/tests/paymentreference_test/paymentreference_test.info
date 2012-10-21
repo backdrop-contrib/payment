@@ -6,3 +6,4 @@ dependencies[] = xtools
 package = Payment
 hidden = TRUE
 files[] = tests/PaymentreferenceCallablesWebTestCase.test
+files[] = tests/PaymentreferenceTestQueueWebTestCase.test

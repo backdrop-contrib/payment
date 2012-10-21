@@ -268,9 +268,23 @@ function paymentreference_field_is_empty(array $item, array $field) {
 function paymentreference_field_insert($entity_type, $entity, array $field, array $instance, $langcode, array &$items) {
   if ($field['type'] == 'paymentreference') {
     foreach ($items as $item) {
-      paymentreference_delete($item['pid']);
+      paymentreference_delete_by_pid($item['pid']);
     }
   }
+}
+
+/**
+ * Implements hook_field_delete_field().
+ */
+function paymentreference_field_delete_field(array $field) {
+  paymentreference_delete_by_field($field['field_name']);
+}
+
+/**
+ * Implements hook_field_delete_instance().
+ */
+function paymentreference_field_delete_instance(array $instance) {
+  paymentreference_delete_by_field_instance($instance['entity_type'], $instance['bundle'], $instance['field_name']);
 }
 
 /**
@@ -280,6 +294,14 @@ function paymentreference_payment_insert(Payment $payment) {
   if (!empty($payment->context_data['paymentreference'])) {
     paymentreference_insert($payment->context_data['entity_type'], $payment->context_data['bundle'], $payment->context_data['field_name'], $payment->pid);
   }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_ACTION().
+ */
+function paymentreference_payment_delete(Payment $payment) {
+
+  paymentreference_delete_by_pid($payment->pid);
 }
 
 /**
@@ -330,7 +352,10 @@ function paymentreference_load($entity_type, $bundle, $field_name, $uid) {
     ->condition('bundle', $bundle)
     ->condition('field_name', $field_name)
     ->condition('status', array_merge(payment_status_info(PAYMENT_STATUS_SUCCESS)->descendants(), array(PAYMENT_STATUS_SUCCESS)))
-    ->condition('uid', $uid);
+    ->condition('uid', $uid)
+    // Order by pid ASC, so we use the oldest payment first.
+    ->orderBy('pid')
+    ->range(0, 1);
 
   return $query->execute()->fetchField();
 }
@@ -362,13 +387,39 @@ function paymentreference_insert($entity_type, $bundle, $field_name, $pid) {
 }
 
 /**
- * Delete a Payment available for referencing.
+ * Delete a Payment from the queue by PID.
  *
  * @param integer $pid
  */
-function paymentreference_delete($pid) {
+function paymentreference_delete_by_pid($pid) {
   db_delete('paymentreference')
     ->condition('pid', $pid)
+    ->execute();
+}
+
+/**
+ * Delete a Payment from the queue by field.
+ *
+ * @param string $field_name
+ */
+function paymentreference_delete_by_field($field_name) {
+  db_delete('paymentreference')
+    ->condition('field_name', $field_name)
+    ->execute();
+}
+
+/**
+ * Delete a Payment from the queue by field instance.
+ *
+ * @param string $entity_type
+ * @param string $bundle
+ * @param string $field_name
+ */
+function paymentreference_delete_by_field_instance($entity_type, $bundle, $field_name) {
+  db_delete('paymentreference')
+    ->condition('field_name', $field_name)
+    ->condition('entity_type', $entity_type)
+    ->condition('bundle', $bundle)
     ->execute();
 }
 
