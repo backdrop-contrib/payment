@@ -827,6 +827,10 @@ class PaymentMethodController {
   /**
    * Execute a payment.
    *
+   * Note that payments may be executed even if their owner is not logged into
+   * the site. This means that if you need to do access control in your
+   * execute() method, you cannot use global $user.
+   *
    * @param Payment $payment
    *
    * @return boolean
