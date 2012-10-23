@@ -529,6 +529,7 @@ function payment_view_payment_methods() {
   $handler->display->display_options['fields']['controller_title']['table'] = 'payment_method';
   $handler->display->display_options['fields']['controller_title']['field'] = 'controller_title';
   $handler->display->display_options['fields']['controller_title']['label'] = 'Type';
+  $handler->display->display_options['fields']['controller_title']['empty'] = 'Unavailable';
   $handler->display->display_options['fields']['controller_title']['hide_alter_empty'] = FALSE;
   /* Field: User: Name */
   $handler->display->display_options['fields']['name']['id'] = 'name';
@@ -577,6 +578,7 @@ function payment_view_payment_methods() {
     t(','),
     t('Title'),
     t('Type'),
+    t('Unavailable'),
     t('Owner'),
     t('Operations'),
     t('Enabled (machine name)'),
