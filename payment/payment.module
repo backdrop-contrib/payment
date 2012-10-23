@@ -293,12 +293,19 @@ function payment_menu_alter(&$items) {
  * Implements hook_modules_uninstalled().
  */
 function payment_modules_uninstalled(array $modules) {
-  db_update('payment_method')
+  $pmids = db_select('payment_method')
+    ->fields('payment_method', array('pmid'))
     ->condition('controller_class_name', payment_method_controllers_info(), 'NOT IN')
-    ->fields(array(
-      'controller_class_name' => 'PaymentMethodControllerUnavailable',
-    ))
-    ->execute();
+    ->condition('enabled', TRUE)
+    ->execute()
+    ->fetchCol();
+  if ($pmids) {
+    foreach (entity_load('payment_method', $pmids) as $payment_method) {
+      $payment_method->controller = payment_method_controller_load('PaymentMethodControllerUnavailable');
+      $payment_method->enabled = FALSE;
+      entity_save('payment_method', $payment_method);
+    }
+  }
 }
 
 /**
