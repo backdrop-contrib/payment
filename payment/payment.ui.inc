@@ -907,7 +907,9 @@ function payment_form_process_method(array $element, array &$form_state, array &
 
   // There are no available payment methods.
   if (count($pmid_options) == 0) {
-    $form['#disabled'] = TRUE;
+    if (!$payment->pid) {
+      $form['#disabled'] = TRUE;
+    }
     $element['pmid_title'] = array(
       '#type' => 'item',
       '#title' => isset($element['#title']) ? $element['#title'] : NULL,
