@@ -33,11 +33,6 @@ class PaymentUnavailableWebTestCase extends PaymentWebTestCase {
     $payment = entity_load_single('payment', $payment->pid);
     $this->assertEqual($payment->method->controller->name, 'PaymentMethodControllerUnavailable', 'When loading a payment method, if its controller unavailable, it is replaced by PaymentMethodControllerUnavailable.');
 
-    // Test uninstalling a module that provides a payment method controller.
-    drupal_uninstall_modules(array('paymentmethodbasic'));
-    $count = db_query("SELECT COUNT(1) FROM {payment_method} WHERE controller_class_name = 'PaymentMethodBasicController'")->fetchField();
-    $this->assertFalse((bool) $count, 'When uninstalling a module that provides payment method controllers, all payment methods that use any of those controllers will be updated to use PaymentMethodControllerUnavailable.');
-
     // Test deleting a payment method.
     entity_delete('payment_method', $payment->method->pmid);
     $payment = entity_load_single('payment', $payment->pid);
