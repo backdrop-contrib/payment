@@ -15,6 +15,7 @@ function payment_token_info() {
   foreach (payment_line_items_info() as $info) {
     $token['payment'][PAYMENT_LINE_ITEM_TOKEN_PREFIX . $info->name] = array(
       'name' => $info->title,
+      'description' => t('The total amount of all line items of this type.'),
     );
   }
 
