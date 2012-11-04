@@ -880,6 +880,22 @@ function payment_line_item_get_specific($name, Payment $payment) {
 function payment_line_item_get_all($name, Payment $payment) {
   return $payment->line_items;
 }
+
+/**
+ * Implements PaymentLineItemInfo::callback.
+ */
+function payment_line_item_get_prefixed($name, Payment $payment) {
+  $selection = array();
+
+  foreach ($payment->line_items as $line_item) {
+    if (strpos($line_item->name, $name) === 0) {
+      $selection[] = $line_item;
+    }
+  }
+
+  return $selection;
+}
+
 /**
  * Implements Rules access callback.
  */
