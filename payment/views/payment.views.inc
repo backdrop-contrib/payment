@@ -10,6 +10,10 @@
  */
 function payment_views_data_alter(&$data) {
   // Payment.
+  $data['payment']['description']['field'] = array(
+    'handler' => 'PaymentViewsHandlerFieldTranslatableString',
+    'string_arguments_field' => 'description_arguments',
+  );
   $data['payment']['operations'] = array(
     'title' => t('Operations'),
     'real field' => 'pid',

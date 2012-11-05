@@ -79,6 +79,12 @@ function payment_schema() {
         'type' => 'varchar',
         'length' => 255,
       ),
+      'description_arguments' => array(
+        'type' => 'blob',
+        'size' => 'big',
+        'serialize' => TRUE,
+        'not null' => TRUE,
+      ),
       'finish_callback' => array(
         'type' => 'varchar',
         'length' => 255,
@@ -276,4 +282,21 @@ function payment_update_7101(&$sandbox) {
   foreach (entity_load('payment') as $payment) {
     entity_save('payment', $payment);
   }
+}
+
+/**
+ * Adds the description_arguments field to {payment}.
+ */
+function payment_update_7102(&$sandbox) {
+  db_add_field('payment', 'description_arguments', array(
+    'type' => 'blob',
+    'size' => 'big',
+    'serialize' => TRUE,
+    'not null' => TRUE,
+  ));
+  db_update('payment')
+    ->fields(array(
+      'description_arguments' => 'a:0:{}',
+    ))
+    ->execute();
 }

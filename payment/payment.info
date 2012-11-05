@@ -11,5 +11,6 @@ files[] = views/PaymentViewsHandlerFieldPaymentMethodEnabledMachineName.inc
 files[] = views/PaymentViewsHandlerFieldPaymentMethodOperations.inc
 files[] = views/PaymentViewsHandlerFieldPaymentStatusTitle.inc
 files[] = views/PaymentViewsHandlerFieldPaymentOperations.inc
+files[] = views/PaymentViewsHandlerFieldTranslatableString.inc
 files[] = views/PaymentViewsHandlerFilterPaymentMethodTitle.inc
 files[] = views/PaymentViewsHandlerFilterPaymentStatusItemStatus.inc

@@ -56,6 +56,13 @@ class Payment extends PaymentCommon {
   public $description = '';
 
   /**
+   * Arguments to pass on to t() when translating $this->description.
+   *
+   * @var array
+   */
+  public $description_arguments = array();
+
+  /**
    * The name of a function to call when payment execution is completed,
    * regardless of the payment status. It receives one argument:
    * - $payment Payment
