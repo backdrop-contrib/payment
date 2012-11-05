@@ -176,12 +176,6 @@ function payment_schema() {
           'pid' => 'pid',
         ),
       ),
-      'psiid' => array(
-        'table' => 'payment',
-        'columns' => array(
-          'psiid' => 'psiid_last',
-        ),
-      ),
     ),
     'indexes' => array(
       'pid' => array('pid'),
