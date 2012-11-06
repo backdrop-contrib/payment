@@ -148,17 +148,8 @@ function payment_views_data_alter(&$data) {
     'description' => array(
       'title' => t('Description'),
       'field' => array(
-        'handler' => 'PaymentViewsHandlerFieldPaymentLineItemDescription',
-        'click sortable' => TRUE,
-      ),
-      'sort' => array(
-        'handler' => 'views_handler_sort',
-      ),
-      'filter' => array(
-        'handler' => 'views_handler_filter_string',
-      ),
-      'argument' => array(
-        'handler' => 'views_handler_argument_string',
+        'handler' => 'PaymentViewsHandlerFieldTranslatableString',
+        'string_arguments_field' => 'description_arguments',
       ),
     ),
     'name' => array(
