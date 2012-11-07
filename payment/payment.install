@@ -294,3 +294,15 @@ function payment_update_7102(&$sandbox) {
     ))
     ->execute();
 }
+
+/**
+ * Sets the exportable status for existing payment methods.
+ */
+function payment_update_7103(array &$sandbox) {
+  db_update('payment_method')
+    ->condition('module', 'payment')
+    ->fields(array(
+      'status' => ENTITY_CUSTOM,
+    ))
+    ->execute();
+}

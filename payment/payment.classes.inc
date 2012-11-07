@@ -537,7 +537,7 @@ class PaymentMethod extends PaymentCommon {
    *
    * @var integer
    */
-  public $status = '';
+  public $status = ENTITY_CUSTOM;
 
   /**
    * The specific human-readable title, e.g. "Paypal WPS".
