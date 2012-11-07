@@ -35,6 +35,26 @@ function payment_rules_event_info() {
       ),
     ),
   );
+  $event['payment_validate'] = array(
+    'label' => t('When validating a payment against a payment method'),
+    'group' => t('Payment'),
+    'access callback' => 'payment_rules_access',
+    'variables' => array(
+      'payment' => array(
+        'type' => 'payment',
+        'label' => t('Payment'),
+      ),
+      'payment_method' => array(
+        'type' => 'payment_method',
+        'label' => t('Payment method'),
+      ),
+      'strict' => array(
+        'type' => 'boolean',
+        'label' => t('Strict validation'),
+        'description' => t('Whether to validate everything a payment method needs or to validate the most important things only. Useful when finding available payment methods, for instance, which does not require unimportant things to be a 100% valid.'),
+      ),
+    ),
+  );
 
   return $event;
 }
@@ -110,6 +130,17 @@ function payment_rules_action_info() {
         'type' => 'text',
         'label' => t('Amount'),
         'description' => $description,
+      ),
+    ),
+  );
+  $actions['payment_rules_action_payment_invalidate'] = array(
+    'label' => t('Invalidate the combination of payment and payment method'),
+    'access callback' => 'payment_rules_access',
+    'group' => t('Payment'),
+    'parameter' => array(
+      'message' => array(
+        'type' => 'text',
+        'label' => t('Message'),
       ),
     ),
   );
@@ -292,6 +323,21 @@ function payment_rules_action_payment_line_item_add(Payment $payment, $name, $de
     )));
   }
 }
+
+/**
+ * Implements Rules action callback: invalidate a combination of a payment and
+ * a payment method.
+ *
+ * @throws PaymentValidatioNException
+ *
+ * @param $message
+ *
+ * @return NULL
+ */
+function payment_rules_action_payment_invalidate($message) {
+  throw new PaymentValidationException($message);
+}
+
 
 /**
  * Implements Rules options list callback for

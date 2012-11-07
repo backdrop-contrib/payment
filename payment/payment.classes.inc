@@ -588,6 +588,9 @@ class PaymentMethod extends PaymentCommon {
   function validate(Payment $payment, $strict = TRUE) {
     $this->controller->validate($payment, $this, $strict);
     module_invoke_all('payment_validate', $payment, $this, $strict);
+    if (module_exists('rules')) {
+      rules_invoke_event('payment_validate', $payment, $this, $strict);
+    }
   }
 }
 
