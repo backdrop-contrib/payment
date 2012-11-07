@@ -1148,6 +1148,23 @@ function payment_method_options() {
 }
 
 /**
+ * Return payment method controllerss for use in form elements.
+ *
+ * @todo In Payment 7.x-2.x merge
+ * payment_rules_options_list_payment_uses_payment_method_type() into this
+ * function.
+ *
+ * @return array
+ *   Keys are payment method controller class names. Values are controller
+ *   titles.
+ */
+function payment_method_controller_options() {
+  module_load_include('inc', 'payment', 'payment.rules');
+
+  return payment_rules_options_list_payment_uses_payment_method_type();
+}
+
+/**
  * Implements form build callback: global configuration form.
  */
 function payment_form_global_configuration(array $form, array &$form_state) {

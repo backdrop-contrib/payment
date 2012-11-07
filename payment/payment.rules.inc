@@ -387,6 +387,7 @@ function payment_rules_options_list_payment_uses_payment_method_type() {
   foreach (payment_method_controller_load_multiple() as $payment_method_controller) {
     $options[$payment_method_controller->name] = $payment_method_controller->title;
   }
+  asort($options);
 
   return $options;
 }
