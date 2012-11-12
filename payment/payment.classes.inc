@@ -308,13 +308,11 @@ class Payment extends PaymentCommon {
     }
     $available = array();
     foreach ($payment_methods as $payment_method) {
-      if ($payment_method->enabled) {
-        try {
-          $payment_method->validate($this, FALSE);
-          $available[$payment_method->pmid] = $payment_method;
-        }
-        catch (PaymentValidationException $e) {
-        }
+      try {
+        $payment_method->validate($this, FALSE);
+        $available[$payment_method->pmid] = $payment_method;
+      }
+      catch (PaymentValidationException $e) {
       }
     }
 
@@ -865,6 +863,11 @@ class PaymentMethodController {
    * @throws PaymentValidationException
    */
   function validate(Payment $payment, PaymentMethod $payment_method, $strict) {
+    // Confirm the payment method is enabled, and thus available in general.
+    if (!$payment_method->enabled) {
+      throw new PaymentValidationPaymentMethodDisabledException(t('The payment method is disabled.'));
+    }
+
     if (!$payment->currency_code) {
       throw new PaymentValidationMissingCurrencyException(t('The payment has no currency set.'));
     }
@@ -1239,3 +1242,8 @@ class PaymentValidationDescriptionMissing extends PaymentValidationException {}
  * Exception thrown if a payment's description is too long.
  */
 class PaymentValidationDescriptionTooLong extends PaymentValidationException {}
+
+/**
+ * Exception thrown if a payment method is disabled.
+ */
+class PaymentValidationPaymentMethodDisabledException extends PaymentValidationException {}

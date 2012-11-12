@@ -43,6 +43,19 @@ class PaymentValidationWebTestCase extends PaymentWebTestCase {
     }
     $this->assertTrue($valid, 'PaymentMethodController::validate() does not invalidate a valid payment.');
 
+    // Test that a payment with a disabled payment method invalidates.
+    try {
+      $this->payment_method->enabled = FALSE;
+      $payment = $this->paymentCreate(1, $this->payment_method);
+      $this->payment_method->validate($payment);
+      $valid = TRUE;
+    }
+    catch (PaymentValidationPaymentMethodDisabledException $e) {
+      $this->payment_method->enabled = TRUE;
+      $valid = FALSE;
+    }
+    $this->assertFalse($valid, 'PaymentMethodController::validate() invalidates a payment of which the payment method is disabled.');
+
     // Test that a payment without a currency code set invalidates.
     try {
       $payment = $this->paymentCreate(1, $this->payment_method);
