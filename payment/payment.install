@@ -14,10 +14,12 @@ function payment_schema() {
       'amount' => array(
         'type' => 'float',
         'size' => 'big',
+        'not null' => TRUE,
       ),
       'amount_total' => array(
         'type' => 'float',
         'size' => 'big',
+        'not null' => TRUE,
       ),
       'description' => array(
         'type' => 'varchar',
@@ -41,10 +43,14 @@ function payment_schema() {
       ),
       'quantity' => array(
         'type' => 'int',
+        'default' => 1,
+        'not null' => TRUE,
       ),
       'tax_rate' => array(
         'type' => 'float',
         'size' => 'big',
+        'default' => 0.0,
+        'not null' => TRUE,
       ),
     ),
     'primary key' => array('name', 'pid'),
@@ -74,10 +80,13 @@ function payment_schema() {
       'currency_code' => array(
         'type' => 'varchar',
         'length' => 3,
+        'default' => 'XXX',
+        'not null' => TRUE,
       ),
       'description' => array(
         'type' => 'varchar',
         'length' => 255,
+        'not null' => TRUE,
       ),
       'description_arguments' => array(
         'type' => 'blob',
@@ -88,6 +97,7 @@ function payment_schema() {
       'finish_callback' => array(
         'type' => 'varchar',
         'length' => 255,
+        'not null' => TRUE,
       ),
       'pid' => array(
         'type' => 'serial',
@@ -155,9 +165,11 @@ function payment_schema() {
       'status' => array(
         'type' => 'varchar',
         'length' => 255,
+        'not null' => TRUE,
       ),
       'created' => array(
         'type' => 'int',
+        'not null' => TRUE,
       ),
       'pid' => array(
         'description' => 'The payment ID.',
@@ -192,6 +204,8 @@ function payment_schema() {
       'enabled' => array(
         'type' => 'int',
         'size' => 'tiny',
+        'default' => 0,
+        'not null' => TRUE,
       ),
       'module' => array(
         'type' => 'varchar',
@@ -209,6 +223,8 @@ function payment_schema() {
       'status' => array(
         'type' => 'int',
         'size' => 'tiny',
+        'default' => ENTITY_CUSTOM,
+        'not null' => TRUE,
       ),
       'title_generic' => array(
         'type' => 'varchar',
@@ -305,4 +321,68 @@ function payment_update_7103(array &$sandbox) {
       'status' => ENTITY_CUSTOM,
     ))
     ->execute();
+}
+
+/**
+ * Updates NOT NULL and default value configuration for some database columns.
+ */
+function payment_update_7104(array &$sandbox) {
+  db_change_field('payment', 'currency_code', 'currency_code', array(
+    'type' => 'varchar',
+    'length' => 3,
+    'default' => 'XXX',
+    'not null' => TRUE,
+  ));
+  db_change_field('payment', 'description', 'description', array(
+    'type' => 'varchar',
+    'length' => 255,
+    'not null' => TRUE,
+  ));
+  db_change_field('payment', 'finish_callback', 'finish_callback', array(
+    'type' => 'varchar',
+    'length' => 255,
+    'not null' => TRUE,
+  ));
+  db_change_field('payment_line_item', 'amount', 'amount', array(
+    'type' => 'float',
+    'size' => 'big',
+    'not null' => TRUE,
+  ));
+  db_change_field('payment_line_item', 'amount_total', 'amount_total', array(
+    'type' => 'float',
+    'size' => 'big',
+    'not null' => TRUE,
+  ));
+  db_change_field('payment_line_item', 'quantity', 'quantity', array(
+    'type' => 'int',
+    'default' => 1,
+    'not null' => TRUE,
+  ));
+  db_change_field('payment_line_item', 'tax_rate', 'tax_rate', array(
+    'type' => 'float',
+    'size' => 'big',
+    'default' => 0.0,
+    'not null' => TRUE,
+  ));
+  db_change_field('payment_method', 'enabled', 'enabled', array(
+    'type' => 'int',
+    'size' => 'tiny',
+    'default' => 0,
+    'not null' => TRUE,
+  ));
+  db_change_field('payment_method', 'status', 'status', array(
+    'type' => 'int',
+    'size' => 'tiny',
+    'default' => ENTITY_CUSTOM,
+    'not null' => TRUE,
+  ));
+  db_change_field('payment_status_item', 'status', 'status', array(
+    'type' => 'varchar',
+    'length' => 255,
+    'not null' => TRUE,
+  ));
+  db_change_field('payment_status_item', 'created', 'created', array(
+    'type' => 'int',
+    'not null' => TRUE,
+  ));
 }
