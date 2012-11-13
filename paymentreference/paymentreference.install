@@ -84,7 +84,9 @@ function paymentreference_field_schema($field) {
  */
 function paymentreference_update_7100(&$sandbox) {
   $pids = db_query("SELECT pr.pid FROM {paymentreference} pr LEFT JOIN {payment} p ON pr.pid = p.pid WHERE p.pid IS NULL")->fetchCol();
-  db_delete('paymentreference')
-    ->condition('pid', $pids)
-    ->execute();
+  if ($pids) {
+    db_delete('paymentreference')
+      ->condition('pid', $pids)
+      ->execute();
+  }
 }
