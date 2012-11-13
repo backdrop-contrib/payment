@@ -15,8 +15,8 @@ class PaymentValidationWebTestCase extends PaymentWebTestCase {
   /**
    * Implements DrupalWebTestCase::setUp().
    */
-  function setUp() {
-    parent::setUp('payment', 'paymentmethodbasic', 'payment_test');
+  function setUp(array $modules = array()) {
+    parent::setUp($modules = array('payment', 'paymentmethodbasic', 'payment_test'));
 
     $this->payment_method = new PaymentMethod(array(
       'controller' => payment_method_controller_load('PaymentMethodBasicController'),

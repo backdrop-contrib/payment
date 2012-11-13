@@ -10,8 +10,8 @@ class PaymentmethodbasicCallablesWebTestCase extends PaymentWebTestCase {
     );
   }
 
-  function setUp() {
-    parent::setUp(array('xtools'));
+  function setUp(array $modules = array()) {
+    parent::setUp($modules + array('xtools'));
   }
 
   function testCallables() {

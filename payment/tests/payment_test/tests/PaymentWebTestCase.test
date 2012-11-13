@@ -2,6 +2,11 @@
 
 class PaymentWebTestCase extends XtoolsWebTestCase {
 
+  function setUp(array $modules = array()) {
+    $this->profile = 'testing';
+    parent::setUp($modules);
+  }
+
   /**
    * Create, save, and return a Payment.
    *

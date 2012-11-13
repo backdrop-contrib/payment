@@ -9,8 +9,8 @@ class PaymentreferenceTestQueueWebTestCase extends PaymentWebTestCase {
     );
   }
 
-  function setUp() {
-    parent::setUp(array('paymentreference'));
+  function setUp(array $modules = array()) {
+    parent::setUp($modules + array('paymentreference'));
   }
 
   function testQueueCRUD() {

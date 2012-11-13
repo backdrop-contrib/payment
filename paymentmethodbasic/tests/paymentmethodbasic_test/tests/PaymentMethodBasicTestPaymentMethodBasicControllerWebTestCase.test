@@ -18,7 +18,7 @@ class PaymentMethodBasicTestPaymentMethodBasicControllerWebTestCase extends Paym
     );
   }
 
-  function setUp() {
+  function setUp(array $modules = array()) {
     parent::setUp(array('paymentmethodbasic_test'));
   }
 
@@ -83,13 +83,12 @@ class PaymentMethodBasicTestPaymentMethodBasicControllerWebTestCase extends Paym
       'name' => 'foo',
       'controller_form[message][value]' => 'bar',
       'controller_form[status]' => PAYMENT_STATUS_FAILED,
-      'controller_form[message][format]' => 'filtered_html',
     ), t('Save'));
     $payment_method = entity_load_single('payment_method', 1);
     $reference = array(
       'message' => 'bar',
       'status' => PAYMENT_STATUS_FAILED,
-      'text_format' => 'filtered_html',
+      'text_format' => 'plain_text',
     );
     $this->assertFalse(array_diff_assoc($reference, $payment_method->controller_data), "An BasicPaymentMethodController payment method's controller data is correctly saved by the payment method form.");
   }

@@ -15,8 +15,8 @@ class PaymentStatusItemWebTestCase extends PaymentWebTestCase {
   /**
    * Implements DrupalWebTestCase::setUp().
    */
-  function setUp() {
-    parent::setUp('payment');
+  function setUp(array $modules = array()) {
+    parent::setUp($modules = array('payment'));
   }
 
   /**

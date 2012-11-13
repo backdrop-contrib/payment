@@ -5,12 +5,7 @@
  */
 class PaymentformWebTestCase extends DrupalWebTestCase {
 
-  function setUp() {
-    // Set up required modules.
-    $modules = func_get_args();
-    if (isset($modules[0]) && is_array($modules[0])) {
-      $modules = $modules[0];
-    }
+  function setUp(array $modules = array()) {
     parent::setUp($modules + array('field', 'node', 'paymentform'));
 
     // Field configuration.

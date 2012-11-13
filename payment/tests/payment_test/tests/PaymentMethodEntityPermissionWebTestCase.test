@@ -10,8 +10,8 @@ class PaymentMethodEntityPermissionWebTestCase extends PaymentWebTestCase {
     );
   }
 
-  function setUp() {
-    parent::setUp(array('payment', 'paymentmethodbasic', 'xtools'));
+  function setUp(array $modules = array()) {
+    parent::setUp($modules + array('payment', 'paymentmethodbasic', 'xtools'));
   }
 
   function testPaymentMethodEntityPermissions() {

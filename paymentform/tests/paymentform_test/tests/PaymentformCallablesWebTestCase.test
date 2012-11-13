@@ -10,8 +10,8 @@ class PaymentFormCallablesValueWebTestCase extends PaymentWebTestCase {
     );
   }
 
-  function setUp() {
-    parent::setUp(array('paymentform', 'xtools'));
+  function setUp(array $modules = array()) {
+    parent::setUp($modules + array('paymentform', 'xtools'));
   }
 
   function testCallables() {

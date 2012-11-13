@@ -12,8 +12,8 @@ class PaymentUnavailableWebTestCase extends PaymentWebTestCase {
     );
   }
 
-  function setUp() {
-    parent::setUp('payment', 'paymentmethodbasic');
+  function setUp(array $modules = array()) {
+    parent::setUp($modules = array('payment', 'paymentmethodbasic'));
   }
 
   /**
