@@ -5,6 +5,7 @@ configure = admin/config/services/payment
 dependencies[] = entity
 package = Payment
 files[] = payment.classes.inc
+files[] = payment.generate.inc
 files[] = views/PaymentViewsHandlerFieldPaymentMethodControllerTitle.inc
 files[] = views/PaymentViewsHandlerFieldPaymentMethodControllerDescription.inc
 files[] = views/PaymentViewsHandlerFieldPaymentMethodEnabledMachineName.inc

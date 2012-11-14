@@ -16,6 +16,7 @@ files[] = tests/PaymentMenuRouterItemPermissionWebTestCase.test
 files[] = tests/PaymentMethodEntityPermissionWebTestCase.test
 files[] = tests/PaymentMethodMenuRouterItemPermissionWebTestCase.test
 files[] = tests/PaymentStatusItemWebTestCase.test
+files[] = tests/PaymentTestUpdatePathWebTestCase.test
 files[] = tests/PaymentUnavailableWebTestCase.test
 files[] = tests/PaymentValidationWebTestCase.test
 files[] = tests/PaymentWebTestCase.test
