@@ -9555,40 +9555,6 @@ db_create_table('payment', array(
   'module' => 'payment',
   'name' => 'payment',
 ));
-db_insert('payment')->fields(array(
-  'context',
-  'context_data',
-  'currency_code',
-  'description',
-  'finish_callback',
-  'pid',
-  'pmid',
-  'psiid_last',
-  'uid',
-))
-->values(array(
-  'context' => '',
-  'context_data' => 'a:0:{}',
-  'currency_code' => 'XXX',
-  'description' => 'This is the payment description',
-  'finish_callback' => 'payment_generate_finish_callback',
-  'pid' => '1',
-  'pmid' => '1',
-  'psiid_last' => '1',
-  'uid' => '1',
-))
-->values(array(
-  'context' => '',
-  'context_data' => 'a:0:{}',
-  'currency_code' => 'XXX',
-  'description' => 'This is the payment description',
-  'finish_callback' => 'payment_generate_finish_callback',
-  'pid' => '2',
-  'pmid' => '2',
-  'psiid_last' => '2',
-  'uid' => '1',
-))
-->execute();
 
 db_create_table('payment_line_item', array(
   'fields' => array(
@@ -9643,52 +9609,6 @@ db_create_table('payment_line_item', array(
   'module' => 'payment',
   'name' => 'payment_line_item',
 ));
-db_insert('payment_line_item')->fields(array(
-  'amount',
-  'description',
-  'description_arguments',
-  'name',
-  'pid',
-  'quantity',
-  'tax_rate',
-))
-->values(array(
-  'amount' => '1.23',
-  'description' => 'This is the line item description',
-  'description_arguments' => 'a:0:{}',
-  'name' => 'payment-generate-1',
-  'pid' => '1',
-  'quantity' => '3',
-  'tax_rate' => '0',
-))
-->values(array(
-  'amount' => '1.23',
-  'description' => 'This is the line item description',
-  'description_arguments' => 'a:0:{}',
-  'name' => 'payment-generate-1',
-  'pid' => '2',
-  'quantity' => '3',
-  'tax_rate' => '0',
-))
-->values(array(
-  'amount' => '4.56',
-  'description' => 'This is the line item description',
-  'description_arguments' => 'a:0:{}',
-  'name' => 'payment-generate-2',
-  'pid' => '1',
-  'quantity' => '1',
-  'tax_rate' => '0.78',
-))
-->values(array(
-  'amount' => '4.56',
-  'description' => 'This is the line item description',
-  'description_arguments' => 'a:0:{}',
-  'name' => 'payment-generate-2',
-  'pid' => '2',
-  'quantity' => '1',
-  'tax_rate' => '0.78',
-))
-->execute();
 
 db_create_table('payment_method', array(
   'fields' => array(
@@ -9753,40 +9673,6 @@ db_create_table('payment_method', array(
   'module' => 'payment',
   'name' => 'payment_method',
 ));
-db_insert('payment_method')->fields(array(
-  'controller_class_name',
-  'enabled',
-  'module',
-  'name',
-  'pmid',
-  'status',
-  'title_generic',
-  'title_specific',
-  'uid',
-))
-->values(array(
-  'controller_class_name' => 'PaymentMethodControllerUnavailable',
-  'enabled' => '0',
-  'module' => 'payment',
-  'name' => 'gakdcnxd',
-  'pmid' => '1',
-  'status' => '0',
-  'title_generic' => 'GAKDCNXD-general',
-  'title_specific' => 'GAKDCNXD-specific',
-  'uid' => '1',
-))
-->values(array(
-  'controller_class_name' => 'PaymentMethodBasicController',
-  'enabled' => '1',
-  'module' => 'payment',
-  'name' => 'eh9wkb2p',
-  'pmid' => '2',
-  'status' => '0',
-  'title_generic' => 'EH9WKB2P-general',
-  'title_specific' => 'EH9WKB2P-specific',
-  'uid' => '1',
-))
-->execute();
 
 db_create_table('payment_status_item', array(
   'fields' => array(
@@ -9831,25 +9717,6 @@ db_create_table('payment_status_item', array(
   'module' => 'payment',
   'name' => 'payment_status_item',
 ));
-db_insert('payment_status_item')->fields(array(
-  'status',
-  'created',
-  'pid',
-  'psiid',
-))
-->values(array(
-  'status' => 'payment_status_new',
-  'created' => '1352890358',
-  'pid' => '1',
-  'psiid' => '1',
-))
-->values(array(
-  'status' => 'payment_status_new',
-  'created' => '1352890358',
-  'pid' => '2',
-  'psiid' => '2',
-))
-->execute();
 
 db_create_table('paymentmethodbasic', array(
   'fields' => array(
@@ -9885,19 +9752,6 @@ db_create_table('paymentmethodbasic', array(
   'module' => 'paymentmethodbasic',
   'name' => 'paymentmethodbasic',
 ));
-db_insert('paymentmethodbasic')->fields(array(
-  'message',
-  'pmid',
-  'status',
-  'text_format',
-))
-->values(array(
-  'message' => '',
-  'pmid' => '2',
-  'status' => 'payment_status_success',
-  'text_format' => '',
-))
-->execute();
 
 db_create_table('paymentreference', array(
   'fields' => array(

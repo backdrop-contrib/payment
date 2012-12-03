@@ -407,28 +407,30 @@ function payment_update_7105(array &$sandbox) {
   else {
     $sandbox['run']++;
   }
-  $sandbox['#finished'] = 1 / ceil($sandbox['count'] / (($sandbox['run'] + 1) * $per_run));
+  if ($sandbox['count']) {
+    $sandbox['#finished'] = 1 / ceil($sandbox['count'] / (($sandbox['run'] + 1) * $per_run));
 
-  // Load the PIDs for this run.
-  $pids = db_select('payment')
-    ->fields('payment', array('pid'))
-    ->range($sandbox['run'] * $per_run, $per_run)
-    ->execute()
-    ->fetchCol();
+    // Load the PIDs for this run.
+    $pids = db_select('payment')
+      ->fields('payment', array('pid'))
+      ->range($sandbox['run'] * $per_run, $per_run)
+      ->execute()
+      ->fetchCol();
 
-  // Load the PIIDs and PIDs for this run.
-  $psiid_first = db_select('payment_status_item')
-    ->fields('payment_status_item', array('pid', 'psiid'))
-    ->condition('pid', $pids)
-    ->execute()
-    ->fetchAllKeyed();
+    // Load the PIIDs and PIDs for this run.
+    $psiid_first = db_select('payment_status_item')
+      ->fields('payment_status_item', array('pid', 'psiid'))
+      ->condition('pid', $pids)
+      ->execute()
+      ->fetchAllKeyed();
 
-  foreach ($psiid_first as $pid => $psiid) {
-    $query = db_update('payment')
-      ->condition('pid', $pid)
-      ->fields(array(
-        'psiid_first' => $psiid,
-      ))
-      ->execute();
+    foreach ($psiid_first as $pid => $psiid) {
+      $query = db_update('payment')
+        ->condition('pid', $pid)
+        ->fields(array(
+          'psiid_first' => $psiid,
+        ))
+        ->execute();
+    }
   }
 }
