@@ -65,15 +65,20 @@ function payment_page_payment_view(Payment $payment) {
  * @param Payment $payment
  * @param array $pmids
  *   The PMIDs of the payment methods the user is allowed to choose from.
+ * @param array $parents
+ *   An array with the machine names of the form's parent elements.
+ *   @todo This is too important to be an optional element. Perhaps we can set
+ *   this using #process in version 2?
  *
  * @return array
  *   Form information with the following keys:
  *   - elements: the form's (renderable) elements.
  *   - submit: an array of form #submit callbacks.
  */
-function payment_form_embedded(array &$form_state, Payment $payment, array $pmids = array()) {
+function payment_form_embedded(array &$form_state, Payment $payment, array $pmids = array(), array $parents = array()) {
   $form_state['payment'] = $payment;
 
+  $elements['#parents'] = $parents;
   $elements['#element_validate'] = array('payment_form_embedded_validate');
   $elements['payment_status'] = array(
     '#access' => !payment_status_is_or_has_ancestor($payment->getStatus()->status, PAYMENT_STATUS_NEW),
