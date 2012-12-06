@@ -1,0 +1,62 @@
+<?php
+
+/**
+ * @file
+ * Contains class PaymentTestPaymentMenuRouterItemPermissionWebTestCase.
+ */
+
+/**
+ * Tests payment menu router item access control.
+ */
+class PaymentTestPaymentMenuRouterItemPermissionWebTestCase extends PaymentWebTestCase {
+
+  static function getInfo() {
+    return array(
+      'name' => 'Payment menu router item permissions',
+      'group' => 'Payment',
+      'dependencies' => array('payment', 'paymentmethodbasic', 'xtools'),
+    );
+  }
+
+  /**
+   * Overrides parent::setUp().
+   */
+  function setUp(array $modules = array()) {
+    parent::setUp($modules + array('payment', 'paymentmethodbasic', 'xtools'));
+  }
+
+  function testPaymentMenuRouterItemPermissions() {
+    $payment_method = $this->paymentMethodCreate(2, payment_method_controller_load('PaymentMethodBasicController'));
+    entity_save('payment_method', $payment_method);
+    $payment = $this->paymentCreate(2, $payment_method);
+    entity_save('payment', $payment);
+
+    // Test the global configuration page.
+    $this->XtoolsAssertMenuRouterItemPermission('admin/config/services/payment/global', array('payment.global.administer'));
+
+    // Test the payment view page.
+    $this->XtoolsAssertMenuRouterItemPermission('payment/' . $payment->pid, array('payment.payment.view.any'));
+
+    // Test the payment edit page.
+    $this->XtoolsAssertMenuRouterItemPermission('payment/' . $payment->pid . '/edit', array('payment.payment.update.any'));
+
+    // Test the payment delete page.
+    $this->XtoolsAssertMenuRouterItemPermission('payment/' . $payment->pid . '/delete', array('payment.payment.delete.any'));
+
+    // Test the administrative payment overview page (Views disabled).
+    $this->XtoolsAssertMenuRouterItemPermission('admin/content/payment', array('payment.payment.view.any'), array(), 'Views disabled');
+
+    // Test a user's payment overview page (Views disabled).
+    $this->XtoolsAssertMenuRouterItemPermission('user/2/payment', array('payment.payment.view.own'), array(), 'Views disabled');
+
+    // Enable Views.
+    $this->assertTrue(module_enable(array('views')), 'Enabled modules: <em>views</em>');
+    $this->resetAll();
+
+    // Test the administrative payment overview page (Views enabled).
+    $this->XtoolsAssertMenuRouterItemPermission('admin/content/payment', array('payment.payment.view.any'), array(), 'Views enabled');
+
+    // Test a user's payment overview page (Views enabled).
+    $this->XtoolsAssertMenuRouterItemPermission('user/2/payment', array('payment.payment.view.own'), array(), 'Views enabled');
+  }
+}

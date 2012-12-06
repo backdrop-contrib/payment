@@ -5,3 +5,4 @@ dependencies[] = payment
 package = Payment
 core = 7.x
 files[] = tests/paymentform.test
+files[] = tests/PaymentformWebTestCase.test

@@ -1,0 +1,68 @@
+<?php
+
+/**
+ * @file
+ * Contains class PaymentTestPaymentMethodMenuRouterItemPermissionWebTestCase.
+ */
+
+/**
+ * Tests payment method menu router item access control.
+ */
+class PaymentTestPaymentMethodMenuRouterItemPermissionWebTestCase extends PaymentWebTestCase {
+
+  static function getInfo() {
+    return array(
+      'name' => 'Payment method menu router item permissions',
+      'group' => 'Payment',
+      'dependencies' => array('payment', 'paymentmethodbasic', 'xtools'),
+    );
+  }
+
+  /**
+   * Overrides parent::setUp().
+   */
+  function setUp(array $modules = array()) {
+    parent::setUp($modules + array('payment', 'paymentmethodbasic', 'xtools'));
+  }
+
+  function testPaymentMethodMenuRouterItemPermissions() {
+    $payment_method_1 = $this->paymentMethodCreate(1, payment_method_controller_load('PaymentMethodBasicController'));
+    entity_save('payment_method', $payment_method_1);
+    $payment_method_2 = $this->paymentMethodCreate(2, payment_method_controller_load('PaymentMethodBasicController'));
+    entity_save('payment_method', $payment_method_2);
+
+    // Test the payment method overview (Views disabled).
+    $this->XtoolsAssertMenuRouterItemPermission('admin/config/services/payment/method', array('payment.payment_method.view.any'), array(), 'Views disabled');
+
+    // Enable Views.
+    $this->assertTrue(module_enable(array('views')), 'Enabled modules: <em>views</em>');
+    $this->resetAll();
+
+    // Test the payment method overview (Views enabled).
+    $this->XtoolsAssertMenuRouterItemPermission('admin/config/services/payment/method', array('payment.payment_method.view.any'), array(), 'Views enabled');
+
+    // Test the payment method controller selection page.
+    $this->XtoolsAssertMenuRouterItemPermission('admin/config/services/payment/method/add', array('payment.payment_method.create.PaymentMethodBasicController'));
+
+    // Test the payment method add page.
+    $this->XtoolsAssertMenuRouterItemPermission('admin/config/services/payment/method/add/PaymentMethodBasicController', array('payment.payment_method.create.PaymentMethodBasicController'));
+
+    // Test the payment method edit page for a payment method that belongs to user 1.
+    $this->XtoolsAssertMenuRouterItemPermission('admin/config/services/payment/method/' . $payment_method_1->pmid . '/edit', array('payment.payment_method.update.any'));
+
+    // Test the payment method edit page for a payment method that belongs to user 2.
+    $this->XtoolsAssertMenuRouterItemPermission('admin/config/services/payment/method/' . $payment_method_2->pmid . '/edit', array('payment.payment_method.update.own'));
+
+    // Test the payment method delete page for a payment method that belongs to user 1.
+    $this->XtoolsAssertMenuRouterItemPermission('admin/config/services/payment/method/' . $payment_method_1->pmid . '/delete', array('payment.payment_method.delete.any'));
+
+    // Test the payment method delete page for a payment method that belongs to user 2.
+    $this->XtoolsAssertMenuRouterItemPermission('admin/config/services/payment/method/' . $payment_method_2->pmid . '/delete', array('payment.payment_method.delete.own'));
+
+    // Test the payment method clone page for a payment method that belongs to user 1.
+    $this->XtoolsAssertMenuRouterItemPermission('admin/config/services/payment/method/' . $payment_method_1->pmid . '/clone', array('payment.payment_method.view.any', 'payment.payment_method.create.' . $payment_method_1->controller->name));
+
+    // Test the payment method clone page for a payment method that belongs to user 2.
+    $this->XtoolsAssertMenuRouterItemPermission('admin/config/services/payment/method/' . $payment_method_2->pmid . '/clone', array('payment.payment_method.view.own', 'payment.payment_method.create.' . $payment_method_2->controller->name));
+  }
+}

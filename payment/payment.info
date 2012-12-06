@@ -16,3 +16,4 @@ files[] = views/PaymentViewsHandlerFieldTranslatableString.inc
 files[] = views/PaymentViewsHandlerFilterPaymentMethodControllerTitle.inc
 files[] = views/PaymentViewsHandlerFilterPaymentMethodTitle.inc
 files[] = views/PaymentViewsHandlerFilterPaymentStatusItemStatus.inc
+files[] = tests/PaymentWebTestCase.test

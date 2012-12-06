@@ -1,0 +1,31 @@
+<?php
+
+/**
+ * @file
+ * Contains class PaymentTestCallablesWebTestCase.
+ */
+
+/**
+ * Tests implementations of callables.
+ */
+class PaymentTestCallablesWebTestCase extends XtoolsWebTestCase {
+
+  static function getInfo() {
+    return array(
+      'name' => 'Hook and callback implementations',
+      'group' => 'Payment',
+      'dependencies' => array('payment', 'payment_test', 'views', 'xtools'),
+    );
+  }
+
+  /**
+   * Overrides parent::setUp().
+   */
+  function setUp(array $modules = array()) {
+    parent::setUp($modules = array('xtools'));
+  }
+
+  function testCallables() {
+    $this->XtoolsAssertCallables(array('payment', 'payment_test'), array('drupal', 'payment', 'views', 'xtools'));
+  }
+}

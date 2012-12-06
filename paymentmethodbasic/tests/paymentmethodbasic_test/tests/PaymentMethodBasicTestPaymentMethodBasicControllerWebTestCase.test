@@ -2,13 +2,13 @@
 
 /**
  * @file
- * Contains class PaymentMethodBasicTestPaymentMethodBasicControllerWebTestCase.
+ * Contains class PaymentmethodbasicTestPaymentMethodBasicControllerWebTestCase.
  */
 
 /**
  * Tests PaymentMethodBasicController functionality.
  */
-class PaymentMethodBasicTestPaymentMethodBasicControllerWebTestCase extends PaymentWebTestCase {
+class PaymentmethodbasicTestPaymentMethodBasicControllerWebTestCase extends PaymentWebTestCase {
 
   static function getInfo() {
     return array(
@@ -46,7 +46,7 @@ class PaymentMethodBasicTestPaymentMethodBasicControllerWebTestCase extends Paym
 
     // Test loading a payment method.
     $payment_method_loaded = entity_load_single('payment_method', $pmid);
-    $this->assertFalse(array_diff_assoc($payment_method->controller_data, $payment_method_loaded->controller_data), "An BasicPaymentMethodController payment method's controller data is loaded correctly.");
+    $this->assertFalse(array_diff_assoc($payment_method->controller_data, $payment_method_loaded->controller_data), "An BasicPaymentMethodController payment method's controller data is loaded orrectly.");
 
     // Test updating a payment method.
     $payment_method->controller_data = array(

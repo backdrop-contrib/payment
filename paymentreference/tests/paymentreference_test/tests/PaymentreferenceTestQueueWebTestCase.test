@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * @file
+ * Contains class PaymentreferenceTestQueueWebTestCase.
+ */
+
+/**
+ * Tests the reference queue.
+ */
 class PaymentreferenceTestQueueWebTestCase extends PaymentWebTestCase {
 
   static function getInfo() {
@@ -8,7 +16,13 @@ class PaymentreferenceTestQueueWebTestCase extends PaymentWebTestCase {
       'group' => 'Payment Reference',
     );
   }
+  /**
+   * Overrides parent::setUp().
+   */
 
+  /**
+   * Overrides parent::setUp().
+   */
   function setUp(array $modules = array()) {
     parent::setUp($modules + array('paymentreference'));
   }

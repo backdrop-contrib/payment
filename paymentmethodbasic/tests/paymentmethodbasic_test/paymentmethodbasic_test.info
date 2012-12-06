@@ -5,5 +5,5 @@ dependencies[] = paymentmethodbasic
 dependencies[] = xtools
 package = Payment
 hidden = TRUE
-files[] = tests/PaymentmethodbasicCallablesWebTestCase.test
-files[] = tests/PaymentMethodBasicTestPaymentMethodBasicControllerWebTestCase.test
+files[] = tests/PaymentmethodbasicTestCallablesWebTestCase.test
+files[] = tests/PaymentmethodbasicTestPaymentMethodBasicControllerWebTestCase.test
