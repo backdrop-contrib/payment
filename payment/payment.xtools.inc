@@ -24,11 +24,51 @@ function payment_xtools_blueprint_info() {
     new XtoolsBlueprintPlaceholder('PaymentStatusInfo'),
   ), 'integer');
 
+  // Payment
+  $blueprints['Payment'] = new XtoolsBlueprintObject('Payment', array(
+    'context' => new XtoolsBlueprintChildElement(new XtoolsBlueprintString(0, 255), TRUE),
+    'context_data' => new XtoolsBlueprintChildElement(new XtoolsBlueprintArray(), TRUE),
+    'currency_code' => new XtoolsBlueprintChildElement(new XtoolsBlueprintString(3, 3), TRUE),
+    'description' => new XtoolsBlueprintChildElement(new XtoolsBlueprintString(0, 255), TRUE),
+    'description_arguments' => new XtoolsBlueprintChildElement(new XtoolsBlueprintArray(array(), array(), 'string'), TRUE),
+    'finish_callback' => new XtoolsBlueprintChildElement(new XtoolsBlueprintString(0, 255), TRUE),
+    'line_items' => new XtoolsBlueprintChildElement(new XtoolsBlueprintArray(array(), array(new XtoolsBlueprintPlaceholder('PaymentLineItem')), 'string'), TRUE),
+    'method' => new XtoolsBlueprintChildElement(new XtoolsBlueprintPlaceholder('PaymentMethod'), TRUE),
+    'method_data' => new XtoolsBlueprintChildElement(new XtoolsBlueprintArray(), TRUE),
+    'pid' => new XtoolsBlueprintChildElement(new XtoolsBlueprintInteger(0), TRUE),
+    'line_items' => new XtoolsBlueprintChildElement(new XtoolsBlueprintArray(array(), array(new XtoolsBlueprintPlaceholder('PaymentLineItem'))), TRUE),
+    'uid' => new XtoolsBlueprintChildElement(new XtoolsBlueprintOr(array(new XtoolsBlueprintNULL(), new XtoolsBlueprintInteger(0))), TRUE),
+  ));
+
+  // PaymentLineItem
+  $blueprints['PaymentLineItem'] = new XtoolsBlueprintObject('PaymentLineItem', array(
+    'amount' => new XtoolsBlueprintChildElement(new XtoolsBlueprintFloat(0), TRUE),
+    'description' => new XtoolsBlueprintChildElement(new XtoolsBlueprintString(0, 255), TRUE),
+    'description_arguments' => new XtoolsBlueprintChildElement(new XtoolsBlueprintArray(array(), array(), 'string'), TRUE),
+    'name' => new XtoolsBlueprintChildElement(new XtoolsBlueprintString, TRUE),
+    'tax_rate' => new XtoolsBlueprintChildElement(new XtoolsBlueprintFloat(0), TRUE),
+    'quantity' => new XtoolsBlueprintChildElement(new XtoolsBlueprintInteger(0), TRUE),
+  ));
+
   // PaymentLineItemInfo
   $blueprints['PaymentLineItemInfo'] = new XtoolsBlueprintObject('PaymentLineItemInfo', array(
-    'callback' => new XtoolsBlueprintChildElement(new XtoolsBlueprintString, TRUE),
-    'name' => new XtoolsBlueprintChildElement(new XtoolsBlueprintString, TRUE),
-    'title' => new XtoolsBlueprintChildElement(new XtoolsBlueprintString, TRUE),
+    'callback' => new XtoolsBlueprintChildElement(new XtoolsBlueprintString(0, 255), TRUE),
+    'name' => new XtoolsBlueprintChildElement(new XtoolsBlueprintString(0, 255), TRUE),
+    'title' => new XtoolsBlueprintChildElement(new XtoolsBlueprintString(0, 255), TRUE),
+  ));
+
+  // PaymentMethod
+  $blueprints['PaymentMethod'] = new XtoolsBlueprintObject('PaymentMethod', array(
+    'controller' => new XtoolsBlueprintChildElement(new XtoolsBlueprintObject('PaymentMethodController'), TRUE),
+    'controller_data' => new XtoolsBlueprintChildElement(new XtoolsBlueprintArray(), TRUE),
+    'enabled' => new XtoolsBlueprintChildElement(new XtoolsBlueprintBoolean, TRUE),
+    'name' => new XtoolsBlueprintChildElement(new XtoolsBlueprintString(0, 255), TRUE),
+    'module' => new XtoolsBlueprintChildElement(new XtoolsBlueprintString(0, 255), TRUE),
+    'pmid' => new XtoolsBlueprintChildElement(new XtoolsBlueprintInteger(0), TRUE),
+    'status' => new XtoolsBlueprintChildElement(new XtoolsBlueprintInteger(0), TRUE),
+    'title_specific' => new XtoolsBlueprintChildElement(new XtoolsBlueprintString(0, 255), TRUE),
+    'title_generic' => new XtoolsBlueprintChildElement(new XtoolsBlueprintString(0, 255), TRUE),
+    'uid' => new XtoolsBlueprintChildElement(new XtoolsBlueprintOr(array(new XtoolsBlueprintNULL(), new XtoolsBlueprintInteger(0))), TRUE),
   ));
 
   // PaymentStatusInfo
@@ -37,6 +77,14 @@ function payment_xtools_blueprint_info() {
     'parent' => new XtoolsBlueprintChildElement(new XtoolsBlueprintString),
     'status' => new XtoolsBlueprintChildElement(new XtoolsBlueprintString, TRUE),
     'title' => new XtoolsBlueprintChildElement(new XtoolsBlueprintString, TRUE),
+  ));
+
+  // PaymentStatusItem
+  $blueprints['PaymentStatusItem'] = new XtoolsBlueprintObject('PaymentStatusItem', array(
+    'created' => new XtoolsBlueprintChildElement(new XtoolsBlueprintInteger, TRUE),
+    'pid' => new XtoolsBlueprintChildElement(new XtoolsBlueprintInteger, TRUE),
+    'psiid' => new XtoolsBlueprintChildElement(new XtoolsBlueprintInteger, TRUE),
+    'status' => new XtoolsBlueprintChildElement(new XtoolsBlueprintString, TRUE),
   ));
 
   return $blueprints;

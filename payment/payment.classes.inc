@@ -629,7 +629,10 @@ class PaymentMethodEntityController extends EntityAPIControllerExportable {
     foreach ($entities as $payment_method) {
       // Cast non-string scalars to their original types, because some backends
       // store/return all variables as strings.
+      $payment_method->enabled = (bool) $payment_method->enabled;
       $payment_method->pmid = (int) $payment_method->pmid;
+      $payment_method->status = (int) $payment_method->status;
+      $payment_method->uid = (int) $payment_method->uid;
     }
     // Load PaymentMethodUnavailable for all requested IDs that did not match
     // any existing payment methods.
