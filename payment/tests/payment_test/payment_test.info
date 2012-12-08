@@ -8,6 +8,7 @@ package = Payment
 hidden = TRUE
 files[] = tests/PaymentTestActionHookAndCallbackWebTestCase.test
 files[] = tests/PaymentTestCallablesWebTestCase.test
+files[] = tests/PaymentTestEntityCrudWebTestCase.test
 files[] = tests/PaymentTestPaymentAmountFormElementWebTestCase.test
 files[] = tests/PaymentTestPaymentEntityPermissionWebTestCase.test
 files[] = tests/PaymentTestPaymentLineItemFormElementWebTestCase.test

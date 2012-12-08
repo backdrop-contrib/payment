@@ -549,7 +549,7 @@ class PaymentMethod extends PaymentCommon {
    *
    * @var string
    */
-  public $title_generic = NULL;
+  public $title_generic = '';
 
   /**
    * The UID of the user this payment method belongs to.
@@ -567,7 +567,9 @@ class PaymentMethod extends PaymentCommon {
     parent::__construct($properties);
 
     if (is_null($this->uid)) {
-      $this->uid = $user->uid;
+      // Cast non-string scalars to their original types, because some backends
+      // store/return all variables as strings.
+      $this->uid = (int) $user->uid;
     }
   }
 
@@ -671,6 +673,9 @@ class PaymentMethodEntityController extends EntityAPIControllerExportable {
   function save($entity, DatabaseTransaction $transaction = NULL) {
     $entity->controller_class_name = $entity->controller->name;
     $return = parent::save($entity, $transaction);
+    // Cast non-string scalars to their original types, because some backends
+    // store/return all variables as strings.
+    $entity->pmid = (int) $entity->pmid;
     unset($entity->controller_class_name);
 
     return $return;
