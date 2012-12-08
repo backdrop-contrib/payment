@@ -31,7 +31,7 @@ function payment_xtools_blueprint_info() {
     'currency_code' => new XtoolsBlueprintChildElement(new XtoolsBlueprintString(3, 3), TRUE),
     'description' => new XtoolsBlueprintChildElement(new XtoolsBlueprintString(0, 255), TRUE),
     'description_arguments' => new XtoolsBlueprintChildElement(new XtoolsBlueprintArray(array(), array(), 'string'), TRUE),
-    'finish_callback' => new XtoolsBlueprintChildElement(new XtoolsBlueprintString(0, 255), TRUE),
+    'finish_callback' => new XtoolsBlueprintChildElement(new XtoolsBlueprintCallable(), TRUE),
     'line_items' => new XtoolsBlueprintChildElement(new XtoolsBlueprintArray(array(), array(new XtoolsBlueprintPlaceholder('PaymentLineItem')), 'string'), TRUE),
     'method' => new XtoolsBlueprintChildElement(new XtoolsBlueprintPlaceholder('PaymentMethod'), TRUE),
     'method_data' => new XtoolsBlueprintChildElement(new XtoolsBlueprintArray(), TRUE),
