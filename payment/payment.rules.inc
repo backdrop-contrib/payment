@@ -375,7 +375,7 @@ function payment_rules_action_payment_line_item_delete(Payment $payment, $name) 
  * @return boolean
  */
 function payment_rules_condition_payment_uses_payment_method(Payment $payment, array $pmids) {
-  return in_array($payment->method->pmid, $pmids);
+  return $payment->method && in_array($payment->method->pmid, $pmids);
 }
 
 /**
@@ -404,7 +404,7 @@ function payment_rules_options_list_payment_uses_payment_method_type() {
  * @return boolean
  */
 function payment_rules_condition_payment_uses_payment_method_type(Payment $payment, array $payment_method_controller_class_names) {
-  return in_array($payment->method->controller->name, $payment_method_controller_class_names);
+  return $payment->method && in_array($payment->method->controller->name, $payment_method_controller_class_names);
 }
 
 /**
