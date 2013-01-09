@@ -862,7 +862,7 @@ function payment_access($operation, Payment $payment = NULL, $account = NULL) {
     case 'view':
     case 'update';
     case 'delete':
-      return user_access('payment.payment.' . $operation . '.any', $account) || $payment && user_access('payment.payment.' . $operation . '.own', $account) && $account->uid = $payment->uid;
+      return user_access('payment.payment.' . $operation . '.any', $account) || $payment && user_access('payment.payment.' . $operation . '.own', $account) && $account->uid == $payment->uid;
   }
   return FALSE;
 }
