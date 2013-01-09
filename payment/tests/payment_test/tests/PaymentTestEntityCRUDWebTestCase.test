@@ -18,7 +18,7 @@ class PaymentTestEntityCrudWebTestCase extends PaymentWebTestCase {
   }
 
   function setUp(array $modules = array()) {
-    parent::setUp($modules = array('payment', 'xtools'));
+    parent::setUp($modules = array('payment_test', 'xtools'));
   }
 
   /**
@@ -88,9 +88,10 @@ class PaymentTestEntityCrudWebTestCase extends PaymentWebTestCase {
 
     // Test inserting a payment.
     $payment = new Payment(array(
-      'method' => $payment_method,
       'currency_code' => 'foo',
       'description' => 'bar',
+      'finish_callback' => 'payment_test_finish_callback',
+      'method' => $payment_method,
     ));
     entity_save('payment', $payment);
     $query = db_select('payment');
