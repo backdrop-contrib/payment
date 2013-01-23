@@ -154,6 +154,10 @@ function payment_form_standalone(array $form, array &$form_state, Payment $payme
   $form_info = payment_form_embedded($form_state, $payment, $pmids);
   $form = $form_info['elements'];
   $form['#submit'] = array_merge($form_info['submit'], array('payment_form_standalone_submit'));
+  // The stand-alone form is a special case, where the root element from
+  // payment_form_embedded() is the form root. Because of that, we have to
+  // re-set the validate callback.
+  $form['#validate'] = $form['#element_validate'];
   $form['actions'] = array(
     '#type' => 'actions',
   );
