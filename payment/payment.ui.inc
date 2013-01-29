@@ -130,7 +130,10 @@ function payment_form_embedded_validate(array $form, array &$form_state) {
  * Implements form submit callback for payment_form_embedded().
  */
 function payment_form_embedded_submit(array $form, array &$form_state) {
-  $form_state['payment']->setStatus(new PaymentStatusItem($form_state['values']['payment_status']));
+  // The payment status element may be unavailable.
+  if (isset($form_state['values']['payment_status'])) {
+    $form_state['payment']->setStatus(new PaymentStatusItem($form_state['values']['payment_status']));
+  }
 }
 
 /**
