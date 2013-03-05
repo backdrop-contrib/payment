@@ -189,7 +189,7 @@ function payment_rules_condition_info() {
     'group' => t('Payment'),
   );
   $conditions['payment_rules_condition_payment_uses_payment_method'] = array(
-    'label' => t('Payment method is'),
+    'label' => t('Payment uses payment method'),
     'access callback' => 'payment_rules_access',
     'parameter' => array(
       'payment' => array(
@@ -207,7 +207,7 @@ function payment_rules_condition_info() {
     'group' => t('Payment'),
   );
   $conditions['payment_rules_condition_payment_uses_payment_method_type'] = array(
-    'label' => t('Payment method type is'),
+    'label' => t('Payment uses payment method of type'),
     'access callback' => 'payment_rules_access',
     'parameter' => array(
       'payment' => array(
@@ -225,7 +225,7 @@ function payment_rules_condition_info() {
     'group' => t('Payment'),
   );
   $conditions['payment_rules_condition_payment_method_controller_supports_currency'] = array(
-    'label' => t('Payment method type supports currency'),
+    'label' => t('Payment uses payment method of a type that supports currency'),
     'access callback' => 'payment_rules_access',
     'parameter' => array(
       'payment' => array(
