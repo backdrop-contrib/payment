@@ -36,7 +36,7 @@ function payment_rules_event_info() {
     ),
   );
   $event['payment_validate'] = array(
-    'label' => t('When validating a payment against a payment method'),
+    'label' => t('When validating a payment against an arbitrary payment method'),
     'group' => t('Payment'),
     'access callback' => 'payment_rules_access',
     'variables' => array(
