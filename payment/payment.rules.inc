@@ -293,6 +293,30 @@ function payment_rules_condition_info() {
     ),
     'group' => t('Payment'),
   );
+  $conditions['payment_rules_condition_payment_amount_comparison'] = array(
+    'label' => t('Payment amount comparison'),
+    'access callback' => 'payment_rules_access',
+    'parameter' => array(
+      'payment' => array(
+        'label' => t('Payment'),
+        'type' => 'payment',
+        'restriction' => 'selector',
+      ),
+      'operator' => array(
+        'type' => 'text',
+        'label' => t('Comparison operator'),
+        'default value' => '<=',
+        'options list' => 'payment_numeric_comparison_operator_options',
+        'restriction' => 'input',
+      ),
+      'comparison_amount' => array(
+        'type' => 'decimal',
+        'label' => t('Amount'),
+        'default value' => '0',
+      ),
+    ),
+    'group' => t('Payment'),
+  );
 
   return $conditions;
 }
@@ -532,4 +556,31 @@ function payment_rules_condition_payment_method_controller_supports_currency(Pay
  */
 function payment_rules_condition_payment_method_supports_currencies(PaymentMethod $payment_method, array $currency_codes) {
   return empty($payment_method->controller->currencies) || (bool) array_intersect($currency_codes, array_keys($payment_method->controller->currencies));
+}
+
+/**
+ * Implements Rules condition callback: compare the payment amount.
+ *
+ * @param Payment $payment
+ *   The payment of which to compare the amount.
+ * @param string $comparison_operator
+ * @param string $comparison_amount
+ *
+ * @return boolean
+ */
+function payment_rules_condition_payment_amount_comparison(Payment $payment, $operator, $comparison_amount) {
+  $payment_amount = $payment->totalAmount(TRUE);
+  switch ($operator) {
+    case '<':
+      return $payment_amount < $comparison_amount;
+    case '<=':
+      return $payment_amount <= $comparison_amount;
+    case '=':
+      return $payment_amount == $comparison_amount;
+    case '>=':
+      return $payment_amount >= $comparison_amount;
+    case '>':
+      return $payment_amount > $comparison_amount;
+  }
+  return FALSE;
 }

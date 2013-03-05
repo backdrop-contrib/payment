@@ -1188,3 +1188,16 @@ function payment_form_global_configuration(array $form, array &$form_state) {
 
   return system_settings_form($form);
 }
+
+/**
+ * Returns an array of numerical comparison operators for use in Rules.
+ */
+function payment_numeric_comparison_operator_options() {
+  return array(
+    '<' => t('lesser than'),
+    '<=' => t('lesser than or equal to'),
+    '=' => t('equal to'),
+    '>=' => t('greater than or equal to'),
+    '>' => t('greater than'),
+  );
+}
