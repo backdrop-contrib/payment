@@ -1162,18 +1162,18 @@ function payment_method_options() {
 /**
  * Return payment method controllerss for use in form elements.
  *
- * @todo In Payment 7.x-2.x merge
- * payment_rules_options_list_payment_uses_payment_method_type() into this
- * function.
- *
  * @return array
  *   Keys are payment method controller class names. Values are controller
  *   titles.
  */
 function payment_method_controller_options() {
-  module_load_include('inc', 'payment', 'payment.rules');
+  $options = array();
+  foreach (payment_method_controller_load_multiple() as $payment_method_controller) {
+    $options[$payment_method_controller->name] = $payment_method_controller->title;
+  }
+  natcasesort($options);
 
-  return payment_rules_options_list_payment_uses_payment_method_type();
+  return $options;
 }
 
 /**

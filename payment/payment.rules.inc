@@ -47,6 +47,7 @@ function payment_rules_event_info() {
       'payment_method' => array(
         'type' => 'payment_method',
         'label' => t('Payment method'),
+        'description' => t('The payment method the variable is validated against.'),
       ),
       'strict' => array(
         'type' => 'boolean',
@@ -189,7 +190,7 @@ function payment_rules_condition_info() {
     'group' => t('Payment'),
   );
   $conditions['payment_rules_condition_payment_uses_payment_method'] = array(
-    'label' => t('Payment uses payment method'),
+    'label' => t('Payment uses payment method (deprecated)'),
     'access callback' => 'payment_rules_access',
     'parameter' => array(
       'payment' => array(
@@ -206,8 +207,26 @@ function payment_rules_condition_info() {
     ),
     'group' => t('Payment'),
   );
+  $conditions['payment_rules_condition_payment_method_comparison'] = array(
+    'label' => t('Payment method is'),
+    'access callback' => 'payment_rules_access',
+    'parameter' => array(
+      'payment_method' => array(
+        'label' => t('Payment method'),
+        'type' => 'payment_method',
+        'restriction' => 'selector',
+      ),
+      'pmids' => array(
+        'type' => 'list<text>',
+        'label' => t('Payment methods'),
+        'options list' => 'payment_method_options',
+        'restriction' => 'input',
+      ),
+    ),
+    'group' => t('Payment'),
+  );
   $conditions['payment_rules_condition_payment_uses_payment_method_type'] = array(
-    'label' => t('Payment uses payment method of type'),
+    'label' => t('Payment uses payment method of type (deprecated)'),
     'access callback' => 'payment_rules_access',
     'parameter' => array(
       'payment' => array(
@@ -218,14 +237,32 @@ function payment_rules_condition_info() {
       'payment_method_controller_class_names' => array(
         'type' => 'list<text>',
         'label' => t('Payment method types'),
-        'options list' => 'payment_rules_options_list_payment_uses_payment_method_type',
+        'options list' => 'payment_method_controller_options',
+        'restriction' => 'input',
+      ),
+    ),
+    'group' => t('Payment'),
+  );
+  $conditions['payment_rules_condition_payment_method_type_comparison'] = array(
+    'label' => t('Payment method is of type'),
+    'access callback' => 'payment_rules_access',
+    'parameter' => array(
+      'payment_method' => array(
+        'label' => t('Payment method'),
+        'type' => 'payment_method',
+        'restriction' => 'selector',
+      ),
+      'payment_method_controller_class_names' => array(
+        'type' => 'list<text>',
+        'label' => t('Payment method types'),
+        'options list' => 'payment_method_controller_options',
         'restriction' => 'input',
       ),
     ),
     'group' => t('Payment'),
   );
   $conditions['payment_rules_condition_payment_method_controller_supports_currency'] = array(
-    'label' => t('Payment uses payment method of a type that supports currency'),
+    'label' => t('Payment uses payment method of a type that supports currency (deprecated)'),
     'access callback' => 'payment_rules_access',
     'parameter' => array(
       'payment' => array(
@@ -235,6 +272,22 @@ function payment_rules_condition_info() {
       ),
       'currency' => array(
         'type' => 'text',
+        'label' => t('Currency code'),
+      ),
+    ),
+    'group' => t('Payment'),
+  );
+  $conditions['payment_rules_condition_payment_method_supports_currencies'] = array(
+    'label' => t('Payment method supports currency'),
+    'access callback' => 'payment_rules_access',
+    'parameter' => array(
+      'payment_method' => array(
+        'label' => t('Payment method'),
+        'type' => 'payment_method',
+        'restriction' => 'selector',
+      ),
+      'currency' => array(
+        'type' => 'list<text>',
         'label' => t('Currency code'),
       ),
     ),
@@ -367,6 +420,11 @@ function payment_rules_action_payment_line_item_delete(Payment $payment, $name) 
  * Implements Rules condition callback: check whether a payment uses one of the
  * selected payment methods.
  *
+ * This function is deprecated. Use
+ * payment_rules_condition_payment_method_comparison() instead.
+ *
+ * @see payment_rules_condition_payment_method_comparison()
+ *
  * @param Payment $payment
  *   The payment to check the condition for.
  * @param array $pmids
@@ -375,26 +433,45 @@ function payment_rules_action_payment_line_item_delete(Payment $payment, $name) 
  * @return boolean
  */
 function payment_rules_condition_payment_uses_payment_method(Payment $payment, array $pmids) {
-  return $payment->method && in_array($payment->method->pmid, $pmids);
+  return $payment->method && payment_rules_condition_payment_method_comparison($payment->method, $pmids);
+}
+
+/**
+ * Implements Rules condition callback: check whether a payment method is one
+ * of the given payment methods.
+ *
+ * @param PaymentMethod $payment_method
+ *   The payment method to check the condition for.
+ * @param array $pmids
+ *   An array with payment method IDs.
+ *
+ * @return boolean
+ */
+function payment_rules_condition_payment_method_comparison(PaymentMethod $payment_method, array $pmids) {
+  return in_array($payment_method->pmid, $pmids);
 }
 
 /**
  * Implements Rules options list callback for
  * payment_rules_condition_payment_uses_payment_method_type.
+ *
+ * This function is deprecated. Use payment_method_controller_options()
+ * instead.
+ *
+ * @todo Remove this function in Payment 2.
  */
 function payment_rules_options_list_payment_uses_payment_method_type() {
-  $options = array();
-  foreach (payment_method_controller_load_multiple() as $payment_method_controller) {
-    $options[$payment_method_controller->name] = $payment_method_controller->title;
-  }
-  asort($options);
-
-  return $options;
+  return payment_method_controller_options();
 }
 
 /**
  * Implements Rules condition callback: check whether a payment uses one of the
  * selected payment methods types.
+ *
+ * This function is deprecated. Use
+ * payment_rules_condition_payment_method_type_comparison() instead.
+ *
+ * @see payment_rules_condition_payment_method_type_comparison()
  *
  * @param Payment $payment
  *   The payment to check the condition for.
@@ -404,12 +481,32 @@ function payment_rules_options_list_payment_uses_payment_method_type() {
  * @return boolean
  */
 function payment_rules_condition_payment_uses_payment_method_type(Payment $payment, array $payment_method_controller_class_names) {
-  return $payment->method && in_array($payment->method->controller->name, $payment_method_controller_class_names);
+  return $payment->method && payment_rules_condition_payment_method_type_comparison($payment->method, $payment_method_controller_class_names);
+}
+
+/**
+ * Implements Rules condition callback: check whether a payment method uses one
+ * of the given controllers.
+ *
+ * @param PaymentMethod $payment_method
+ *   The payment method to check the condition for.
+ * @param array $payment_method_controller_class_names
+ *   An array with class names of payment method controllers.
+ *
+ * @return boolean
+ */
+function payment_rules_condition_payment_method_type_comparison(PaymentMethod $payment_method, array $payment_method_controller_class_names) {
+  return in_array($payment_method->controller->name, $payment_method_controller_class_names);
 }
 
 /**
  * Implements Rules condition callback: check whether a payment method
  * controller supports a currency.
+ *
+ * This function is deprecated. Use
+ * payment_rules_condition_payment_method_supports_currencies() instead.
+ *
+ * @see payment_rules_condition_payment_method_supports_currencies()
  *
  * @param Payment $payment
  *   The payment to check the condition for.
@@ -419,5 +516,20 @@ function payment_rules_condition_payment_uses_payment_method_type(Payment $payme
  * @return boolean
  */
 function payment_rules_condition_payment_method_controller_supports_currency(Payment $payment, $currency_code) {
-  return empty($payment->method->controller->currencies) ? TRUE : isset($payment->method->controller->currencies[$currency_code]);
+  return $payment->method && payment_rules_condition_payment_method_supports_currencies($payment->method, array($currency_code));
+}
+
+/**
+ * Implements Rules condition callback: check whether a payment method supports
+ * a currency.
+ *
+ * @param PaymentMethod $payment_method
+ *   The payment method to check the condition for.
+ * @param array $currency_codes
+ *   The ISO 4217 currency codes to check for.
+ *
+ * @return boolean
+ */
+function payment_rules_condition_payment_method_supports_currencies(PaymentMethod $payment_method, array $currency_codes) {
+  return empty($payment_method->controller->currencies) || (bool) array_intersect($currency_codes, array_keys($payment_method->controller->currencies));
 }
