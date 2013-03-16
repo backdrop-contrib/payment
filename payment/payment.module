@@ -517,7 +517,7 @@ function payment_entity_property_info() {
     'type' => 'integer',
   );
   $properties['payment']['properties']['uid'] = array(
-    'label' => 'User ID',
+    'label' => t('User ID'),
     'description' => t('The ID of the user this payment belongs to.'),
     'required' => TRUE,
     'schema field' => 'uid',
@@ -550,7 +550,7 @@ function payment_entity_property_info() {
     'schema field' => 'title_generic',
   );
   $properties['payment_method']['properties']['uid'] = array(
-    'label' => 'User ID',
+    'label' => t('User ID'),
     'description' => t('The ID of the user this payment method belongs to.'),
     'required' => TRUE,
     'schema field' => 'uid',
