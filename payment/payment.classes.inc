@@ -185,6 +185,10 @@ class Payment extends PaymentCommon {
    */
   function finish() {
     entity_save('payment', $this);
+    module_invoke_all('payment_pre_finish', $this);
+    if (module_exists('rules')) {
+      rules_invoke_event('payment_pre_finish', $this);
+    }
     call_user_func($this->finish_callback, $this);
   }
 

@@ -47,6 +47,7 @@ class PaymentTestActionHookAndCallbackWebTestCase extends PaymentWebTestCase {
     $this->assertTrue(isset($payment->payment_test_payment_pre_execute), 'hook_payment_pre_execute() is invoked before executing a payment.');
     $this->assertTrue(isset($payment->payment_test_payment_status_change), 'hook_payment_status_change() is invoked before executing a payment.');
     $this->assertTrue(isset($payment->payment_test_finish_callback), 'The finish callback is invoked after executing a payment.');
+    $this->assertTrue(isset($payment->payment_test_payment_pre_finish), 'hook_payment_pre_finish() is invoked when finishing a payment.');
 
     // Test hook_payment_form_alter().
     $form_state = form_state_defaults();

@@ -75,6 +75,13 @@ function payment_test_payment_pre_execute(Payment $payment) {
 }
 
 /**
+ * Implements hook_payment_pre_finish().
+ */
+function payment_test_payment_pre_finish(Payment $payment) {
+  $payment->payment_test_payment_pre_finish = TRUE;
+}
+
+/**
  * Implements Payment finish callback.
  */
 function payment_test_finish_callback(Payment $payment) {

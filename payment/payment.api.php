@@ -140,6 +140,25 @@ function hook_payment_pre_execute(Payment $payment) {
     'tax_rate' => 0.19,
   )));
 }
+
+/**
+ * Executes right before payment execution is finished.
+ *
+ * @see Payment::finish()
+ *
+ * @param Payment $payment
+ *
+ * @return NULL
+ */
+function hook_payment_pre_finish(Payment $payment) {
+  if (payment_status_is_or_has_ancestor($payment->getStatus()->status, PAYMENT_STATUS_SUCCESS)) {
+    drupal_set_message(t('Your payment was successfully completed.'));
+  }
+  else {
+    drupal_set_message(t('Your payment was not completed.'));
+  }
+}
+
 /**
  * Validate a payment against a payment method.
  *

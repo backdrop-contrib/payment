@@ -35,6 +35,17 @@ function payment_rules_event_info() {
       ),
     ),
   );
+  $event['payment_pre_finish'] = array(
+    'label' => t("When resuming the user's work after finishing payment execution"),
+    'group' => t('Payment'),
+    'access callback' => 'payment_rules_access',
+    'variables' => array(
+      'payment' => array(
+        'type' => 'payment',
+        'label' => t('Payment'),
+      ),
+    ),
+  );
   $event['payment_validate'] = array(
     'label' => t('When validating a payment against an arbitrary payment method'),
     'group' => t('Payment'),
