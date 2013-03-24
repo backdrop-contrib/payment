@@ -210,8 +210,6 @@ function payment_view_payments() {
   $handler->display->display_options['fields']['amount_total']['relationship'] = 'pid_line_item';
   $handler->display->display_options['fields']['amount_total']['group_type'] = 'sum';
   $handler->display->display_options['fields']['amount_total']['label'] = 'Amount';
-  $handler->display->display_options['fields']['amount_total']['alter']['alter_text'] = TRUE;
-  $handler->display->display_options['fields']['amount_total']['alter']['text'] = '[currency_code] [amount_total]';
   /* Field: Payment method: Title (specific) */
   $handler->display->display_options['fields']['title_specific']['id'] = 'title_specific';
   $handler->display->display_options['fields']['title_specific']['table'] = 'payment_method';
@@ -346,8 +344,6 @@ function payment_view_payments() {
   $handler->display->display_options['fields']['amount_total']['relationship'] = 'pid_line_item';
   $handler->display->display_options['fields']['amount_total']['group_type'] = 'sum';
   $handler->display->display_options['fields']['amount_total']['label'] = 'Amount';
-  $handler->display->display_options['fields']['amount_total']['alter']['alter_text'] = TRUE;
-  $handler->display->display_options['fields']['amount_total']['alter']['text'] = '[currency_code] [amount_total]';
   /* Field: Payment method: Title (generic) */
   $handler->display->display_options['fields']['title_generic']['id'] = 'title_generic';
   $handler->display->display_options['fields']['title_generic']['table'] = 'payment_method';
@@ -398,12 +394,10 @@ function payment_view_payments() {
     t('Last update'),
     t('Status'),
     t('Broken handler payment.amount'),
-    t('[currency_code] [amount]'),
     t('Title (generic)'),
     t('Operations'),
     t('Administration page'),
     t('Amount'),
-    t('[currency_code] [amount_total]'),
     t('.'),
     t(','),
     t('Unavailable'),
@@ -413,6 +407,26 @@ function payment_view_payments() {
     t('User\'s own payments'),
     t('All'),
   );
+
+  // If Currency 1 is enabled, prefix the amount with the currency code. If
+  // Currency 2 is enabled, the amount Views field handler takes care of amount
+  // formatting.
+  $version = payment_currency_version();
+  foreach (array('administration_page', 'user_page') as $display_name) {
+    if ($version == 1) {
+      $view->display[$display_name]->display_options['fields']['amount_total'] += array(
+        'alter' => array(),
+      );
+      $view->display[$display_name]->display_options['fields']['amount_total']['alter'] += array(
+        'alter_text' => TRUE,
+        'text' => '[currency_code] [amount_total]',
+      );
+      $translatables['payments'][] = t('[currency_code] [amount]');
+    }
+    elseif ($version == 2) {
+      $view->display[$display_name]->display_options['fields']['amount_total']['currency_code_field'] = 'payment_currency_code';
+    }
+  }
 
   return $view;
 }

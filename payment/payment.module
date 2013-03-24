@@ -814,7 +814,12 @@ function payment_method_controller_load_multiple(array $controller_class_names =
  * @return string
  */
 function payment_amount_human_readable($amount, $currency_code = NULL) {
-  // @todo Use Currency 7.x-2.x (http://drupal.org/project/currency).
+  if (payment_currency_version() === 2) {
+    $currency = currency_load($currency_code);
+    if ($currency) {
+      return $currency->format($amount);
+    }
+  }
   $amount_string = number_format($amount, 2, '.', '');
   $decimal_separator_position = strpos($amount_string, '.');
   $arguments = array(
@@ -1018,4 +1023,39 @@ function payment_debug($message, $file = '', $line = 0) {
     drupal_set_message(t($string, $string_arguments));
     watchdog('Payment', $string, $string_arguments);
   }
+}
+
+/**
+ * Checks what version of Currency is installed, if any.
+ *
+ * @return integer|false
+ *   An integer major version, or FALSE if the module is not available.
+ */
+function payment_currency_version() {
+  // Currency.module 7.x-1.x and 7.x-2.x both exist, but currency_load() only
+  // exists in 7.x-2.x.
+  if (module_exists('currency') && function_exists('currency_load')) {
+    return 2;
+  }
+  elseif (module_exists('currency_api')) {
+    return 1;
+  }
+  return FALSE;
+}
+
+/**
+ * Returns an options list of currencies.
+ *
+ * @return array
+ *  Keys are ISO 4217 codes and values are currency titles.
+ */
+function payment_currency_options() {
+  $version = payment_currency_version();
+  if ($version == 2) {
+    return currency_options();
+  }
+  if ($version == 1) {
+    return currency_api_get_list();
+  }
+  return array();
 }

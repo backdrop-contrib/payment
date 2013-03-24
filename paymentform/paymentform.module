@@ -61,7 +61,7 @@ function paymentform_field_instance_settings_form($field, $instance) {
     $form['currency_code'] = array(
       '#type' => 'select',
       '#title' => t('Currency'),
-      '#options' => currency_api_get_list(),
+      '#options' => payment_currency_options(),
       '#default_value' => $instance['settings']['currency_code'],
       '#required' => TRUE,
     );

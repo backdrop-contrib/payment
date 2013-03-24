@@ -225,6 +225,10 @@ function payment_views_data_alter(&$data) {
       ),
     ),
   );
+  if (payment_currency_version() == 2) {
+    $data['payment_line_item']['amount']['field']['handler'] = 'CurrencyAmountViewsHandlerField';
+    $data['payment_line_item']['amount_total']['field']['handler'] = 'CurrencyAmountViewsHandlerField';
+  }
 
   // Payment method.
   $data['payment_method']['controller_description'] = array(
