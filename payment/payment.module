@@ -81,6 +81,19 @@ function payment_init() {
 }
 
 /**
+ * Implements hook_module_implements_alter().
+ */
+function payment_module_implements_alter(array &$implementations, $hook) {
+  if ($hook == 'payment_method_load') {
+    // Commerce Payment has a function called commerce_payment_method_load(),
+    // which looks like Commerce's implementation of
+    // hook_payment_method_load(), but in fact is a Commerce Payment CRUD
+    // function.
+    unset($implementations['commerce']);
+  }
+}
+
+/**
  * Implements hook_menu().
  *
  * @see payment_views_default_views()
