@@ -380,6 +380,9 @@ function payment_hook_info() {
   $hooks['payment_pre_execute'] = array(
     'group' => 'payment',
   );
+  $hooks['payment_pre_finish'] = array(
+    'group' => 'payment',
+  );
   $hooks['payment_validate'] = array(
     'group' => 'payment',
   );
