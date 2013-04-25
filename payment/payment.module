@@ -453,8 +453,8 @@ function payment_entity_info() {
     'base table' => 'payment',
     'entity keys' => array(
       'id' => 'pid',
-      'label' => 'description',
     ),
+    'label callback' => 'payment_label',
     // @todo Enable static cache once http://drupal.org/node/1273756 is fixed.
     'static cache' => FALSE,
     'fieldable' => TRUE,
@@ -491,6 +491,19 @@ function payment_entity_info() {
 }
 
 /**
+ * Returns the label of a given Payment entity.
+ *
+ * @param Payment $entity
+ *   A Payment entity.
+ *
+ * @return string
+ *   The label of the Payment entity.
+ */
+function payment_label(Payment $entity) {
+  return t($entity->description, $entity->description_arguments);
+}
+
+/**
  * Implements hook_entity_property_info().
  */
 function payment_entity_property_info() {
@@ -510,6 +523,7 @@ function payment_entity_property_info() {
   $properties['payment']['properties']['description'] = array(
     'label' => t('Description'),
     'schema field' => 'description',
+    'getter callback' => 'payment_entity_property_get',
   );
   $properties['payment']['properties']['finish_callback'] = array(
     'description' => t('The name of the function to call once payment processing is completed.'),
@@ -574,6 +588,21 @@ function payment_entity_property_info() {
   );
 
   return $properties;
+}
+
+/**
+ * Gets the property of a Payment entity.
+ *
+ * @see payment_entity_property_info()
+ */
+function payment_entity_property_get(Payment $payment, array $options, $name, $type, $info) {
+  switch ($name) {
+    case 'description':
+      return payment_label($payment);
+
+    default:
+      return entity_property_verbatim_get($payment, $options, $name, $type, $info);
+  }
 }
 
 /**
