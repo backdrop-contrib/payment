@@ -107,13 +107,13 @@ function hook_payment_line_item_info_alter(array &$line_items_info) {
 }
 
 /**
- * Executes when a payment status has been changed.
+ * Executes when a payment status is being set.
  *
  * @see Payment::setStatus()
  *
  * @param Payment $payment
  * @param PaymentStatusItem $previous_status_item
- *   The status the payment had before it was changed.
+ *   The status the payment had before it was set.
  *
  * @return NULL
  */

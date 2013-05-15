@@ -261,15 +261,12 @@ class Payment extends PaymentCommon {
    * @return Payment
    */
   function setStatus(PaymentStatusItem $status_item) {
-    // A fail-safe to ensure hook implementations are only called if the status
-    // has really changed.
-    if ($this->getStatus()->status == $status_item->status) {
-      return;
-    }
-
     $previous_status_item = $this->getStatus();
     $status_item->pid = $this->pid;
-    $this->statuses[] = $status_item;
+    // Prevent duplicate status items.
+    if ($this->getStatus()->status != $status_item->status) {
+      $this->statuses[] = $status_item;
+    }
     foreach (module_implements('payment_status_change') as $module_name) {
       call_user_func($module_name . '_payment_status_change', $this, $previous_status_item);
       // If a hook invocation has added another log item, a new loop with
