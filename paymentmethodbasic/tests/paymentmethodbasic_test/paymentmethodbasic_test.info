@@ -4,4 +4,5 @@ core = 7.x
 dependencies[] = paymentmethodbasic
 package = Payment
 hidden = TRUE
+files[] = tests/PaymentmethodbasicTestModuleInstallUninstall.test
 files[] = tests/PaymentmethodbasicTestPaymentMethodBasicControllerWebTestCase.test
