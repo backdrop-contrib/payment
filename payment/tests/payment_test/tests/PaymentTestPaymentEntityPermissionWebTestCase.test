@@ -14,7 +14,7 @@ class PaymentTestPaymentEntityPermissionWebTestCase extends PaymentWebTestCase {
     return array(
       'name' => 'Payment permissions',
       'group' => 'Payment',
-      'dependencies' => array('payment', 'xtools'),
+      'dependencies' => array('payment'),
     );
   }
 
@@ -22,7 +22,7 @@ class PaymentTestPaymentEntityPermissionWebTestCase extends PaymentWebTestCase {
    * Overrides parent::setUp().
    */
   function setUp(array $modules = array()) {
-    parent::setUp($modules + array('payment', 'xtools'));
+    parent::setUp($modules + array('payment'));
   }
 
   function testPaymentEntityPermissions() {
@@ -30,7 +30,7 @@ class PaymentTestPaymentEntityPermissionWebTestCase extends PaymentWebTestCase {
     $payment_2 = $this->paymentCreate(2);
 
     // Test creating a payment.
-    $this->XtoolsAssertEntityPermission(NULL, 'Payment', 'payment_access', 'create', array(), array(
+    $this->assertEntityPermission(NULL, 'Payment', 'payment_access', 'create', array(), array(
       'anonymous' => TRUE,
       'authenticated_without_permissions' => TRUE,
     ));
@@ -39,16 +39,16 @@ class PaymentTestPaymentEntityPermissionWebTestCase extends PaymentWebTestCase {
     $operations = array('delete', 'update', 'view');
     foreach ($operations as $operation) {
       // Test a payment that belongs to user 1.
-      $this->XtoolsAssertEntityPermission($payment_1, 'Payment', 'payment_access', $operation, array("payment.payment.$operation.any"));
-      $this->XtoolsAssertEntityPermission($payment_1, 'Payment', 'payment_access', $operation, array("payment.payment.$operation.own"), array(
+      $this->assertEntityPermission($payment_1, 'Payment', 'payment_access', $operation, array("payment.payment.$operation.any"));
+      $this->assertEntityPermission($payment_1, 'Payment', 'payment_access', $operation, array("payment.payment.$operation.own"), array(
         'authenticated_with_permissions' => FALSE,
       ));
-      $this->XtoolsAssertEntityPermission($payment_1, 'Payment', 'payment_access', $operation);
+      $this->assertEntityPermission($payment_1, 'Payment', 'payment_access', $operation);
 
       // Test a payment that belongs to user 2.
-      $this->XtoolsAssertEntityPermission($payment_2, 'Payment', 'payment_access', $operation, array("payment.payment.$operation.any"));
-      $this->XtoolsAssertEntityPermission($payment_2, 'Payment', 'payment_access', $operation, array("payment.payment.$operation.own"));
-      $this->XtoolsAssertEntityPermission($payment_2, 'Payment', 'payment_access', $operation);
+      $this->assertEntityPermission($payment_2, 'Payment', 'payment_access', $operation, array("payment.payment.$operation.any"));
+      $this->assertEntityPermission($payment_2, 'Payment', 'payment_access', $operation, array("payment.payment.$operation.own"));
+      $this->assertEntityPermission($payment_2, 'Payment', 'payment_access', $operation);
     }
   }
 }

@@ -51,9 +51,3 @@ PaymentLineItem object does not necessarily have to be defined in
 hook_payment_line_item_info(), either because it can be retrieved by another
 line item type defined there, or because it should not be retrieved at
 all.
-
-TESTING
--------
-
-Use XtoolsWebTestCase::XtoolsAssertCallables(array($module), array('payment'))
-to test a particular module's implementations of Payment hooks and callbacks.

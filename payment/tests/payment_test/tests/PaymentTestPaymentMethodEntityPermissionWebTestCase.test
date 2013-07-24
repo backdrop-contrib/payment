@@ -14,7 +14,7 @@ class PaymentTestPaymentMethodEntityPermissionWebTestCase extends PaymentWebTest
     return array(
       'name' => 'Payment method permissions',
       'group' => 'Payment',
-      'dependencies' => array('payment', 'paymentmethodbasic', 'xtools'),
+      'dependencies' => array('payment', 'paymentmethodbasic'),
     );
   }
 
@@ -22,35 +22,35 @@ class PaymentTestPaymentMethodEntityPermissionWebTestCase extends PaymentWebTest
    * Overrides parent::setUp().
    */
   function setUp(array $modules = array()) {
-    parent::setUp($modules + array('payment', 'paymentmethodbasic', 'xtools'));
+    parent::setUp($modules + array('payment', 'paymentmethodbasic'));
   }
 
   function testPaymentMethodEntityPermissions() {
     // Create a new payment method.
-    $this->XtoolsAssertEntityPermission($this->paymentMethodCreate(0, payment_method_controller_load('PaymentMethodBasicController')), 'payment method', 'payment_method_access', 'create', array('payment.payment_method.create.PaymentMethodBasicController'));
+    $this->assertEntityPermission($this->paymentMethodCreate(0, payment_method_controller_load('PaymentMethodBasicController')), 'payment method', 'payment_method_access', 'create', array('payment.payment_method.create.PaymentMethodBasicController'));
 
     // Update a payment method that belongs to user 1.
-    $this->XtoolsAssertEntityPermission($this->paymentMethodCreate(1, payment_method_controller_load('PaymentMethodBasicController')), 'payment method', 'payment_method_access', 'update', array('payment.payment_method.update.any'));
+    $this->assertEntityPermission($this->paymentMethodCreate(1, payment_method_controller_load('PaymentMethodBasicController')), 'payment method', 'payment_method_access', 'update', array('payment.payment_method.update.any'));
 
     // Update a payment method that belongs to user 2.
-    $this->XtoolsAssertEntityPermission($this->paymentMethodCreate(2, payment_method_controller_load('PaymentMethodBasicController')), 'payment method', 'payment_method_access', 'update', array('payment.payment_method.update.own'));
+    $this->assertEntityPermission($this->paymentMethodCreate(2, payment_method_controller_load('PaymentMethodBasicController')), 'payment method', 'payment_method_access', 'update', array('payment.payment_method.update.own'));
 
     // Delete a payment method that belongs to user 1.
-    $this->XtoolsAssertEntityPermission($this->paymentMethodCreate(1, payment_method_controller_load('PaymentMethodBasicController')), 'payment method', 'payment_method_access', 'delete', array('payment.payment_method.delete.any'));
+    $this->assertEntityPermission($this->paymentMethodCreate(1, payment_method_controller_load('PaymentMethodBasicController')), 'payment method', 'payment_method_access', 'delete', array('payment.payment_method.delete.any'));
 
     // Delete a payment method that belongs to user 2.
-    $this->XtoolsAssertEntityPermission($this->paymentMethodCreate(2, payment_method_controller_load('PaymentMethodBasicController')), 'payment method', 'payment_method_access', 'delete', array('payment.payment_method.delete.own'));
+    $this->assertEntityPermission($this->paymentMethodCreate(2, payment_method_controller_load('PaymentMethodBasicController')), 'payment method', 'payment_method_access', 'delete', array('payment.payment_method.delete.own'));
 
     // Enable an enabled payment method that belongs to user 1.
     $payment_method = $this->paymentMethodCreate(1, payment_method_controller_load('PaymentMethodBasicController'));
-    $this->XtoolsAssertEntityPermission($payment_method, 'enabled payment method', 'payment_method_access', 'enable', array('payment.payment_method.update.any'), array(
+    $this->assertEntityPermission($payment_method, 'enabled payment method', 'payment_method_access', 'enable', array('payment.payment_method.update.any'), array(
       'root' => FALSE,
       'authenticated_with_permissions' => FALSE,
     ));
 
     // Enable an enabled payment method that belongs to user 2.
     $payment_method = $this->paymentMethodCreate(2, payment_method_controller_load('PaymentMethodBasicController'));
-    $this->XtoolsAssertEntityPermission($payment_method, 'enabled payment method', 'payment_method_access', 'enable', array('payment.payment_method.update.own'), array(
+    $this->assertEntityPermission($payment_method, 'enabled payment method', 'payment_method_access', 'enable', array('payment.payment_method.update.own'), array(
       'root' => FALSE,
       'authenticated_with_permissions' => FALSE,
     ));
@@ -58,17 +58,17 @@ class PaymentTestPaymentMethodEntityPermissionWebTestCase extends PaymentWebTest
     // Enable a disabled payment method that belongs to user 1.
     $payment_method = $this->paymentMethodCreate(1, payment_method_controller_load('PaymentMethodBasicController'));
     $payment_method->enabled = FALSE;
-    $this->XtoolsAssertEntityPermission($payment_method, 'disabled payment method', 'payment_method_access', 'enable', array('payment.payment_method.update.any'));
+    $this->assertEntityPermission($payment_method, 'disabled payment method', 'payment_method_access', 'enable', array('payment.payment_method.update.any'));
 
     // Enable a disabled payment method that belongs to user 2.
     $payment_method = $this->paymentMethodCreate(2, payment_method_controller_load('PaymentMethodBasicController'));
     $payment_method->enabled = FALSE;
-    $this->XtoolsAssertEntityPermission($payment_method, 'disabled payment method', 'payment_method_access', 'enable', array('payment.payment_method.update.own'));
+    $this->assertEntityPermission($payment_method, 'disabled payment method', 'payment_method_access', 'enable', array('payment.payment_method.update.own'));
 
     // Disable a disabled payment method that belongs to user 1.
     $payment_method = $this->paymentMethodCreate(1, payment_method_controller_load('PaymentMethodBasicController'));
     $payment_method->enabled = FALSE;
-    $this->XtoolsAssertEntityPermission($payment_method, 'disabled payment method', 'payment_method_access', 'disable', array('payment.payment_method.update.any'), array(
+    $this->assertEntityPermission($payment_method, 'disabled payment method', 'payment_method_access', 'disable', array('payment.payment_method.update.any'), array(
       'root' => FALSE,
       'authenticated_with_permissions' => FALSE,
     ));
@@ -76,29 +76,29 @@ class PaymentTestPaymentMethodEntityPermissionWebTestCase extends PaymentWebTest
     // Disable a disabled payment method that belongs to user 2.
     $payment_method = $this->paymentMethodCreate(2, payment_method_controller_load('PaymentMethodBasicController'));
     $payment_method->enabled = FALSE;
-    $this->XtoolsAssertEntityPermission($payment_method, 'disabled payment method', 'payment_method_access', 'disable', array('payment.payment_method.update.own'), array(
+    $this->assertEntityPermission($payment_method, 'disabled payment method', 'payment_method_access', 'disable', array('payment.payment_method.update.own'), array(
       'root' => FALSE,
       'authenticated_with_permissions' => FALSE,
     ));
 
     // Disable an enabled payment method that belongs to user 1.
     $payment_method = $this->paymentMethodCreate(1, payment_method_controller_load('PaymentMethodBasicController'));
-    $this->XtoolsAssertEntityPermission($payment_method, 'disabled payment method', 'payment_method_access', 'disable', array('payment.payment_method.update.any'));
+    $this->assertEntityPermission($payment_method, 'disabled payment method', 'payment_method_access', 'disable', array('payment.payment_method.update.any'));
 
     // Enable am enabled payment method that belongs to user 2.
     $payment_method = $this->paymentMethodCreate(2, payment_method_controller_load('PaymentMethodBasicController'));
-    $this->XtoolsAssertEntityPermission($payment_method, 'disabled payment method', 'payment_method_access', 'disable', array('payment.payment_method.update.own'));
+    $this->assertEntityPermission($payment_method, 'disabled payment method', 'payment_method_access', 'disable', array('payment.payment_method.update.own'));
 
     // Clone a payment method that belongs to user 1.
-    $this->XtoolsAssertEntityPermission($this->paymentMethodCreate(1, payment_method_controller_load('PaymentMethodBasicController')), 'payment method', 'payment_method_access', 'clone', array('payment.payment_method.view.any', 'payment.payment_method.create.PaymentMethodBasicController'));
+    $this->assertEntityPermission($this->paymentMethodCreate(1, payment_method_controller_load('PaymentMethodBasicController')), 'payment method', 'payment_method_access', 'clone', array('payment.payment_method.view.any', 'payment.payment_method.create.PaymentMethodBasicController'));
 
     // Clone a payment method that belongs to user 2.
-    $this->XtoolsAssertEntityPermission($this->paymentMethodCreate(2, payment_method_controller_load('PaymentMethodBasicController')), 'payment method', 'payment_method_access', 'clone', array('payment.payment_method.view.own', 'payment.payment_method.create.PaymentMethodBasicController'));
+    $this->assertEntityPermission($this->paymentMethodCreate(2, payment_method_controller_load('PaymentMethodBasicController')), 'payment method', 'payment_method_access', 'clone', array('payment.payment_method.view.own', 'payment.payment_method.create.PaymentMethodBasicController'));
 
     // View a payment method that belongs to user 1.
-    $this->XtoolsAssertEntityPermission($this->paymentMethodCreate(1, payment_method_controller_load('PaymentMethodBasicController')), 'payment method', 'payment_method_access', 'view', array('payment.payment_method.view.any'));
+    $this->assertEntityPermission($this->paymentMethodCreate(1, payment_method_controller_load('PaymentMethodBasicController')), 'payment method', 'payment_method_access', 'view', array('payment.payment_method.view.any'));
 
     // View a payment method that belongs to user 2.
-    $this->XtoolsAssertEntityPermission($this->paymentMethodCreate(2, payment_method_controller_load('PaymentMethodBasicController')), 'payment method', 'payment_method_access', 'view', array('payment.payment_method.view.own'));
+    $this->assertEntityPermission($this->paymentMethodCreate(2, payment_method_controller_load('PaymentMethodBasicController')), 'payment method', 'payment_method_access', 'view', array('payment.payment_method.view.own'));
   }
 }
