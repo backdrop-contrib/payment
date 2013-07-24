@@ -455,8 +455,6 @@ function payment_entity_info() {
       'id' => 'pid',
     ),
     'label callback' => 'payment_label',
-    // @todo Enable static cache once http://drupal.org/node/1273756 is fixed.
-    'static cache' => FALSE,
     'fieldable' => TRUE,
     'bundles' => array(
       'payment' => array(
@@ -482,8 +480,6 @@ function payment_entity_info() {
       'name' => 'name',
     ),
     'exportable' => TRUE,
-    // @todo Enable static cache once http://drupal.org/node/1273756 is fixed.
-    'static cache' => FALSE,
     'access callback' => 'payment_method_access',
   );
 

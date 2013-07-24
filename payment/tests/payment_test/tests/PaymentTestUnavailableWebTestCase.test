@@ -43,7 +43,7 @@ class PaymentTestUnavailableWebTestCase extends PaymentWebTestCase {
 
     // Test deleting a payment method.
     entity_delete('payment_method', $payment->method->pmid);
-    $payment = entity_load_single('payment', $payment->pid);
+    $payment = entity_load_unchanged('payment', $payment->pid);
     $this->assertTrue(is_a($payment->method, 'PaymentMethodUnavailable'), 'When loading a payment, if its payment method is unavailable, it is replaced by PaymentMethodUnavailable.');
   }
 }
