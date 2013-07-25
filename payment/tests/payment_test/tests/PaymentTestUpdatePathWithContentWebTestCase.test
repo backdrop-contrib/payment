@@ -12,6 +12,7 @@ class PaymentTestUpdatePathWithContentWebTestCase extends UpdatePathTestCase {
 
   static function getInfo() {
     return array(
+      'description' => '',
       'name'  => 'Update path (with existing content and configuration)',
       'group' => 'Payment',
       'dependencies' => array('payment', 'paymentform', 'paymentmethodbasic', 'paymentreference'),

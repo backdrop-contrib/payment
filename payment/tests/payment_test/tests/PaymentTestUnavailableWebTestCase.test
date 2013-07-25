@@ -12,6 +12,7 @@ class PaymentTestUnavailableWebTestCase extends PaymentWebTestCase {
 
   static function getInfo() {
     return array(
+      'description' => '',
       'name' => 'Unavailable payment methods and payment method controllers',
       'group' => 'Payment',
     );

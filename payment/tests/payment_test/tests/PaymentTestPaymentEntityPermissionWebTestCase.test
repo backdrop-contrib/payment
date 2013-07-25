@@ -12,6 +12,7 @@ class PaymentTestPaymentEntityPermissionWebTestCase extends PaymentWebTestCase {
 
   static function getInfo() {
     return array(
+      'description' => '',
       'name' => 'Payment permissions',
       'group' => 'Payment',
       'dependencies' => array('payment'),

@@ -12,6 +12,7 @@ class PaymentTestPaymentValidationWebTestCase extends PaymentWebTestCase {
 
   static function getInfo() {
     return array(
+      'description' => '',
       'name' => 'Payment validation',
       'group' => 'Payment',
     );

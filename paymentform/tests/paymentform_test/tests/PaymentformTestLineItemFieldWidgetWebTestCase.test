@@ -11,6 +11,7 @@ class PaymentformTestLineItemFieldWidgetWebTestCase extends PaymentformWebTestCa
 
   static function getInfo() {
     return array(
+      'description' => '',
       'name' => 'Payment line item field widget',
       'group' => 'Payment Form Field',
       'dependencies' => array('node'),

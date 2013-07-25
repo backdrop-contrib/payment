@@ -12,6 +12,7 @@ class PaymentmethodbasicTestPaymentMethodBasicControllerWebTestCase extends Paym
 
   static function getInfo() {
     return array(
+      'description' => '',
       'name' => 'PaymentMethodBasicController functionality',
       'group' => 'Basic Payment Method',
       'dependencies' => array('paymentmethodbasic_test'),

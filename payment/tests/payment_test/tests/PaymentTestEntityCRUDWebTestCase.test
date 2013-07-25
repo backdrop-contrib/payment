@@ -12,6 +12,7 @@ class PaymentTestEntityCrudWebTestCase extends PaymentWebTestCase {
 
   static function getInfo() {
     return array(
+      'description' => '',
       'name' => 'Entity CRUD functionality',
       'group' => 'Payment',
     );

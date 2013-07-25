@@ -12,6 +12,7 @@ class PaymentTestPaymentMethodEntityPermissionWebTestCase extends PaymentWebTest
 
   static function getInfo() {
     return array(
+      'description' => '',
       'name' => 'Payment method permissions',
       'group' => 'Payment',
       'dependencies' => array('payment', 'paymentmethodbasic'),

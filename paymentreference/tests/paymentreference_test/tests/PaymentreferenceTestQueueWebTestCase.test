@@ -12,6 +12,7 @@ class PaymentreferenceTestQueueWebTestCase extends PaymentWebTestCase {
 
   static function getInfo() {
     return array(
+      'description' => '',
       'name' => 'Queue CRUD and its Field integration',
       'group' => 'Payment Reference',
     );

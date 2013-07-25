@@ -12,6 +12,7 @@ class PaymentTestActionHookAndCallbackWebTestCase extends PaymentWebTestCase {
 
   static function getInfo() {
     return array(
+      'description' => '',
       'name' => 'Action hook and callback invocations',
       'group' => 'Payment',
     );

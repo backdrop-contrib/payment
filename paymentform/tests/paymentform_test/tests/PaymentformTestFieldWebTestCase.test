@@ -12,6 +12,7 @@ class PaymentformTestFieldWebTestCase extends PaymentformWebTestCase {
 
   static function getInfo() {
     return array(
+      'description' => '',
       'name' => 'Payment form field',
       'group' => 'Payment Form Field',
     );

@@ -12,6 +12,7 @@ class PaymentTestPaymentLineItemFormElementWebTestCase extends PaymentWebTestCas
 
   static function getInfo() {
     return array(
+      'description' => '',
       'name' => 'Payment line item form element',
       'group' => 'Payment',
     );

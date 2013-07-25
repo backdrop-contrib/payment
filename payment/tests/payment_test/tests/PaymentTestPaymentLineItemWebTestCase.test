@@ -12,6 +12,7 @@ class PaymentTestPaymentLineItemWebTestCase extends PaymentWebTestCase {
 
   static function getInfo() {
     return array(
+      'description' => '',
       'name' => 'Payment line item handling',
       'group' => 'Payment',
     );

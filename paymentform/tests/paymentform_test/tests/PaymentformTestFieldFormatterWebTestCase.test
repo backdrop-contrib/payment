@@ -12,6 +12,7 @@ class PaymentformTestFieldFormatterWebTestCase extends PaymentformWebTestCase {
 
   static function getInfo() {
     return array(
+      'description' => '',
       'name' => 'Payment form field formatter',
       'group' => 'Payment Form Field',
       'dependencies' => array('paymentform_test'),
