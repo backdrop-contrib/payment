@@ -55,5 +55,9 @@ class PaymentTestActionHookAndCallbackWebTestCase extends PaymentWebTestCase {
     $form = payment_form_embedded($form_state, $payment);
     $this->assertTrue(isset($form['elements']['payment_test']), 'Form elements can be altered through hook_payment_form_alter().');
     $this->assertTrue(in_array('payment_test', $form['submit']), 'Submit callbacks can be altered through hook_payment_form_alter().');
+
+    // Tests hook_payment_view_alter().
+    $build = entity_view('payment', array($payment));
+    $this->assertTrue(isset($build['#payment_test_payment_view_alter']));
   }
 }

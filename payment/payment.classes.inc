@@ -461,6 +461,8 @@ class PaymentEntityController extends EntityAPIController {
         '#markup' => check_plain($payment->method->title_generic),
       );
     }
+    $type = 'payment';
+    drupal_alter(array('payment_view', 'entity_view'), $build, $type);
 
     return $build;
   }

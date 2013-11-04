@@ -166,3 +166,10 @@ function payment_test_form_payment_element(array $form, array &$form_state) {
   // Redirect, so we can test whether form errors were thrown.
   $form_state['redirect'] = 'user';
 }
+
+/**
+ * Implements hook_payment_view_alter().
+ */
+function payment_test_payment_view_alter(&$build) {
+  $build['#payment_test_payment_view_alter'] = TRUE;
+}

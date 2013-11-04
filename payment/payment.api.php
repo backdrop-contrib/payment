@@ -198,3 +198,11 @@ function hook_payment_validate(Payment $payment, PaymentMethod $payment_method, 
  * @return NULL
  */
 function hook_payment_form_alter(array &$elements, array &$form_state, array &$submit) {}
+
+/**
+ * Alter the results of entity_view('payment', ...).
+ *
+ * @param $build
+ *   A renderable array representing the payment content.
+ */
+function hook_payment_view_alter(&$build) {}
