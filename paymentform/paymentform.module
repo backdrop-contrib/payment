@@ -90,7 +90,7 @@ function paymentform_field_widget_form(array &$form, array &$form_state, array $
     $element['line_item'] = array(
       '#type' => 'payment_line_item',
       '#currency_code' => $instance['settings']['currency_code'],
-      '#cardinality' => (int) $field['cardinality'],
+      '#cardinality' => $field['cardinality'] == FIELD_CARDINALITY_UNLIMITED ? 0 : (int) $field['cardinality'],
       '#default_value' => $default_value,
       '#required' => $element['#required'],
     );
