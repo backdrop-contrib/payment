@@ -31,6 +31,7 @@ function payment_tokens($type, array $tokens, array $data = array(), array $opti
   $replacements = array();
 
   if ($type == 'payment') {
+    /** @var Payment $payment */
     $payment = $data['payment'];
     foreach ($tokens as $name => $token) {
       $pattern = '#^' . PAYMENT_LINE_ITEM_TOKEN_PREFIX . '#';

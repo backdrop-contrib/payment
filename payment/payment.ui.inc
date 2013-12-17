@@ -132,7 +132,9 @@ function payment_form_embedded_validate(array $form, array &$form_state) {
 function payment_form_embedded_submit(array $form, array &$form_state) {
   // The payment status element may be unavailable.
   if (isset($form_state['values']['payment_status'])) {
-    $form_state['payment']->setStatus(new PaymentStatusItem($form_state['values']['payment_status']));
+    /** @var Payment $payment */
+    $payment = $form_state['payment'];
+    $payment->setStatus(new PaymentStatusItem($form_state['values']['payment_status']));
   }
 }
 
@@ -184,6 +186,7 @@ function payment_form_standalone(array $form, array &$form_state, Payment $payme
  * Implements form submit callback for payment_form().
  */
 function payment_form_standalone_submit(array $form, array &$form_state) {
+  /** @var Payment $payment */
   $payment = $form_state['payment'];
 
   // Save the payment.
@@ -792,7 +795,6 @@ function payment_form_process_line_item(array $element, array &$form_state, arra
       '#type' => 'machine_name',
       '#default_value' => $line_item ? $line_item->name : '',
       '#maxlength' => 255,
-      '#required' => TRUE,
       '#machine_name' => array(
         'source' => array_merge($element['#parents'], array('container_' . $delta, 'description')),
         'exists' => 'payment_method_name_exists',
@@ -904,7 +906,7 @@ function payment_form_process_line_item_submit_ajax_callback(array $form, array 
  * @see payment_element_info()
  */
 function payment_form_process_method(array $element, array &$form_state, array &$form) {
-  $form_state['payment_parents'] = $element['#parents'];
+  /** @var Payment $payment */
   $payment = $form_state['payment'];
 
   $element['#tree'] = TRUE;
@@ -1091,9 +1093,9 @@ function payment_status_hierarchy() {
 /**
  * Helper function for payment_status_hierarchy().
  *
- * @param array $parents
+ * @param string[] $statuses
  *   An array with payment statuses that are part of the same hierarchy level.
- * @param array $children
+ * @param array[] $children
  *   Keys are payment statuses. Values are arrays with those statuses' child
  *   statuses.
  *

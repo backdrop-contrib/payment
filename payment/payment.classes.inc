@@ -36,7 +36,7 @@ class Payment extends PaymentCommon {
    * Information about this payment that is specific to the context that
    * created it, such as the webshop module.
    *
-   * @var array
+   * @var mixed[]
    */
   public $context_data = array();
 
@@ -58,7 +58,7 @@ class Payment extends PaymentCommon {
   /**
    * Arguments to pass on to t() when translating $this->description.
    *
-   * @var array
+   * @var string[]
    */
   public $description_arguments = array();
 
@@ -80,7 +80,7 @@ class Payment extends PaymentCommon {
    *
    * @see Payment::setLineItem()
    *
-   * @var array
+   * @var PaymentLineItem[]
    */
   public $line_items = array();
 
@@ -94,7 +94,7 @@ class Payment extends PaymentCommon {
   /**
    * Information about this payment that is specific to its payment method.
    *
-   * @var array
+   * @var mixed[]
    */
   public $method_data = array();
 
@@ -111,7 +111,7 @@ class Payment extends PaymentCommon {
    *
    * @see Payment::setStatus()
    *
-   * @var array
+   * @var PaymentStatusItem[]
    */
   public $statuses = array();
 
@@ -125,11 +125,9 @@ class Payment extends PaymentCommon {
   /**
    * Constructor.
    *
-   * @param array $properties
+   * @param mixed[] $properties
    *   An associative array. Keys are property names and values are property
    *   values.
-   *
-   * @return NULL
    */
   function __construct(array $properties = array()) {
     global $user;
@@ -148,8 +146,6 @@ class Payment extends PaymentCommon {
 
   /**
    * Execute the actual payment.
-   *
-   * @return NULL
    */
   function execute() {
     // Preprocess the payment.
@@ -180,8 +176,6 @@ class Payment extends PaymentCommon {
 
   /**
    * Finish the payment after its execution.
-   *
-   * @return NULL
    */
   function finish() {
     entity_save('payment', $this);
@@ -199,7 +193,7 @@ class Payment extends PaymentCommon {
    *
    * @param PaymentLineItem $line_item
    *
-   * @return Payment
+   * @return static
    */
   function setLineItem(PaymentLineItem $line_item) {
     $this->line_items[$line_item->name] = $line_item;
@@ -210,12 +204,12 @@ class Payment extends PaymentCommon {
   /**
    * Get line items.
    *
-   * @param string $name (optional)
+   * @param string|null $name (optional)
    *   The requested line item(s)'s machine name, as possibly defined in
    *   hook_payment_line_item_info(). If $name is NULL, then all line items
    *   will be returned.
    *
-   * @return array
+   * @return PaymentLineItem[]
    *   An array with matching PaymentLineItem objects.
    */
   function getLineItems($name = NULL) {
@@ -235,7 +229,7 @@ class Payment extends PaymentCommon {
    *
    * @param boolean $tax
    *   Whether to include taxes or not.
-   * @param array $line_items
+   * @param PaymentLineItem[]|null $line_items
    *   An array with PaymentLineItem objects to calculate the total from.
    *   Leave empty to use $this->line_items.
    *
@@ -258,7 +252,7 @@ class Payment extends PaymentCommon {
    *
    * @param PaymentStatusItem $status_item
    *
-   * @return Payment
+   * @return static
    */
   function setStatus(PaymentStatusItem $status_item) {
     $previous_status_item = $this->getStatus();
@@ -273,7 +267,7 @@ class Payment extends PaymentCommon {
       // invocations has already been executed and we don't need to continue
       // with this one.
       if ($this->getStatus()->status != $status_item->status) {
-        return;
+        return $this;
       }
     }
     if (module_exists('rules')) {
@@ -295,13 +289,12 @@ class Payment extends PaymentCommon {
   /**
    * Get available/valid payment methods for this payment.
    *
-   * @param array $payment_methods
-   *   An array with the PaymentMethod objects to check for. Use an empty
-   *   array to check the availability of all payment methods.
+   * @param PaymentMethod[] $payment_methods
+   *   Use an empty array to check the availability of all payment methods.
    *
-   * @return array
-   *   An array with PaymentMethod objects usable for Payment in its current
-   *   state, keyed by PMID.
+   * @return PaymentMethod[]
+   *   An array with payment methods usable for Payment in its current state,
+   *   keyed by PMID.
    */
   function availablePaymentMethods(array $payment_methods = array()) {
     if (!$payment_methods) {
@@ -327,7 +320,7 @@ class Payment extends PaymentCommon {
 class PaymentEntityController extends EntityAPIController {
 
   /**
-   * Implements EntityAPIController::load().
+   * {@inheritdoc}
    */
   function load($ids = array(), $conditions = array()) {
     $entities = parent::load($ids, $conditions);
@@ -342,7 +335,7 @@ class PaymentEntityController extends EntityAPIController {
   }
 
   /**
-   * Implements EntityAPIController::attachLoad().
+   * {@inheritdoc}
    */
   function attachLoad(&$queried_entities, $revision_id = FALSE) {
     $pids = array_keys($queried_entities);
@@ -392,7 +385,7 @@ class PaymentEntityController extends EntityAPIController {
   }
 
   /**
-   * Implements EntityAPIController::save().
+   * {@inheritdoc}
    */
   function save($entity, DatabaseTransaction $transaction = NULL) {
     $payment = $entity;
@@ -447,7 +440,7 @@ class PaymentEntityController extends EntityAPIController {
   }
 
   /**
-   * Implements EntityAPIController::view().
+   * {@inheritdoc}
    */
   function view($entities, $view_mode = 'full', $langcode = NULL, $page = NULL) {
     $build = parent::view($entities, $view_mode, $langcode, $page);
@@ -468,7 +461,7 @@ class PaymentEntityController extends EntityAPIController {
   }
 
   /**
-   * Implements EntityAPIController::delete().
+   * {@inheritdoc}
    */
   function delete($ids, DatabaseTransaction $transaction = NULL) {
     parent::delete($ids, $transaction);
@@ -499,7 +492,7 @@ class PaymentMethod extends PaymentCommon {
   /**
    * Information about this payment method that is specific to its controller.
    *
-   * @var array
+   * @var mixed[]
    */
   public $controller_data = array();
 
@@ -562,7 +555,7 @@ class PaymentMethod extends PaymentCommon {
   public $uid = NULL;
 
   /**
-   * Implements PaymentCommon::__construct().
+   * {@inheritdoc}
    */
   function __construct(array $properties = array()) {
     global $user;
@@ -613,6 +606,9 @@ class PaymentMethodUnavailable extends PaymentMethod {
   // collide with existing payment methods.
   public $pmid = 0;
 
+  /**
+   * {@inheritdoc}
+   */
   function __construct() {
     $this->title_specific = $this->title_generic = t('Unavailable');
     $this->controller = payment_method_controller_load('PaymentMethodControllerUnavailable');
@@ -625,7 +621,7 @@ class PaymentMethodUnavailable extends PaymentMethod {
 class PaymentMethodEntityController extends EntityAPIControllerExportable {
 
   /**
-   * Implements EntityAPIController::load().
+   * {@inheritdoc}
    */
   function load($ids = array(), $conditions = array()) {
     static $unavailable = NULL;
@@ -657,7 +653,7 @@ class PaymentMethodEntityController extends EntityAPIControllerExportable {
   }
 
   /**
-   * Implements EntityAPIController::attachLoad().
+   * {@inheritdoc}
    */
   function attachLoad(&$queries_entities, $revision_id = FALSE) {
     foreach ($queries_entities as $entity) {
@@ -671,7 +667,7 @@ class PaymentMethodEntityController extends EntityAPIControllerExportable {
   }
 
   /**
-   * Implements EntityAPIController::save().
+   * {@inheritdoc}
    */
   function save($entity, DatabaseTransaction $transaction = NULL) {
     $entity->controller_class_name = $entity->controller->name;
@@ -685,7 +681,7 @@ class PaymentMethodEntityController extends EntityAPIControllerExportable {
   }
 
   /**
-   * Implements EntityAPIController::export().
+   * {@inheritdoc}
    */
   function export($entity, $prefix = '') {
     // The payment method controller should not be exported. Instead, we
@@ -701,7 +697,7 @@ class PaymentMethodEntityController extends EntityAPIControllerExportable {
   }
 
   /**
-   * Implements EntityAPIController::import().
+   * {@inheritdoc}
    */
   function import($export) {
     if ($payment = parent::import($export)) {
@@ -718,6 +714,9 @@ class PaymentMethodEntityController extends EntityAPIControllerExportable {
  */
 class PaymentMethodFeaturesController extends EntityDefaultFeaturesController {
 
+  /**
+   * {@inheritdoc}
+   */
   function export($data, &$export, $module_name = '') {
     $pipe = parent::export($data, $export, $module_name);
 
@@ -756,6 +755,8 @@ class PaymentMethodController {
   /**
    * Default values for the controller_data property of a PaymentMethod that
    * uses this controller.
+   *
+   * @var mixed[]
    */
   public $controller_data_defaults = array();
 
@@ -766,7 +767,7 @@ class PaymentMethodController {
    * "minimum" and "maximum", whose values are the minimum and maximum amount
    * supported for the specified currency. Leave empty to allow all currencies.
    *
-   * @var array
+   * @var array[]
    */
   public $currencies = array();
 
@@ -839,7 +840,7 @@ class PaymentMethodController {
   /**
    * The human-readable plain text title.
    *
-   * @var array
+   * @var string
    */
   public $title = '';
 
@@ -923,7 +924,7 @@ class PaymentMethodController {
    * Returns an array with the names of all available payment method
    * controllers that inherit of this one.
    *
-   * return array
+   * return string[]
    */
   static function descendants() {
     $descendants = array();
@@ -946,19 +947,22 @@ class PaymentMethodController {
  */
 class PaymentMethodControllerUnavailable extends PaymentMethodController {
 
+  /**
+   * {@inheritdoc}
+   */
   function __construct() {
     $this->title = t('Unavailable');
   }
 
   /**
-   * Implements PaymentMethodController::execute().
+   * {@inheritdoc}
    */
   function execute(Payment $payment) {
     $payment->setStatus(new PaymentStatusItem(PAYMENT_STATUS_UNKNOWN));
   }
 
   /**
-   * Implements PaymentMethodController::validate().
+   * {@inheritdoc}
    */
   function validate(Payment $payment, PaymentMethod $payment_method, $strict) {
     throw new PaymentValidationException(t('This payment method type is unavailable.'));
@@ -980,7 +984,7 @@ class PaymentStatusInfo extends PaymentCommon {
   /**
    * This status's parent status.
    *
-   * @var array
+   * @var string
    */
   public $parent = NULL;
 
@@ -1001,7 +1005,7 @@ class PaymentStatusInfo extends PaymentCommon {
   /**
    * Get this payment status's ancestors.
    *
-   * @return array
+   * @return string[]
    *   The machine names of this status's ancestors.
    */
   function ancestors() {
@@ -1016,7 +1020,7 @@ class PaymentStatusInfo extends PaymentCommon {
   /**
    * Get this payment status's children.
    *
-   * @return array
+   * @return string[]
    *   The machine names of this status's children.
    */
   function children() {
@@ -1033,7 +1037,7 @@ class PaymentStatusInfo extends PaymentCommon {
   /**
    * Get this payment status's descendants.
    *
-   * @return array
+   * @return string[]
    *   The machine names of this status's descendants.
    */
   function descendants() {
@@ -1073,7 +1077,7 @@ class PaymentLineItem extends PaymentCommon {
   /**
    * Arguments to pass on to t() when translating $this->description.
    *
-   * @var array
+   * @var string[]
    */
   public $description_arguments = array();
 
@@ -1204,7 +1208,7 @@ class PaymentLineItemInfo extends PaymentCommon {
 class PaymentException extends Exception {
 
   /**
-   * Implements Exception::__construct().
+   * {@inheritdoc}
    */
   function __construct($message = '', $code = 0, Exception $previous = NULL) {
     parent::__construct($message, $code, $previous);
