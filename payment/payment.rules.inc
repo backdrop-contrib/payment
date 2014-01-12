@@ -193,7 +193,7 @@ function payment_rules_condition_info() {
       ),
       'payment_statuses' => array(
         'type' => 'list<text>',
-        'label' => t('Payment status is or is derived from'),
+        'label' => t('Payment status is derived from'),
         'options list' => 'payment_status_options',
         'restriction' => 'input',
       ),
