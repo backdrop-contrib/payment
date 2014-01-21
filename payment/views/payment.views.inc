@@ -282,7 +282,6 @@ function payment_views_data_alter(&$data) {
       'handler' => 'views_handler_argument_string',
     ),
   );
-  $data['payment_method']['title_specific']['filter']['handler'] = 'PaymentViewsHandlerFilterPaymentMethodTitle';
   $data['payment_method']['operations'] = array(
     'title' => t('Operations'),
     'real field' => 'pmid',
@@ -290,6 +289,7 @@ function payment_views_data_alter(&$data) {
       'handler' => 'PaymentViewsHandlerFieldPaymentMethodOperations',
     ),
   );
+  $data['payment_method']['pmid']['filter']['handler'] = 'PaymentViewsHandlerFilterPaymentMethodTitle';
   $data['payment_method']['uid']['relationship'] = array(
     'title' => t('User'),
     'base' => 'users',

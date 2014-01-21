@@ -273,25 +273,31 @@ function payment_view_payments() {
     1 => 0,
     3 => 0,
   );
-  /* Filter criterion: Payment method: Title (specific) */
-  $handler->display->display_options['filters']['title_specific']['id'] = 'title_specific';
-  $handler->display->display_options['filters']['title_specific']['table'] = 'payment_method';
-  $handler->display->display_options['filters']['title_specific']['field'] = 'title_specific';
-  $handler->display->display_options['filters']['title_specific']['relationship'] = 'pmid';
-  $handler->display->display_options['filters']['title_specific']['group'] = 1;
-  $handler->display->display_options['filters']['title_specific']['exposed'] = TRUE;
-  $handler->display->display_options['filters']['title_specific']['expose']['operator_id'] = 'title_specific_op';
-  $handler->display->display_options['filters']['title_specific']['expose']['label'] = 'Payment method';
-  $handler->display->display_options['filters']['title_specific']['expose']['operator'] = 'title_specific_op';
-  $handler->display->display_options['filters']['title_specific']['expose']['identifier'] = 'payment_method';
-  $handler->display->display_options['filters']['title_specific']['expose']['remember'] = TRUE;
-  $handler->display->display_options['filters']['title_specific']['expose']['multiple'] = TRUE;
+  /* Filter criterion: Payment method: Payment method ID */
+  $handler->display->display_options['filters']['pmid']['id'] = 'pmid';
+  $handler->display->display_options['filters']['pmid']['table'] = 'payment_method';
+  $handler->display->display_options['filters']['pmid']['field'] = 'pmid';
+  $handler->display->display_options['filters']['pmid']['relationship'] = 'pmid';
+  $handler->display->display_options['filters']['pmid']['group'] = 1;
+  $handler->display->display_options['filters']['pmid']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['pmid']['expose']['operator_id'] = 'pmid_op';
+  $handler->display->display_options['filters']['pmid']['expose']['label'] = 'Payment method';
+  $handler->display->display_options['filters']['pmid']['expose']['operator'] = 'pmid_op';
+  $handler->display->display_options['filters']['pmid']['expose']['identifier'] = 'pmid';
+  $handler->display->display_options['filters']['pmid']['expose']['remember'] = TRUE;
+  $handler->display->display_options['filters']['pmid']['expose']['multiple'] = TRUE;
+  $handler->display->display_options['filters']['pmid']['expose']['remember_roles'] = array(
+    2 => '2',
+    1 => 0,
+    3 => 0,
+  );
   /* Filter criterion: User: Name */
   $handler->display->display_options['filters']['uid']['id'] = 'uid';
   $handler->display->display_options['filters']['uid']['table'] = 'users';
   $handler->display->display_options['filters']['uid']['field'] = 'uid';
   $handler->display->display_options['filters']['uid']['relationship'] = 'uid';
   $handler->display->display_options['filters']['uid']['value'] = '';
+  $handler->display->display_options['filters']['uid']['group'] = 1;
   $handler->display->display_options['filters']['uid']['exposed'] = TRUE;
   $handler->display->display_options['filters']['uid']['expose']['operator_id'] = 'uid_op';
   $handler->display->display_options['filters']['uid']['expose']['label'] = 'User';
