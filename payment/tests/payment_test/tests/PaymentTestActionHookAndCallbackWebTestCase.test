@@ -58,6 +58,6 @@ class PaymentTestActionHookAndCallbackWebTestCase extends PaymentWebTestCase {
 
     // Tests hook_payment_view_alter().
     $build = entity_view('payment', array($payment));
-    $this->assertTrue(isset($build['#payment_test_payment_view_alter']));
+    $this->assertTrue(isset($build['payment'][$payment->pid]['#payment_test_payment_view_alter']));
   }
 }

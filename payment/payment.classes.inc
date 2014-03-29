@@ -444,6 +444,7 @@ class PaymentEntityController extends EntityAPIController {
    */
   function view($entities, $view_mode = 'full', $langcode = NULL, $page = NULL) {
     $build = parent::view($entities, $view_mode, $langcode, $page);
+    $type = 'payment';
     foreach ($build['payment'] as &$payment_build) {
       $payment = $payment_build['#entity'];
       $payment_build['payment_line_items'] = payment_line_items($payment);
@@ -453,9 +454,8 @@ class PaymentEntityController extends EntityAPIController {
         '#title' => t('Payment method'),
         '#markup' => check_plain($payment->method->title_generic),
       );
+      drupal_alter(array('payment_view', 'entity_view'), $payment_build, $type);
     }
-    $type = 'payment';
-    drupal_alter(array('payment_view', 'entity_view'), $build, $type);
 
     return $build;
   }
