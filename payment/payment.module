@@ -455,6 +455,7 @@ function payment_entity_info() {
       'id' => 'pid',
     ),
     'label callback' => 'payment_label',
+    'uri callback' => 'payment_uri',
     'fieldable' => TRUE,
     'bundles' => array(
       'payment' => array(
@@ -479,6 +480,7 @@ function payment_entity_info() {
       'label' => 'title_specific',
       'name' => 'name',
     ),
+    'uri callback' => 'payment_method_uri',
     'exportable' => TRUE,
     'access callback' => 'payment_method_access',
   );
@@ -1099,4 +1101,22 @@ function payment_currency_options() {
     return currency_api_get_list();
   }
   return array();
+}
+
+/**
+ * Implements callback_entity_info_uri().
+ */
+function payment_uri(Payment $payment) {
+  return array(
+    'path' => 'payment/' . $payment->pid,
+  );
+}
+
+/**
+ * Implements callback_entity_info_uri().
+ */
+function payment_method_uri(PaymentMethod $payment_method) {
+  return array(
+    'path' => 'admin/config/services/payment/method/' . $payment_method->pmid,
+  );
 }
