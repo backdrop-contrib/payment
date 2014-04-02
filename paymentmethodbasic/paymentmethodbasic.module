@@ -108,6 +108,19 @@ class PaymentMethodBasicController extends PaymentMethodController {
   function execute(Payment $payment) {
     $payment->setStatus(new PaymentStatusItem($payment->method->controller_data['status']));
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function validate(Payment $payment, PaymentMethod $payment_method, $strict) {
+    // This payment method controller does not have a minimum amount, so when
+    // the parent throws such an exception, catch it and do nothing.
+    try {
+      parent::validate($payment, $payment_method, $strict);
+    }
+    catch (PaymentValidationAmountBelowMinimumException $e) {
+    }
+  }
 }
 
 /**

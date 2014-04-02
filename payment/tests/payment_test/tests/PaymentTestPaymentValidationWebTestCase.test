@@ -111,32 +111,6 @@ class PaymentTestPaymentValidationWebTestCase extends PaymentWebTestCase {
     }
     $this->assertFalse($valid, 'PaymentMethodController::validate() invalidates a payment that has no (callable) finish callback set.');
 
-    // Test that a payment with a total amount below PAYMENT_MINIMUM_AMOUNT
-    // invalidates.
-    try {
-      $payment = $this->paymentCreate(1, $this->payment_method);
-      $payment->line_items = array();
-      $this->payment_method->validate($payment);
-      $valid = TRUE;
-    }
-    catch (PaymentValidationAmountBelowMinimumException $e) {
-      $valid = FALSE;
-    }
-    $this->assertFalse($valid, 'PaymentMethodController::validate() invalidates a payment of which the amount is below the default minimum of ' . PAYMENT_MINIMUM_AMOUNT . '.');
-
-    // Test that a payment with a total amount below its controller's minimum
-    // invalidates.
-    try {
-      $payment = $this->paymentCreate(1, $this->payment_method);
-      $payment->line_items['foo']->amount = 0.1;
-      $this->payment_method->validate($payment);
-      $valid = TRUE;
-    }
-    catch (PaymentValidationAmountBelowMinimumException $e) {
-      $valid = FALSE;
-    }
-    $this->assertFalse($valid, "PaymentMethodController::validate() invalidates a payment of which the amount is below its controller's supported minimum.");
-
     // Test that a payment with a total amount above its controller's maximum
     // invalidates.
     try {
