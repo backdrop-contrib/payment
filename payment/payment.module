@@ -837,7 +837,7 @@ function payment_method_controller_load_multiple(array $controller_class_names =
   if (is_null($controllers)) {
     foreach (payment_method_controllers_info() as $controller_class_name_alias => $controller_class_name) {
       $controller = new $controller_class_name();
-      $controller->name = $controller_class_name;
+      $controller->name = $controller_class_name_alias;
       $controllers[$controller_class_name_alias] = $controller;
     }
   }
