@@ -388,3 +388,16 @@ function payment_views_data_alter(&$data) {
     ),
   );
 }
+
+/**
+ * Implements hook_views_plugins().
+ */
+function payment_views_plugins() {
+  $plugins = array();
+  $plugins['access']['payment_own_payment_overview'] = array(
+    'title' => t('People with the <em>View any payment</em> permission and people who own the payments'),
+    'handler' => 'PaymentViewsHandlerAccessOwnPaymentOverview',
+  );
+
+  return $plugins;
+}

@@ -1120,3 +1120,24 @@ function payment_method_uri(PaymentMethod $payment_method) {
     'path' => 'admin/config/services/payment/method/' . $payment_method->pmid,
   );
 }
+
+/**
+ * Implements menu access callback.
+ *
+ * @see PaymentOwnOverviewViewsHandlerAccess::get_access_callback()
+ *
+ * @param stdClass|null $account
+ *   The account for which to check access. Defaults to the currently logged-in
+ *   user.
+ *
+ * @return bool
+ */
+function _payment_own_overview_views_handler_access($account = NULL) {
+  global $user;
+
+  if (!$account) {
+    $account = $user;
+  }
+
+  return user_access('payment.payment.view.any') || user_access('payment.payment.view.own') && $account->uid == arg(1);
+}

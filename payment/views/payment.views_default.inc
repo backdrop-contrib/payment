@@ -40,8 +40,7 @@ function payment_view_payments() {
   $handler->display->display_options['title'] = 'Payments';
   $handler->display->display_options['use_more_always'] = FALSE;
   $handler->display->display_options['group_by'] = TRUE;
-  $handler->display->display_options['access']['type'] = 'perm';
-  $handler->display->display_options['access']['perm'] = 'payment.payment.view.own';
+  $handler->display->display_options['access']['type'] = 'payment_own_payment_overview';
   $handler->display->display_options['cache']['type'] = 'none';
   $handler->display->display_options['query']['type'] = 'views_query';
   $handler->display->display_options['query']['options']['query_comment'] = FALSE;
@@ -319,8 +318,7 @@ function payment_view_payments() {
   $handler = $view->new_display('page', 'User\'s own payments', 'user_page');
   $handler->display->display_options['defaults']['hide_admin_links'] = FALSE;
   $handler->display->display_options['defaults']['access'] = FALSE;
-  $handler->display->display_options['access']['type'] = 'perm';
-  $handler->display->display_options['access']['perm'] = 'payment.payment.view.own';
+  $handler->display->display_options['access']['type'] = 'payment_own_payment_overview';
   $handler->display->display_options['defaults']['fields'] = FALSE;
   /* Field: Payment status item: Creation date and time */
   $handler->display->display_options['fields']['created']['id'] = 'created';
@@ -400,12 +398,11 @@ function payment_view_payments() {
     t('Last update'),
     t('Status'),
     t('Broken handler payment.amount'),
+    t('[currency_code] [amount]'),
     t('Title (generic)'),
     t('Operations'),
     t('Administration page'),
     t('Amount'),
-    t('.'),
-    t(','),
     t('Unavailable'),
     t('Last updated between'),
     t('Current status'),
