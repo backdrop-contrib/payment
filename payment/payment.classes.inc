@@ -638,7 +638,19 @@ class PaymentMethodEntityController extends EntityAPIControllerExportable {
     // Load PaymentMethodUnavailable for all requested IDs that did not match
     // any existing payment methods.
     if (is_array($ids)) {
-      $diff = array_diff($ids, array_keys($entities));
+      // If the entities were loaded by PID.
+      if (is_numeric(reset($ids))) {
+        $diff = array_diff($ids, array_keys($entities));
+      }
+      // If the entities were loaded by name.
+      else {
+        $names = array();
+        foreach ($entities as $entity) {
+          $names[] = $entity->name;
+        }
+        $diff = array_diff($ids, $names);
+      }
+
       if ($diff && is_null($unavailable)) {
         $unavailable = new PaymentMethodUnavailable;
       }
