@@ -1025,7 +1025,9 @@ function payment_form_process_method_validate(array $element, array &$form_state
  * Implements form submit callback for a payment_method element.
  */
 function payment_form_process_method_submit(array $form, array &$form_state) {
-  $pmid = drupal_array_get_nested_value($form_state['values'], array_merge($form_state['payment_parents'], array('pmid')));
+  $parents = $form_state['triggering_element'];
+  array_pop($parents);
+  $pmid = drupal_array_get_nested_value($form_state['values'], array_merge($parents, array('pmid')));
   unset($pmid);
   $form_state['payment']->method = NULL;
   $form_state['rebuild'] = TRUE;
