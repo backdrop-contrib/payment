@@ -13,13 +13,15 @@
    */
   Drupal.behaviors.PaymentreferenceWindowCloseLink = {
     attach: function(context) {
-      $('span.paymentreference-window-close').each(function() {
-        $(this).replaceWith('<a href="#" class="paymentreference-window-close">' + this.innerHTML + '</a>');
-      });
-      $('a.paymentreference-window-close').bind('click', function() {
-        window.opener.focus();
-        window.close();
-      });
+      if (window.opener) {
+        $('span.paymentreference-window-close').each(function() {
+          $(this).replaceWith('<a href="#" class="paymentreference-window-close">' + this.innerHTML + '</a>');
+        });
+        $('a.paymentreference-window-close').bind('click', function() {
+          window.opener.focus();
+          window.close();
+        });
+      }
     }
   }
 
