@@ -79,7 +79,7 @@ function payment_form_embedded(array &$form_state, Payment $payment, array $pmid
   $form_state['payment'] = $payment;
 
   $elements['#parents'] = $parents;
-  $elements['#element_validate'] = array('payment_form_embedded_validate');
+  $elements['#validate'] = array('payment_form_embedded_validate');
   $elements['payment_status'] = array(
     '#access' => !payment_status_is_or_has_ancestor($payment->getStatus()->status, PAYMENT_STATUS_NEW),
     '#type' => 'select',
@@ -159,10 +159,6 @@ function payment_form_standalone(array $form, array &$form_state, Payment $payme
   $form_info = payment_form_embedded($form_state, $payment, $pmids);
   $form = $form_info['elements'];
   $form['#submit'] = array_merge($form_info['submit'], array('payment_form_standalone_submit'));
-  // The stand-alone form is a special case, where the root element from
-  // payment_form_embedded() is the form root. Because of that, we have to
-  // re-set the validate callback.
-  $form['#validate'] = $form['#element_validate'];
   $form['actions'] = array(
     '#type' => 'actions',
   );
