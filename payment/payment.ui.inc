@@ -67,8 +67,6 @@ function payment_page_payment_view(Payment $payment) {
  *   The PMIDs of the payment methods the user is allowed to choose from.
  * @param array $parents
  *   An array with the machine names of the form's parent elements.
- *   @todo This is too important to be an optional element. Perhaps we can set
- *   this using #process in version 2?
  *
  * @return array
  *   Form information with the following keys:
