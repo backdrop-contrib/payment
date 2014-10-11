@@ -50,6 +50,7 @@ function paymentreference_element_info() {
     '#payment_load_callback' => '',
     // Arguments to pass on to the #payment_load_callback callback.
     '#payment_load_arguments' => array(),
+    '#value_callback' => 'paymentreference_form_process_paymentreference_value',
   );
 
   return $elements;
@@ -622,11 +623,12 @@ function paymentreference_form_process_paymentreference_ajax_callback(array $for
  * Implements form validate callback for paymentreference elements.
  */
 function paymentreference_form_process_paymentreference_validate(array $element, array &$form_state) {
-  $pid = call_user_func_array($element['#payment_load_callback'], $element['#payment_load_arguments']);
-  if ($element['#required'] && !$pid) {
-    form_error($element, t('!name field is required.', array(
-      '!name' => $element['#title'],
-    )));
-  }
-  form_set_value($element, $pid, $form_state);
+  form_set_value($element, $element['#value'], $form_state);
+}
+
+/**
+ * Implements form value callback for paymentreference elements.
+ */
+function paymentreference_form_process_paymentreference_value(array $element, $input, array &$form_state) {
+  return call_user_func_array($element['#payment_load_callback'], $element['#payment_load_arguments']);
 }

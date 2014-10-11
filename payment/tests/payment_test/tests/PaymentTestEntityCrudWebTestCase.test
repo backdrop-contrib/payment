@@ -19,7 +19,7 @@ class PaymentTestEntityCrudWebTestCase extends PaymentWebTestCase {
   }
 
   function setUp(array $modules = array()) {
-    parent::setUp($modules = array('payment_test'));
+    parent::setUp($modules + array('payment_test'));
   }
 
   /**
@@ -29,45 +29,60 @@ class PaymentTestEntityCrudWebTestCase extends PaymentWebTestCase {
     $schema = drupal_get_schema('payment_method');
 
     // Test inserting a payment method.
-    $payment_method = new PaymentMethod(array(
+    $payment_method_1 = new PaymentMethod(array(
       'controller' => payment_method_controller_load('PaymentMethodControllerUnavailable'),
       'name' => 'foo',
       'title_generic' => 'bar',
       'title_specific' => 'baz',
     ));
-    entity_save('payment_method', $payment_method);
+    entity_save('payment_method', $payment_method_1);
     $query = db_select('payment_method');
     foreach (array_keys($schema['fields']) as $field) {
-      if (property_exists($payment_method, $field)) {
-        $query->condition($field, $payment_method->$field);
+      if (property_exists($payment_method_1, $field)) {
+        $query->condition($field, $payment_method_1->$field);
       }
     }
     $count = $query->countQuery()->execute()->fetchField();
     $this->assertTrue($count, 'A new payment method is correctly inserted.');
 
-    // Test loading a payment method.
-    $payment_method_loaded = entity_load_single('payment_method', $payment_method->pmid);
-    $this->assertTrue($payment_method_loaded instanceof PaymentMethod);
+    // Test loading a payment method by ID.
+    $payment_method_loaded_1 = entity_load_single('payment_method', $payment_method_1->pmid);
+    $this->assertTrue($payment_method_loaded_1 instanceof PaymentMethod);
+
+    // Test loading payment methods by name.
+    $payment_method_2 = PaymentGenerate::paymentMethod();
+    entity_save('payment_method', $payment_method_2);
+    $payment_method_loaded_2 = entity_load_single('payment_method', $payment_method_2->name);
+    $this->assertEqual($payment_method_loaded_2->name, $payment_method_2->name);
+    $payment_methods_loaded = entity_load('payment_method', array($payment_method_1->name, $payment_method_2->name));
+    $this->assertEqual($payment_methods_loaded[$payment_method_1->pmid]->name, $payment_method_1->name);
+    $this->assertEqual($payment_methods_loaded[$payment_method_2->pmid]->name, $payment_method_2->name);
+    // Save the payment methods and assert no new ones are created.
+    foreach ($payment_methods_loaded as $payment_method) {
+      entity_save('payment_method', $payment_method);
+    }
+    $payment_methods_loaded = entity_load('payment_method', array($payment_method_1->name, $payment_method_2->name));
+    $this->assertEqual(count($payment_methods_loaded), 2);
 
     // Test updating a payment method.
-    $payment_method->controller = payment_method_controller_load('PaymentMethodControllerUnavailable');
-    $payment_method->name = 'bar';
-    $payment_method->title_generic = 'baz';
-    $payment_method->title_specific = 'foo';
-    entity_save('payment_method', $payment_method);
+    $payment_method_1->controller = payment_method_controller_load('PaymentMethodControllerUnavailable');
+    $payment_method_1->name = 'bar';
+    $payment_method_1->title_generic = 'baz';
+    $payment_method_1->title_specific = 'foo';
+    entity_save('payment_method', $payment_method_1);
     $query = db_select('payment_method');
     foreach (array_keys($schema['fields']) as $field) {
-      if (property_exists($payment_method, $field)) {
-        $query->condition($field, $payment_method->$field);
+      if (property_exists($payment_method_1, $field)) {
+        $query->condition($field, $payment_method_1->$field);
       }
     }
     $count = $query->countQuery()->execute()->fetchField();
     $this->assertTrue($count, 'A payment method is correctly updated.');
 
     // Test deleting a payment method.
-    entity_delete('payment_method', $payment_method->pmid);
+    entity_delete('payment_method', $payment_method_1->pmid);
     $count = db_select('payment_method')
-      ->condition('pmid', $payment_method->pmid)
+      ->condition('pmid', $payment_method_1->pmid)
       ->countQuery()
       ->execute()
       ->fetchField();

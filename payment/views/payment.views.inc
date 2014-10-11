@@ -387,6 +387,19 @@ function payment_views_data_alter(&$data) {
       ),
     ),
   );
+
+  // {users}
+  $data['users']['uid_payment'] = array(
+    'title' => t('Payments'),
+    'real field' => 'uid',
+    'relationship' => array(
+      'title' => t('Payments'),
+      'base' => 'payment',
+      'base field' => 'uid',
+      'handler' => 'views_handler_relationship',
+      'label' => t('Payments'),
+    ),
+  );
 }
 
 /**
