@@ -79,7 +79,9 @@ function payment_form_embedded(array &$form_state, Payment $payment, array $pmid
   $form_state['payment'] = $payment;
 
   $elements['#parents'] = $parents;
-  $elements['#validate'] = array('payment_form_embedded_validate');
+  // Nest the callback, because if $elements is used as a top-level form render
+  // array, #validate will be called instead of #element_validate.
+  $elements['validate']['#element_validate'] = array('payment_form_embedded_validate');
   $elements['payment_status'] = array(
     '#access' => !payment_status_is_or_has_ancestor($payment->getStatus()->status, PAYMENT_STATUS_NEW),
     '#type' => 'select',
@@ -111,10 +113,12 @@ function payment_form_embedded(array &$form_state, Payment $payment, array $pmid
 /**
  * Implements form validate callback for payment_form_embedded().
  */
-function payment_form_embedded_validate(array $form, array &$form_state) {
+function payment_form_embedded_validate(array $element, array &$form_state, array $form) {
+  $root_element_parents = array_slice($element['#array_parents'], 0, -1);
+  $root_element = drupal_array_get_nested_value($form, $root_element_parents);
   $payment = $form_state['payment'];
-  field_attach_form_validate('payment', $payment, $form, $form_state);
-  field_attach_submit('payment', $payment, $form, $form_state);
+  field_attach_form_validate('payment', $payment, $root_element, $form_state);
+  field_attach_submit('payment', $payment, $root_element, $form_state);
 
   if (empty($form_state['rebuild']) && $payment->method) {
     try {
