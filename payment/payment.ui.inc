@@ -727,25 +727,22 @@ function payment_form_process_line_item(array $element, array &$form_state, arra
 
   // Fetch all line items to display elements for.
   $line_items = array();
-  // We're building the form for the first time.
-  if (!isset($form_state['payment_line_item_count'])) {
-    // Track one empty line item by default.
-    $form_state['payment_line_item_count'] = count($line_items) + 1;
-    // Track and add the default values.
-    if (isset($element['#default_value'])) {
-      $line_items = array_values($element['#default_value']);
-      $form_state['payment_line_item_count'] += count($element['#default_value']);
-    }
+  if (isset($element['#default_value'])) {
+    $line_items = array_values($element['#default_value']);
   }
+  // Apply cardinality limit.
+  if ($element['#cardinality'] > 0) {
+    $line_items = array_slice($line_items, 0, $element['#cardinality']);
+  }
+
+  if (!isset($form_state['payment_line_item_count'])) {
+    $form_state['payment_line_item_count'] = max(1, count($line_items));
+  }
+
   // Add any tracked line items that haven't been added yet.
   if ($form_state['payment_line_item_count'] > count($line_items)) {
     $diff = $form_state['payment_line_item_count'] - count($line_items);
     $line_items = array_merge($line_items, array_fill(0, $diff, NULL));
-  }
-
-  // Apply cardinality limit.
-  if ($element['#cardinality'] > 0) {
-    $line_items = array_slice($line_items, 0, $element['#cardinality']);
   }
 
   // Build the line items.
