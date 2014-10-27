@@ -2,18 +2,18 @@
 
 /**
  * @file
- * Contains class PaymentTestUpdatePathWithoutContentWebTestCase.
+ * Contains class PaymentTestUpdatePathWithContentWebTestCase.
  */
 
 /**
  * Tests Payment's update path.
  */
-class PaymentTestUpdatePathWithoutContentWebTestCase extends UpdatePathTestCase {
+class PaymentTestUpdatePathWithContentWebTestCase extends UpdatePathTestCase {
 
   static function getInfo() {
     return array(
       'description' => '',
-      'name'  => 'Update path (without existing content and configuration)',
+      'name'  => 'Update path (with existing content and configuration)',
       'group' => 'Payment',
       'dependencies' => array('payment', 'paymentform', 'paymentmethodbasic', 'paymentreference'),
     );
@@ -24,7 +24,10 @@ class PaymentTestUpdatePathWithoutContentWebTestCase extends UpdatePathTestCase 
    */
   function setUp() {
     $this->profile = 'testing';
-    $this->databaseDumpFiles = array(drupal_get_path('module', 'payment') . '/../payment-database-dump.php');
+    $this->databaseDumpFiles = array(
+      drupal_get_path('module', 'payment') . '/payment-database-dump.php',
+      drupal_get_path('module', 'payment') . '/payment-database-dump-content.php',
+    );
     parent::setUp();
     // Re-register the autoload functions that were unregistered by
     // UpdatePathTestCase::setUp(), because it also loads some module files
