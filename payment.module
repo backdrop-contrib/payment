@@ -804,6 +804,20 @@ function payment_method_controllers_info() {
 }
 
 /**
+ * Implements hook_modules_enabled().
+ */
+function payment_modules_enabled() {
+  drupal_static_reset();
+}
+
+/**
+ * Implements hook_modules_disabled().
+ */
+function payment_modules_disabled() {
+  drupal_static_reset();
+}
+
+/**
  * Load a payment method controller().
  *
  * @param string $controller_class_name
