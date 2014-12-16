@@ -1111,7 +1111,7 @@ class PaymentLineItem extends PaymentCommon {
   /**
    * Quantity.
    *
-   * @var integer
+   * @var float
    */
   public $quantity = 1;
 

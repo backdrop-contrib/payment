@@ -33,6 +33,7 @@ class PaymentTestPaymentLineItemWebTestCase extends PaymentWebTestCase {
     $payment->setLineItem(new PaymentLineItem(array(
       'name' => 'foo',
       'amount' => 19.11,
+      'quantity' => -1.1,
       'tax_rate' => 0.1,
     )));
 
@@ -46,7 +47,7 @@ class PaymentTestPaymentLineItemWebTestCase extends PaymentWebTestCase {
     $this->assertTrue($payment->line_items['foo']->unitAmount(TRUE) == 21.021, 'Payment::unitAmount() returns amount including tax.');
 
     // Test Payment::totalAmount() without tax.
-    $this->assertTrue($payment->totalAmount(FALSE) == 19.11, 'Payment::totalAmount() returns amount excluding tax.');
+    $this->assertEqual(round($payment->totalAmount(FALSE), 3), round(-21.021, 3));
 
     $payment->setLineItem(new PaymentLineItem(array(
       'name' => 'bar',
@@ -54,7 +55,7 @@ class PaymentTestPaymentLineItemWebTestCase extends PaymentWebTestCase {
     )));
 
     // Test Payment::totalAmount() without passed on amounts.
-    $this->assertTrue($payment->totalAmount(TRUE) == 40.801, 'Payment::totalAmount() adds up Payment::line_items.');
+    $this->assertEqual(round($payment->totalAmount(TRUE), 4), round(-3.3431, 4));
 
     $payment->setLineItem(new PaymentLineItem(array(
       'name' => 'beer',
@@ -63,7 +64,7 @@ class PaymentTestPaymentLineItemWebTestCase extends PaymentWebTestCase {
 
     // Test Payment::totalAmount() with passed on amounts.
     $line_items = $payment->getLineItems('payment_test');
-    $this->assertTrue($payment->totalAmount(TRUE, $line_items) == 40.801, 'Payment::totalAmount() adds up only passed on line items.');
+    $this->assertEqual(round($payment->totalAmount(TRUE, $line_items), 4), round(-3.3431, 4));
 
     // Test payment_line_item_get_specific() and whether
     // Payment::getLineItems() can get line items that are not exposed

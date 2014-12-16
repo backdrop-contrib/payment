@@ -27,7 +27,7 @@ class PaymentTestPaymentLineItemFormElementWebTestCase extends PaymentWebTestCas
       'line_item[container_0][amount]' => '10.0',
       'line_item[container_0][description]' => 'foo',
       'line_item[container_0][name]' => 'bar',
-      'line_item[container_0][quantity]' => '1',
+      'line_item[container_0][quantity]' => '-1.1',
       'line_item[container_0][tax_rate]' => '10',
     );
   }
@@ -120,7 +120,7 @@ class PaymentTestPaymentLineItemFormElementWebTestCase extends PaymentWebTestCas
       'line_item[container_0][quantity]' => $this->randomName(2),
     );
     $this->drupalPost('payment_test-form-element-payment-line-item', $values, t('Submit'));
-    $this->assertText(t('Quantity should be a positive integer.'), 'A non-integer amount throws a validation error.');
+    $this->assertText(t('Quantity should be a number.'), 'A non-number quantity throws a validation error.');
 
     // Test a non-numeric tax rate.
     $values =  array(

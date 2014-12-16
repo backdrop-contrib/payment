@@ -852,8 +852,8 @@ function payment_form_process_line_item_validate(array $element, array &$form_st
     }
 
     // Validate quantity.
-    if (preg_match('#\D#', $line_item_data['quantity'])) {
-      form_error($element[$container]['quantity'], t('Quantity should be a positive integer.'));
+    if (!is_numeric($line_item_data['quantity'])) {
+      form_error($element[$container]['quantity'], t('Quantity should be a number.'));
     }
 
     // Validate tax rate.
