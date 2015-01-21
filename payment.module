@@ -6,7 +6,7 @@
  */
 
 // Load include files that contain hooks or callback code.
-module_load_include('inc', 'payment', 'payment.ui');
+include_once dirname(__FILE__) . '/payment.ui.inc';
 
 /**
  * An absolute parent status: a payment for which all money has been transferred.
