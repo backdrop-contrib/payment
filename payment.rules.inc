@@ -371,7 +371,8 @@ function payment_rules_condition_payment_status_has_ancestor(Payment $payment, a
  * Implements Rules action callback for payment_rules_payment_set_status.
  */
 function payment_rules_action_payment_set_status(Payment $payment, $status_data) {
-  $payment->setStatus(reset($status_data));
+  $status = new PaymentStatusItem($status_data);
+  $payment->setStatus($status);
 }
 
 /**
