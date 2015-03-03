@@ -7,6 +7,11 @@
 
 // Load include files that contain hooks or callback code.
 include_once dirname(__FILE__) . '/payment.ui.inc';
+// Payment 7.x-1.13 changed the directory structure, so all classes are in a
+// different directory. Because the registry isn't rebuilt before running
+// updates, there was no way to fix the class loading errors without Drush. By
+// loading the classes file manually, this problem is circumvented.
+include_once dirname(__FILE__) . '/payment.classes.inc';
 
 /**
  * An absolute parent status: a payment for which all money has been transferred.
