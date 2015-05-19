@@ -952,6 +952,7 @@ function payment_form_process_method(array $element, array &$form_state, array &
   }
   // There are multiple available payment methods.
   else {
+    natcasesort($pmid_options);
     $form['#prefix'] = '<div id="payment-method-wrapper">';
     $form['#suffix'] = '</div>';
     $element['pmid'] = array(
@@ -1153,13 +1154,13 @@ function payment_method_options() {
   foreach (entity_load('payment_method') as $payment_method) {
     $options[$payment_method->pmid] = check_plain($payment_method->title_specific);
   }
-  asort($options);
+  natcasesort($pmid_options);
 
   return $options;
 }
 
 /**
- * Return payment method controllerss for use in form elements.
+ * Return payment method controllers for use in form elements.
  *
  * @return array
  *   Keys are payment method controller class names. Values are controller
