@@ -42,8 +42,9 @@ function payment_schema() {
         'default' => 0,
       ),
       'quantity' => array(
-        'type' => 'int',
-        'default' => 1,
+        'type' => 'float',
+        'size' => 'big',
+        'default' => 1.0,
         'not null' => TRUE,
       ),
       'tax_rate' => array(
@@ -433,4 +434,16 @@ function payment_update_7105(array &$sandbox) {
         ->execute();
     }
   }
+}
+
+/**
+ * Make quantity accept float values
+ */
+function payment_update_7106(array &$sandbox) {
+  db_change_field('payment_line_item', 'quantity', 'quantity', array(
+    'type' => 'float',
+    'size' => 'big',
+    'default' => 1.0,
+    'not null' => TRUE,
+  ));
 }

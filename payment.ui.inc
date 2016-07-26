@@ -867,7 +867,7 @@ function payment_form_process_line_item_validate(array $element, array &$form_st
 
     // Convert the raw input to a PaymentLineItem object.
     $line_item_data['amount'] = (float) $line_item_data['amount'];
-    $line_item_data['quantity'] = (int) $line_item_data['quantity'];
+    $line_item_data['quantity'] = (float) $line_item_data['quantity'];
     $line_item_data['tax_rate'] = (float) $line_item_data['tax_rate'];
     $line_items[] = new PaymentLineItem($line_item_data);
   }

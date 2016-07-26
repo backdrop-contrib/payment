@@ -357,7 +357,7 @@ class PaymentEntityController extends EntityAPIController {
       $line_item_data['description_arguments'] = unserialize($line_item_data['description_arguments']);
       $line_item_data['amount'] = (float) $line_item_data['amount'];
       $line_item_data['tax_rate'] = (float) $line_item_data['tax_rate'];
-      $line_item_data['quantity'] = (int) $line_item_data['quantity'];
+      $line_item_data['quantity'] = (float) $line_item_data['quantity'];
       $line_items[$line_item_data['pid']][$line_item_data['name']] = new PaymentLineItem($line_item_data);
     }
 
@@ -1113,7 +1113,7 @@ class PaymentLineItem extends PaymentCommon {
    *
    * @var float
    */
-  public $quantity = 1;
+  public $quantity = 1.0;
 
   /**
    * Return this line item's unit amount.
