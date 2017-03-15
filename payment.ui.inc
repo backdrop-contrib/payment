@@ -188,7 +188,7 @@ function payment_form_standalone_submit(array $form, array &$form_state) {
   $payment = $form_state['payment'];
 
   // Save the payment.
-  entity_save('payment', $payment);
+  $payment->save();
 
   // Execute the payment.
   if ($payment->getStatus()->status == PAYMENT_STATUS_NEW) {
@@ -428,7 +428,7 @@ function payment_form_payment_method_submit(array $form, array &$form_state) {
   // The generic title defaults to the specific one.
   $payment_method->title_generic = $values['title_generic'] ? $values['title_generic'] : $values['title_specific'];
   $payment_method->uid = user_load_by_name($values['owner'])->uid;
-  entity_save('payment_method', $payment_method);
+  $payment_method->save();
   $form_state['redirect'] = 'admin/config/services/payment/method';
   backdrop_set_message(t('Payment method %title has been saved.', array(
     '%title' => $payment_method->title_specific,
@@ -528,7 +528,7 @@ function payment_payment_status_sort_title(PaymentStatusInfo $status_a, PaymentS
 }
 
 function payment_method_name_exists($name) {
-  return !is_a(entity_load_single('payment_method', $name), 'PaymentMethodUnavailable');
+  return !is_a(entity_load('payment_method', $name), 'PaymentMethodUnavailable');
   
 }
 
@@ -618,7 +618,7 @@ function payment_page_method_enable_disable($operation, PaymentMethod $payment_m
       $payment_method->enabled = FALSE;
       break;
   }
-  entity_save('payment_method', $payment_method);
+  $payment_method->save();
   backdrop_goto('admin/config/services/payment/method');
 }
 
@@ -941,7 +941,7 @@ function payment_form_process_method(array $element, array &$form_state, array &
     }
     // Default to the only available payment method.
     if (!$payment->method || $payment->method->pmid != $pmids[0]) {
-      $payment->method = entity_load_single('payment_method', $pmids[0]);
+      $payment->method = entity_load('payment_method', $pmids[0]);
     }
 
     $element['payment_method_controller_payment_configuration'] = array(
@@ -1011,7 +1011,7 @@ function payment_form_process_method_validate(array $element, array &$form_state
     $payment = $form_state['payment'];
     // Another payment method was selected, so rebuild the form.
     if (!$payment->method || $payment->method->pmid != $pmid) {
-      $payment->method = entity_load_single('payment_method', $pmid);
+      $payment->method = entity_load('payment_method', $pmid);
       $form_state['rebuild'] = TRUE;
     }
   }

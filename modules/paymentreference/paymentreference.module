@@ -485,7 +485,7 @@ function paymentreference_page_finish() {
     unset($_SESSION['paymentreference_pid']);
 
     // Load the payment and the instance it's for, and build the page.
-    if ($payment = entity_load_single('payment', $pid)) {
+    if ($payment = entity_load('payment', $pid)) {
       $instance_info = paymentreference_load_instance($pid, $payment->uid);
       $instance = field_info_instance($instance_info['entity_type'], $instance_info['field_name'], $instance_info['bundle']);
       backdrop_set_title($instance['label']);
@@ -565,7 +565,7 @@ function paymentreference_form_process_paymentreference(array $element, array &$
     );
   }
   else {
-    $payment = entity_load_single('payment', $pid);
+    $payment = entity_load('payment', $pid);
     $row = array(
       payment_amount_human_readable($payment->totalAmount(TRUE), $payment->currency_code),
       payment_status_info($payment->getStatus()->status, TRUE)->title,

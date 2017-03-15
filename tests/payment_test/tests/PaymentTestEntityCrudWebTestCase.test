@@ -35,7 +35,7 @@ class PaymentTestEntityCrudWebTestCase extends PaymentWebTestCase {
       'title_generic' => 'bar',
       'title_specific' => 'baz',
     ));
-    entity_save('payment_method', $payment_method_1);
+    $payment_method_1->save();
     $query = db_select('payment_method');
     foreach (array_keys($schema['fields']) as $field) {
       if (property_exists($payment_method_1, $field)) {
@@ -46,20 +46,20 @@ class PaymentTestEntityCrudWebTestCase extends PaymentWebTestCase {
     $this->assertTrue($count, 'A new payment method is correctly inserted.');
 
     // Test loading a payment method by ID.
-    $payment_method_loaded_1 = entity_load_single('payment_method', $payment_method_1->pmid);
+    $payment_method_loaded_1 = entity_load('payment_method', $payment_method_1->pmid);
     $this->assertTrue($payment_method_loaded_1 instanceof PaymentMethod);
 
     // Test loading payment methods by name.
     $payment_method_2 = PaymentGenerate::paymentMethod();
-    entity_save('payment_method', $payment_method_2);
-    $payment_method_loaded_2 = entity_load_single('payment_method', $payment_method_2->name);
+    $payment_method_2->save();
+    $payment_method_loaded_2 = entity_load('payment_method', $payment_method_2->name);
     $this->assertEqual($payment_method_loaded_2->name, $payment_method_2->name);
     $payment_methods_loaded = entity_load('payment_method', array($payment_method_1->name, $payment_method_2->name));
     $this->assertEqual($payment_methods_loaded[$payment_method_1->pmid]->name, $payment_method_1->name);
     $this->assertEqual($payment_methods_loaded[$payment_method_2->pmid]->name, $payment_method_2->name);
     // Save the payment methods and assert no new ones are created.
     foreach ($payment_methods_loaded as $payment_method) {
-      entity_save('payment_method', $payment_method);
+      $payment_method->save();
     }
     $payment_methods_loaded = entity_load('payment_method', array($payment_method_1->name, $payment_method_2->name));
     $this->assertEqual(count($payment_methods_loaded), 2);
@@ -69,7 +69,7 @@ class PaymentTestEntityCrudWebTestCase extends PaymentWebTestCase {
     $payment_method_1->name = 'bar';
     $payment_method_1->title_generic = 'baz';
     $payment_method_1->title_specific = 'foo';
-    entity_save('payment_method', $payment_method_1);
+    $payment_method_1->save();
     $query = db_select('payment_method');
     foreach (array_keys($schema['fields']) as $field) {
       if (property_exists($payment_method_1, $field)) {
@@ -95,7 +95,7 @@ class PaymentTestEntityCrudWebTestCase extends PaymentWebTestCase {
   function testPaymentCRUD() {
     $schema = backdrop_get_schema('payment');
     $payment_method = $this->paymentMethodCreate(1, payment_method_controller_load('PaymentMethodControllerUnavailable'));
-    entity_save('payment_method', $payment_method);
+    $payment_method->save();
 
     // Test inserting a payment.
     $payment = new Payment(array(
@@ -104,7 +104,7 @@ class PaymentTestEntityCrudWebTestCase extends PaymentWebTestCase {
       'finish_callback' => 'payment_test_finish_callback',
       'method' => $payment_method,
     ));
-    entity_save('payment', $payment);
+    $payment->save();
     $query = db_select('payment');
     foreach ($schema['fields'] as $name => $definition) {
       if (property_exists($payment, $name)) {
@@ -120,13 +120,13 @@ class PaymentTestEntityCrudWebTestCase extends PaymentWebTestCase {
     $this->assertTrue($count, 'A new payment is correctly inserted.');
 
     // Test loading a payment.
-    $payment_loaded = entity_load_single('payment', $payment->pid);
+    $payment_loaded = entity_load('payment', $payment->pid);
     $this->assertTrue($payment_loaded instanceof Payment);
 
     // Test updating a payment.
     $payment->currency_code = 'bar';
     $payment->description = 'foo';
-    entity_save('payment', $payment);
+    $payment->save();
     $query = db_select('payment');
     foreach ($schema['fields'] as $name => $definition) {
       if (property_exists($payment, $name)) {

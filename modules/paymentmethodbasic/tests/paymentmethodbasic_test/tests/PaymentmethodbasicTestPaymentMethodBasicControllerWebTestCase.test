@@ -35,7 +35,7 @@ class PaymentmethodbasicTestPaymentMethodBasicControllerWebTestCase extends Paym
         'text_format' => 'bar',
       ),
     ));
-    entity_save('payment_method', $payment_method);
+    $payment_method->save();
     $pmid = $payment_method->pmid;
     $count = db_query("SELECT COUNT(1) FROM {paymentmethodbasic} WHERE pmid = :pmid AND message = :message AND status = :status AND text_format = :text_format", array(
       ':pmid' => $pmid,
@@ -46,7 +46,7 @@ class PaymentmethodbasicTestPaymentMethodBasicControllerWebTestCase extends Paym
     $this->assertTrue($count, "A new BasicPaymentMethodController payment method's controller data is inserted correctly.");
 
     // Test loading a payment method.
-    $payment_method_loaded = entity_load_single('payment_method', $pmid);
+    $payment_method_loaded = entity_load('payment_method', $pmid);
     $this->assertFalse(array_diff_assoc($payment_method->controller_data, $payment_method_loaded->controller_data), "An BasicPaymentMethodController payment method's controller data is loaded orrectly.");
 
     // Test updating a payment method.
@@ -55,7 +55,7 @@ class PaymentmethodbasicTestPaymentMethodBasicControllerWebTestCase extends Paym
       'status' => PAYMENT_STATUS_NEW,
       'text_format' => 'bar',
     );
-    entity_save('payment_method', $payment_method);
+    $payment_method->save();
     $count = db_query("SELECT COUNT(1) FROM {paymentmethodbasic} WHERE pmid = :pmid AND message = :message AND status = :status AND text_format = :text_format", array(
       ':pmid' => $pmid,
       ':message' => $payment_method->controller_data['message'],
@@ -85,7 +85,7 @@ class PaymentmethodbasicTestPaymentMethodBasicControllerWebTestCase extends Paym
       'controller_form[message][value]' => 'bar',
       'controller_form[status]' => PAYMENT_STATUS_FAILED,
     ), t('Save'));
-    $payment_method = entity_load_single('payment_method', 3);
+    $payment_method = entity_load('payment_method', 3);
     $reference = array(
       'message' => 'bar',
       'status' => PAYMENT_STATUS_FAILED,

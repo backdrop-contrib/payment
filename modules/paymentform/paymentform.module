@@ -224,7 +224,7 @@ function paymentform_payment_finish(Payment $payment) {
     backdrop_set_message(t('Your payment failed.') . $view);
   }
 
-  $entity = entity_load_single($payment->context_data['entity_type'], $payment->context_data['entity_id']);
+  $entity = entity_load($payment->context_data['entity_type'], $payment->context_data['entity_id']);
   if ($uri = entity_uri($payment->context_data['entity_type'], $entity)) {
     backdrop_goto($uri['path'], $uri['options']);
   }

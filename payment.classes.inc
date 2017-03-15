@@ -202,7 +202,7 @@ class Payment extends PaymentCommon {
    * Finish the payment after its execution.
    */
   function finish() {
-    entity_save('payment', $this);
+    $this->save();
     module_invoke_all('payment_pre_finish', $this);
     if (module_exists('rules')) {
       rules_invoke_event('payment_pre_finish', $this);
@@ -612,7 +612,12 @@ class PaymentMethod extends PaymentCommon {
       rules_invoke_event('payment_validate', $payment, $this, $strict);
     }
   }
-
+  /**
+   * Implements EntityInterface::id().
+   */
+  function id() {
+    return $this->pmid;
+  }
   /**
    * Implements EntityInterface::entityType().
    */
@@ -683,7 +688,7 @@ class PaymentMethodEntityController extends EntityDatabaseStorageController {
       }
 
       if ($diff && is_null($unavailable)) {
-        $unavailable = new PaymentMethodUnavailable;
+        $unavailable = new PaymentMethodUnavailable(array());
       }
       foreach ($diff as $pmid) {
         $entities[$pmid] = $unavailable;
@@ -813,8 +818,7 @@ class PaymentMethodController {
    * the same name, but suffixed with "_validate". If this function exists, it
    * will be called automatically. $form_state['payment'] contains the Payment
    * that is added or edited. All method-specific information should be added
-   * to it in the validate callback. The payment will be saved automatically
-   * using entity_save().
+   * to it in the validate callback. The payment will be saved automatically.
    *
    * The function accepts its parent form element and &$form_state as
    * parameters. It should return an array of form elements.
@@ -838,8 +842,7 @@ class PaymentMethodController {
    * function exists, it will be called automatically.
    * $form_state['payment_method'] contains the PaymentMethod that is added or
    * edited. All controller-specific information should be added to it in the
-   * validate callback. The payment method will be saved automatically using
-   * entity_save().
+   * validate callback. The payment method will be saved automatically.
    *
    * The function accepts its parent form element and &$form_state as
    * parameters. It should return an array of form elements.
