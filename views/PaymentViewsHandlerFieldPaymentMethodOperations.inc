@@ -14,7 +14,7 @@ class PaymentViewsHandlerFieldPaymentMethodOperations extends views_handler_fiel
    * Implements views_handler_field::render().
    */
   function render($values) {
-    $token = drupal_get_token('payment');
+    $token = backdrop_get_token('payment');
     $pmid = $this->get_value($values);
     $links = menu_contextual_links('payment', 'admin/config/services/payment/method', array($pmid, '', $token));
 
@@ -23,12 +23,12 @@ class PaymentViewsHandlerFieldPaymentMethodOperations extends views_handler_fiel
         $links['payment-' . $operation]['href'] .= '/' . $token;
       }
     }
+    $dropbutton = array(
+      '#type' => 'dropbutton',
+      '#links' => $links,
+    );
 
-    return theme('links__ctools_dropbutton', array(
-      'links' => $links,
-      'attributes' => array(
-        'class' => array('links', 'inline', 'operations'),
-      ),
-    ));
+    return backdrop_render($dropbutton);
+
   }
 }

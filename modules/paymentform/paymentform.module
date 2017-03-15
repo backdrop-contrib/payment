@@ -202,7 +202,7 @@ function paymentform_field_formatter_view($entity_type, $entity, $field, $instan
       $payment->setLineItem(new PaymentLineItem($line_item_data));
     }
 
-    return drupal_get_form('payment_form_standalone', $payment);
+    return backdrop_get_form('payment_form_standalone', $payment);
   }
 }
 
@@ -215,20 +215,20 @@ function paymentform_payment_finish(Payment $payment) {
     $view = ' ' . l(t('View payment'), 'payment/' . $payment->pid) . '.';
   }
   if (payment_status_is_or_has_ancestor($payment->getStatus()->status, PAYMENT_STATUS_PENDING)) {
-    drupal_set_message(t('Your payment is still being processed.') . $view);
+    backdrop_set_message(t('Your payment is still being processed.') . $view);
   }
   elseif (payment_status_is_or_has_ancestor($payment->getStatus()->status, PAYMENT_STATUS_SUCCESS)) {
-    drupal_set_message(t('Your payment was successfully completed.') . $view);
+    backdrop_set_message(t('Your payment was successfully completed.') . $view);
   }
   elseif (payment_status_is_or_has_ancestor($payment->getStatus()->status, PAYMENT_STATUS_FAILED)) {
-    drupal_set_message(t('Your payment failed.') . $view);
+    backdrop_set_message(t('Your payment failed.') . $view);
   }
 
   $entity = entity_load_single($payment->context_data['entity_type'], $payment->context_data['entity_id']);
   if ($uri = entity_uri($payment->context_data['entity_type'], $entity)) {
-    drupal_goto($uri['path'], $uri['options']);
+    backdrop_goto($uri['path'], $uri['options']);
   }
-  drupal_goto('<front>');
+  backdrop_goto('<front>');
 }
 
 

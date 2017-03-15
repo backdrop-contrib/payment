@@ -2,7 +2,7 @@
   /**
    * Enable the payment method select element.
    */
-  Drupal.behaviors.PaymentMethodSelector = {
+  Backdrop.behaviors.PaymentMethodSelector = {
     attach: function(context) {
 	    $('#payment-method-pmid').attr('disabled', false);
     }

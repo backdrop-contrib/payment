@@ -46,7 +46,8 @@ function paymentmethodbasic_schema() {
  */
 function paymentmethodbasic_install() {
   foreach (paymentmethodbasic_payment_method_defaults() as $payment_method) {
-    entity_save('payment_method', $payment_method);
+    $save = entity_get_controller('payment_method');
+    $save->save($payment_method);
   }
 }
 

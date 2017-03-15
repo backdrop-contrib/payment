@@ -36,7 +36,7 @@ class PaymentTestUnavailableWebTestCase extends PaymentWebTestCase {
 
     // Test disabling a module that provides a payment method controller.
     module_disable(array('paymentmethodbasic'));
-    drupal_static_reset();
+    backdrop_static_reset();
     $payment = $this->paymentCreate(1, $payment_method);
     entity_save('payment', $payment);
     $payment = entity_load_single('payment', $payment->pid);

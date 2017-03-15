@@ -384,7 +384,7 @@ function paymentreference_insert($entity_type, $bundle, $field_name, $pid) {
     'pid' => $pid,
   );
 
-  return drupal_write_record('paymentreference', $data);
+  return backdrop_write_record('paymentreference', $data);
 }
 
 /**
@@ -441,7 +441,7 @@ function paymentreference_instance_title(array $instance) {
  * @param array $instance
  *
  * @return array
- *   A Drupal build array.
+ *   A Backdrop build array.
  */
 function paymentreference_page(array $instance) {
   $payment = new Payment(array(
@@ -462,7 +462,7 @@ function paymentreference_page(array $instance) {
     'name' => 'paymentreference',
   )));
 
-  return drupal_get_form('payment_form_standalone', $payment);
+  return backdrop_get_form('payment_form_standalone', $payment);
 }
 
 /**
@@ -470,7 +470,7 @@ function paymentreference_page(array $instance) {
  */
 function paymentreference_payment_finish(Payment $payment) {
   $_SESSION['paymentreference_pid'] = $payment->pid;
-  drupal_goto('paymentreference/finish');
+  backdrop_goto('paymentreference/finish');
 }
 
 /**
@@ -488,14 +488,14 @@ function paymentreference_page_finish() {
     if ($payment = entity_load_single('payment', $pid)) {
       $instance_info = paymentreference_load_instance($pid, $payment->uid);
       $instance = field_info_instance($instance_info['entity_type'], $instance_info['field_name'], $instance_info['bundle']);
-      drupal_set_title($instance['label']);
+      backdrop_set_title($instance['label']);
       return array(
         '#type' => 'markup',
         '#markup' => t('Your payment is %status. You can now <span class="paymentreference-window-close">close this window</span>.', array(
           '%status' => payment_status_info($payment->getStatus()->status, TRUE)->title,
         )),
         '#attached' => array(
-          'js' => array(drupal_get_path('module', 'paymentreference') . '/js/paymentreference.js'),
+          'js' => array(backdrop_get_path('module', 'paymentreference') . '/js/paymentreference.js'),
         ),
       );
     }
@@ -532,11 +532,11 @@ function paymentreference_form_process_paymentreference(array $element, array &$
   }
 
   // AJAX.
-  $ajax_wrapper_id = drupal_html_id('paymentreference-' . $element['#name']);
+  $ajax_wrapper_id = backdrop_html_id('paymentreference-' . $element['#name']);
   $element['#prefix'] = '<div id="' . $ajax_wrapper_id . '">';
   $element['#suffix'] = '</div>';
   $element['#attached']['js'] = array(
-    drupal_get_path('module', 'paymentreference') . '/js/paymentreference.js',
+    backdrop_get_path('module', 'paymentreference') . '/js/paymentreference.js',
     array(
     'type' => 'setting',
       'data' => array(
@@ -616,7 +616,7 @@ function paymentreference_form_process_paymentreference(array $element, array &$
  * Implements form AJAX callback for paymentreference elements.
  */
 function paymentreference_form_process_paymentreference_ajax_callback(array $form, array &$form_state) {
-  return drupal_array_get_nested_value($form, $form_state[$form_state['triggering_element']['#name']]);
+  return backdrop_array_get_nested_value($form, $form_state[$form_state['triggering_element']['#name']]);
 }
 
 /**

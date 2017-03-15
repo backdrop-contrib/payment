@@ -81,7 +81,7 @@ function payment_init() {
   if (preg_match('#^admin/config/services/payment/method#', $_GET['q'])
     || preg_match('#^admin/content/payment#', $_GET['q'])
     || preg_match('#^user/\d+?/payment#', $_GET['q'])) {
-    drupal_add_css(drupal_get_path('module', 'payment') . '/css/payment.css');
+    backdrop_add_css(backdrop_get_path('module', 'payment') . '/css/payment.css');
   }
 }
 
@@ -105,7 +105,7 @@ function payment_module_implements_alter(array &$implementations, $hook) {
  */
 function payment_menu() {
   // Payment pages.
-  $items['payment/%entity_object'] = array(
+  $items['payment/%payment_object'] = array(
     'load arguments' => array('payment'),
     'title' => 'Payment',
     'title callback' => 'payment_title',
@@ -116,16 +116,16 @@ function payment_menu() {
     'access arguments' => array('view', 1),
     'file' => 'payment.ui.inc',
   );
-  $items['payment/%entity_object/view'] = array(
+  $items['payment/%payment_object/view'] = array(
     'load arguments' => array('payment'),
     'title' => 'View',
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
     'weight' => -10,
   );
-  $items['payment/%entity_object/edit'] = array(
+  $items['payment/%payment_object/edit'] = array(
     'load arguments' => array('payment'),
-    'page callback' => 'drupal_get_form',
+    'page callback' => 'backdrop_get_form',
     'page arguments' => array('payment_form_standalone', 1),
     'access callback' => 'payment_access',
     'access arguments' => array('update', 1),
@@ -135,9 +135,9 @@ function payment_menu() {
     'weight' => -9,
     'file' => 'payment.ui.inc',
   );
-  $items['payment/%entity_object/delete'] = array(
+  $items['payment/%payment_object/delete'] = array(
     'load arguments' => array('payment'),
-    'page callback' => 'drupal_get_form',
+    'page callback' => 'backdrop_get_form',
     'page arguments' => array('payment_form_payment_delete', 1),
     'access callback' => 'payment_access',
     'access arguments' => array('delete', 1),
@@ -154,13 +154,13 @@ function payment_menu() {
     'page callback' => 'system_admin_menu_block_page',
     'access arguments' => array('access administration pages'),
     'file' => 'system.admin.inc',
-    'file path' => drupal_get_path('module', 'system'),
+    'file path' => backdrop_get_path('module', 'system'),
   );
 
   // Global configuration.
   $items['admin/config/services/payment/global'] = array(
     'title' => 'Global configuration',
-    'page callback' => 'drupal_get_form',
+    'page callback' => 'backdrop_get_form',
     'page arguments' => array('payment_form_global_configuration'),
     'access arguments' => array('payment.global.administer'),
     'file' => 'payment.ui.inc',
@@ -186,9 +186,9 @@ function payment_menu() {
     'file' => 'payment.ui.inc',
     'type' => MENU_CALLBACK,
   );
-  $items['admin/config/services/payment/method/%entity_object'] = array(
+  $items['admin/config/services/payment/method/%payment_object'] = array(
     'load arguments' => array('payment_method'),
-    'page callback' => 'drupal_get_form',
+    'page callback' => 'backdrop_get_form',
     'page arguments' => array('payment_form_payment_method', 5),
     'access callback' => 'payment_method_access',
     'access arguments' => array('update', 5),
@@ -197,13 +197,13 @@ function payment_menu() {
     'title arguments' => array(5),
     'file' => 'payment.ui.inc',
   );
-  $items['admin/config/services/payment/method/%entity_object/edit'] = array(
+  $items['admin/config/services/payment/method/%payment_object/edit'] = array(
     'load arguments' => array('payment_method'),
     'title' => 'Edit',
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'context' => MENU_CONTEXT_INLINE,
   );
-  $items['admin/config/services/payment/method/%entity_object/enable'] = array(
+  $items['admin/config/services/payment/method/%payment_object/enable'] = array(
     'load arguments' => array('payment_method'),
     'page callback' => 'payment_page_method_enable_disable',
     'page arguments' => array('enable', 5),
@@ -215,7 +215,7 @@ function payment_menu() {
     'context' => MENU_CONTEXT_INLINE,
     'weight' => 1,
   );
-  $items['admin/config/services/payment/method/%entity_object/disable'] = array(
+  $items['admin/config/services/payment/method/%payment_object/disable'] = array(
     'load arguments' => array('payment_method'),
     'page callback' => 'payment_page_method_enable_disable',
     'page arguments' => array('disable', 5),
@@ -227,7 +227,7 @@ function payment_menu() {
     'context' => MENU_CONTEXT_INLINE,
     'weight' => 1,
   );
-  $items['admin/config/services/payment/method/%entity_object/clone'] = array(
+  $items['admin/config/services/payment/method/%payment_object/clone'] = array(
     'load arguments' => array('payment_method'),
     'page callback' => 'payment_page_method_clone',
     'page arguments' => array(5),
@@ -239,9 +239,9 @@ function payment_menu() {
     'context' => MENU_CONTEXT_INLINE,
     'weight' => 2,
   );
-  $items['admin/config/services/payment/method/%entity_object/delete'] = array(
+  $items['admin/config/services/payment/method/%payment_object/delete'] = array(
     'load arguments' => array('payment_method'),
-    'page callback' => 'drupal_get_form',
+    'page callback' => 'backdrop_get_form',
     'page arguments' => array('payment_form_payment_method_delete', 5),
     'access callback' => 'payment_method_access',
     'access arguments' => array('delete', 5),
@@ -270,7 +270,7 @@ function payment_menu() {
     'file' => 'payment.ui.inc',
     'menu_name' => 'management',
   );
-  if (!module_exists('views')) {
+  //if (!module_exists('views')) {
     $items['admin/content/payment'] = array(
       'title' => 'Payments',
       'access callback' => 'payment_access',
@@ -285,7 +285,7 @@ function payment_menu() {
       'title' => 'Payments',
       'access arguments' => array('payment.payment.view.own'),
     ) + $base;
-  }
+  //}
 
   return $items;
 }
@@ -305,6 +305,11 @@ function payment_menu_alter(&$items) {
       'type' => MENU_DEFAULT_LOCAL_TASK,
     );
   }
+}
+
+function payment_object_load($entity_id, $entity_type) {
+  $entities = entity_load($entity_type, array($entity_id));
+  return reset($entities);
 }
 
 /**
@@ -642,7 +647,7 @@ function payment_element_info() {
     '#tree' => TRUE,
     '#process' => array('payment_form_process_line_item'),
     '#attached' => array(
-      'css' => array(drupal_get_path('module', 'payment') . '/css/payment.css'),
+      'css' => array(backdrop_get_path('module', 'payment') . '/css/payment.css'),
       ),
     '#element_validate' => array('payment_form_process_line_item_validate'),
     // The ISO 4217 currency code.
@@ -670,8 +675,8 @@ function payment_element_info() {
  */
 function payment_views_api() {
   return array(
-    'api' => '2',
-    'path' => drupal_get_path('module', 'payment') . '/views',
+    'api' => '3',
+    'path' => backdrop_get_path('module', 'payment') . '/views',
   );
 }
 
@@ -684,14 +689,14 @@ function payment_views_api() {
  *   An array with PaymentStatusInfo objects for all available statuses.
  */
 function payment_statuses_info() {
-  $statuses_info = &drupal_static(__FUNCTION__);
+  $statuses_info = &backdrop_static(__FUNCTION__);
 
   if (!$statuses_info) {
     $statuses_info = array();
     foreach (module_invoke_all('payment_status_info') as $status_info) {
       $statuses_info[$status_info->status] = $status_info;
     }
-    drupal_alter('payment_status_info', $statuses_info);
+    backdrop_alter('payment_status_info', $statuses_info);
   }
 
   return $statuses_info;
@@ -724,14 +729,14 @@ function payment_status_info($status, $unknown = FALSE) {
  *   An array with PaymentLineItemInfo objects, keyed by PaymentLineItemInfo::name.
  */
 function payment_line_items_info() {
-  $line_items_info = &drupal_static(__FUNCTION__);
+  $line_items_info = &backdrop_static(__FUNCTION__);
 
   if (is_null($line_items_info)) {
     $line_items_info = array();
     foreach (module_invoke_all('payment_line_item_info') as $line_item_info) {
       $line_items_info[$line_item_info->name] = $line_item_info;
     }
-    drupal_alter('payment_line_item_info', $line_items_info);
+    backdrop_alter('payment_line_item_info', $line_items_info);
   }
 
   return $line_items_info;
@@ -792,7 +797,7 @@ function payment_status_is_or_has_ancestor($status, $ancestor_status) {
  *   controllers.
  */
 function payment_method_controllers_info() {
-  $controllers_info = &drupal_static(__FUNCTION__);
+  $controllers_info = &backdrop_static(__FUNCTION__);
 
   if (!$controllers_info) {
     $controllers_info = module_invoke_all('payment_method_controller_info');
@@ -802,7 +807,7 @@ function payment_method_controllers_info() {
         $controllers_info[$controller_class_name] = $controller_class_name;
       }
     }
-    drupal_alter('payment_method_controller_info', $controllers_info);
+    backdrop_alter('payment_method_controller_info', $controllers_info);
   }
 
   return $controllers_info;
@@ -812,14 +817,14 @@ function payment_method_controllers_info() {
  * Implements hook_modules_enabled().
  */
 function payment_modules_enabled() {
-  drupal_static_reset();
+  backdrop_static_reset();
 }
 
 /**
  * Implements hook_modules_disabled().
  */
 function payment_modules_disabled() {
-  drupal_static_reset();
+  backdrop_static_reset();
 }
 
 /**
@@ -1033,7 +1038,7 @@ function payment_method_access($operation, PaymentMethod $payment_method = NULL,
  * @param stdClass $account
  */
 function payment_method_access_token($token, $operation, PaymentMethod $payment_method = NULL, $account = NULL) {
-  return drupal_valid_token($token, 'payment') && payment_method_access($operation, $payment_method, $account);
+  return backdrop_valid_token($token, 'payment') && payment_method_access($operation, $payment_method, $account);
 }
 
 /**
@@ -1049,7 +1054,7 @@ function payment_method_access_token($token, $operation, PaymentMethod $payment_
  * @return NULL
  */
 function payment_debug($message, $file = '', $line = 0) {
-  if (variable_get('payment_debug', TRUE)) {
+  if (state_get('payment_debug', TRUE)) {
     // Make sure we have file and line information.
     if (!$file || !$line) {
       // Get the backtrace as fast as possible.
@@ -1064,7 +1069,7 @@ function payment_debug($message, $file = '', $line = 0) {
       }
 
       // Distill the caller's file and line information from the backtrace.
-      $caller = _drupal_get_last_caller($backtrace);
+      $caller = _backdrop_get_last_caller($backtrace);
       if (!$file) {
         $file = $caller['file'];
       }
@@ -1082,7 +1087,7 @@ function payment_debug($message, $file = '', $line = 0) {
       '@file' => $file,
       '!hide' => $link,
     );
-    drupal_set_message(t($string, $string_arguments));
+    backdrop_set_message(t($string, $string_arguments));
     watchdog('Payment', $string, $string_arguments);
   }
 }
@@ -1159,4 +1164,48 @@ function _payment_own_overview_views_handler_access($account = NULL) {
   }
 
   return user_access('payment.payment.view.any') || user_access('payment.payment.view.own') && $account->uid == arg(1);
+}
+
+/**
+ * Implements hook_autoload_info().
+ */
+function payment_autoload_info() {
+  return array(
+    'PaymentCommon' => 'payment.classes.inc',
+    'Payment' => 'payment.classes.inc',
+    'PaymentEntityController' => 'payment.classes.inc',
+    'PaymentMethod' => 'payment.classes.inc',
+    'PaymentMethodUnavailable' => 'payment.classes.inc',
+    'PaymentMethodEntityController' => 'payment.classes.inc',
+    'PaymentMethodFeaturesController' => 'payment.classes.inc',
+    'PaymentMethodController' => 'payment.classes.inc',
+    'PaymentMethodControllerUnavailable' => 'payment.classes.inc',
+    'PaymentStatusInfo' => 'payment.classes.inc',
+    'PaymentLineItem' => 'payment.classes.inc',
+    'PaymentStatusItem' => 'payment.classes.inc',
+    'PaymentLineItemInfo' => 'payment.classes.inc',
+    'PaymentException' => 'payment.classes.inc',
+    'PaymentValidationException' => 'payment.classes.inc',
+    'PaymentValidationAmountBelowMinimumException' => 'payment.classes.inc',
+    'PaymentValidationAmountExceedsMaximumException' => 'payment.classes.inc',
+    'PaymentValidationMissingCurrencyException' => 'payment.classes.inc',
+    'PaymentValidationUnsupportedCurrencyException' => 'payment.classes.inc',
+    'PaymentValidationMissingFinishCallback' => 'payment.classes.inc',
+    'PaymentValidationDescriptionMissing' => 'payment.classes.inc',
+    'PaymentValidationDescriptionTooLong' => 'payment.classes.inc',
+    'PaymentValidationPaymentMethodDisabledException' => 'payment.classes.inc',
+    'PaymentGenerate' => 'payment.generate.inc',
+
+    'PaymentViewsHandlerAccessOwnPaymentOverview' => 'views/PaymentViewsHandlerAccessOwnPaymentOverview.inc',
+    'PaymentViewsHandlerFieldPaymentMethodControllerDescription' => 'views/PaymentViewsHandlerFieldPaymentMethodControllerDescription.inc',
+    'PaymentViewsHandlerFieldPaymentMethodControllerTitle' => 'views/PaymentViewsHandlerFieldPaymentMethodControllerTitle.inc',
+    'PaymentViewsHandlerFieldPaymentMethodEnabledMachineName' => 'views/PaymentViewsHandlerFieldPaymentMethodEnabledMachineName.inc',
+    'PaymentViewsHandlerFieldPaymentMethodOperations' => 'views/PaymentViewsHandlerFieldPaymentMethodOperations.inc',
+    'PaymentViewsHandlerFieldPaymentOperations' => 'views/PaymentViewsHandlerFieldPaymentOperations.inc',
+    'PaymentViewsHandlerFieldPaymentStatusTitle' => 'views/PaymentViewsHandlerFieldPaymentStatusTitle.inc',
+    'PaymentViewsHandlerFieldTranslatableString' => 'views/PaymentViewsHandlerFieldTranslatableString.inc',
+    'PaymentViewsHandlerFilterPaymentMethodControllerTitle' => 'views/PaymentViewsHandlerFilterPaymentMethodControllerTitle.inc',
+    'PaymentViewsHandlerFilterPaymentMethodTitle' => 'views/PaymentViewsHandlerFilterPaymentMethodTitle.inc',
+    'PaymentViewsHandlerFilterPaymentStatusItemStatus' => 'views/PaymentViewsHandlerFilterPaymentStatusItemStatus.inc',
+  );
 }

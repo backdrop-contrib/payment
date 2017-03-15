@@ -1,0 +1,192 @@
+{
+    "_config_name": "views.view.payment_methods",
+    "name": "payment_methods",
+    "description": "",
+    "tag": "payment",
+    "disabled": false,
+    "base_table": "payment_method",
+    "human_name": "Payment methods",
+    "core": 1,
+    "display": {
+        "default": {
+            "display_title": "Master",
+            "display_plugin": "default",
+            "display_options": {
+                "query": {
+                    "type": "views_query",
+                    "options": {
+                        "query_comment": false
+                    }
+                },
+                "title": "Payment methods",
+                "use_more_always": false,
+                "access": {
+                    "type": "perm",
+                    "perm": "payment.payment_method.view.any"
+                },
+                "cache": {
+                    "type": "none"
+                },
+                "exposed_form": {
+                    "type": "basic"
+                },
+                "pager": {
+                    "type": "none",
+                    "options": {
+                        "offset": "0"
+                    }
+                },
+                "style_plugin": "table",
+                "style_options": {
+                    "row_class": "payment-method-[enabled_machine_name]",
+                    "columns": {
+                        "pmid": "pmid",
+                        "title_specific": "title_specific",
+                        "controller_title": "controller_title",
+                        "name": "name",
+                        "operations": "operations",
+                        "enabled_machine_name": "enabled_machine_name"
+                    },
+                    "default": "title_specific",
+                    "info": {
+                        "pmid": {
+                            "sortable": 0,
+                            "default_sort_order": "asc",
+                            "align": "",
+                            "separator": "",
+                            "empty_column": 0
+                        },
+                        "title_specific": {
+                            "sortable": 1,
+                            "default_sort_order": "asc",
+                            "align": "",
+                            "separator": "",
+                            "empty_column": 0
+                        },
+                        "controller_title": {
+                            "sortable": 0,
+                            "default_sort_order": "asc",
+                            "align": "",
+                            "separator": "",
+                            "empty_column": 0
+                        },
+                        "name": {
+                            "sortable": 0,
+                            "default_sort_order": "asc",
+                            "align": "",
+                            "separator": "",
+                            "empty_column": 0
+                        },
+                        "operations": {
+                            "align": "",
+                            "separator": "",
+                            "empty_column": 0
+                        },
+                        "enabled_machine_name": {
+                            "sortable": 0,
+                            "default_sort_order": "asc",
+                            "align": "",
+                            "separator": "",
+                            "empty_column": 0
+                        }
+                    },
+                    "empty_table": true
+                },
+                "empty": {
+                    "area": {
+                        "id": "area",
+                        "table": "views",
+                        "field": "area",
+                        "content": "There are no payment methods yet.",
+                        "format": "filtered_html"
+                    }
+                },
+                "relationships": {
+                    "uid": {
+                        "id": "uid",
+                        "table": "payment_method",
+                        "field": "uid",
+                        "required": true
+                    }
+                },
+                "fields": {
+                    "pmid": {
+                        "id": "pmid",
+                        "table": "payment_method",
+                        "field": "pmid",
+                        "label": "",
+                        "exclude": true,
+                        "element_label_colon": false,
+                        "hide_alter_empty": false
+                    },
+                    "title_specific": {
+                        "id": "title_specific",
+                        "table": "payment_method",
+                        "field": "title_specific",
+                        "label": "Title",
+                        "hide_alter_empty": false
+                    },
+                    "controller_title": {
+                        "id": "controller_title",
+                        "table": "payment_method",
+                        "field": "controller_title",
+                        "label": "Type",
+                        "empty": "Unavailable",
+                        "hide_alter_empty": false
+                    },
+                    "name": {
+                        "id": "name",
+                        "table": "users",
+                        "field": "name",
+                        "relationship": "uid",
+                        "label": "Owner"
+                    },
+                    "operations": {
+                        "id": "operations",
+                        "table": "payment_method",
+                        "field": "operations",
+                        "hide_alter_empty": false
+                    },
+                    "enabled_machine_name": {
+                        "id": "enabled_machine_name",
+                        "table": "payment_method",
+                        "field": "enabled_machine_name",
+                        "exclude": true
+                    }
+                },
+                "sorts": {
+                    "title_specific": {
+                        "id": "title_specific",
+                        "table": "payment_method",
+                        "field": "title_specific"
+                    }
+                }
+            }
+        },
+        "administration_page": {
+            "display_title": "Administration page",
+            "display_plugin": "page",
+            "display_options": {
+                "query": {
+                    "type": "views_query",
+                    "options": []
+                },
+                "defaults": {
+                    "hide_admin_links": false
+                },
+                "path": "admin/config/services/payment/method",
+                "menu": {
+                    "type": "normal",
+                    "title": "Payment methods",
+                    "weight": "0",
+                    "name": "management"
+                },
+                "tab_options": {
+                    "type": "normal",
+                    "title": "Payment",
+                    "weight": "0"
+                }
+            }
+        }
+    }
+}

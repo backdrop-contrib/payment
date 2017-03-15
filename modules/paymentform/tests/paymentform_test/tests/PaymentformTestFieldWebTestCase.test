@@ -22,7 +22,7 @@ class PaymentformTestFieldWebTestCase extends PaymentformWebTestCase {
    * Test the paymentform field validation.
    */
   function testPaymentformFieldValidation() {
-    $node = $this->DrupalCreateNode(array(
+    $node = $this->BackdropCreateNode(array(
       'type' => $this->content_type->type,
     ));
     $line_item_data = array();
@@ -109,7 +109,7 @@ class PaymentformTestFieldWebTestCase extends PaymentformWebTestCase {
    * Test the paymentform field storage.
    */
   function testPaymentformFieldStorage() {
-    $node = $this->drupalCreateNode(array(
+    $node = $this->backdropCreateNode(array(
       'type' => $this->content_type->type,
     ));
     $node->field_paymentform[LANGUAGE_NONE][0] = $this->PaymentLineItemData;

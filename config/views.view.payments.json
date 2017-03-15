@@ -1,0 +1,461 @@
+{
+    "_config_name": "views.view.payments",
+    "name": "payments",
+    "description": "List all payments made using Payment module.",
+    "tag": "payment",
+    "disabled": false,
+    "base_table": "payment",
+    "human_name": "Payments",
+    "core": 7,
+    "display": {
+        "default": {
+            "display_title": "Master",
+            "display_plugin": "default",
+            "display_options": {
+                "query": {
+                    "type": "views_query",
+                    "options": {
+                        "query_comment": false
+                    }
+                },
+                "title": "Payments",
+                "use_more_always": false,
+                "group_by": true,
+                "access": {
+                    "type": "payment_own_payment_overview"
+                },
+                "cache": {
+                    "type": "none"
+                },
+                "exposed_form": {
+                    "type": "basic"
+                },
+                "pager": {
+                    "type": "full",
+                    "options": {
+                        "items_per_page": "50",
+                        "offset": "0",
+                        "id": "0"
+                    }
+                },
+                "style_plugin": "table",
+                "style_options": {
+                    "columns": {
+                        "created": "created",
+                        "title": "title",
+                        "currency_code": "currency_code",
+                        "amount_total": "amount_total",
+                        "title_specific": "title_specific",
+                        "operations": "operations"
+                    },
+                    "default": "created",
+                    "info": {
+                        "created": {
+                            "sortable": 1,
+                            "default_sort_order": "desc",
+                            "align": "",
+                            "separator": "",
+                            "empty_column": 0
+                        },
+                        "title": {
+                            "align": "",
+                            "separator": "",
+                            "empty_column": 0
+                        },
+                        "currency_code": {
+                            "sortable": 0,
+                            "default_sort_order": "asc",
+                            "align": "",
+                            "separator": "",
+                            "empty_column": 0
+                        },
+                        "amount_total": {
+                            "sortable": 1,
+                            "default_sort_order": "asc",
+                            "align": "",
+                            "separator": "",
+                            "empty_column": 0
+                        },
+                        "title_specific": {
+                            "sortable": 0,
+                            "default_sort_order": "asc",
+                            "align": "",
+                            "separator": "",
+                            "empty_column": 0
+                        },
+                        "operations": {
+                            "align": "",
+                            "separator": "",
+                            "empty_column": 0
+                        }
+                    },
+                    "empty_table": true
+                },
+                "empty": {
+                    "area": {
+                        "id": "area",
+                        "table": "views",
+                        "field": "area",
+                        "content": "There are no payments yet.",
+                        "format": "filtered_html"
+                    }
+                },
+                "relationships": {
+                    "pmid": {
+                        "id": "pmid",
+                        "table": "payment",
+                        "field": "pmid"
+                    },
+                    "pid_line_item": {
+                        "id": "pid_line_item",
+                        "table": "payment",
+                        "field": "pid_line_item"
+                    },
+                    "psiid_last": {
+                        "id": "psiid_last",
+                        "table": "payment",
+                        "field": "psiid_last",
+                        "required": true
+                    },
+                    "uid": {
+                        "id": "uid",
+                        "table": "payment",
+                        "field": "uid"
+                    }
+                },
+                "fields": {
+                    "created": {
+                        "id": "created",
+                        "table": "payment_status_item",
+                        "field": "created",
+                        "relationship": "psiid_last",
+                        "label": "Last update",
+                        "date_format": "long"
+                    },
+                    "title": {
+                        "id": "title",
+                        "table": "payment_status_item",
+                        "field": "title",
+                        "relationship": "psiid_last",
+                        "label": "Status"
+                    },
+                    "currency_code": {
+                        "id": "currency_code",
+                        "table": "payment",
+                        "field": "currency_code",
+                        "label": "",
+                        "exclude": true,
+                        "element_label_colon": false,
+                        "hide_alter_empty": false
+                    },
+                    "amount": {
+                        "id": "amount",
+                        "table": "payment",
+                        "field": "amount",
+                        "alter": {
+                            "alter_text": true,
+                            "text": "[currency_code] [amount]"
+                        },
+                        "hide_alter_empty": false
+                    },
+                    "title_specific": {
+                        "id": "title_specific",
+                        "table": "payment_method",
+                        "field": "title_specific",
+                        "relationship": "pmid",
+                        "label": "Payment method",
+                        "hide_alter_empty": false
+                    },
+                    "title_generic": {
+                        "id": "title_generic",
+                        "table": "payment_method",
+                        "field": "title_generic",
+                        "relationship": "pmid"
+                    },
+                    "operations": {
+                        "id": "operations",
+                        "table": "payment",
+                        "field": "operations"
+                    }
+                },
+                "sorts": {
+                    "created": {
+                        "id": "created",
+                        "table": "payment_status_item",
+                        "field": "created",
+                        "relationship": "psiid_last",
+                        "order": "DESC"
+                    }
+                }
+            }
+        },
+        "administration_page": {
+            "display_title": "Administration page",
+            "display_plugin": "page",
+            "display_options": {
+                "query": {
+                    "type": "views_query",
+                    "options": []
+                },
+                "defaults": {
+                    "hide_admin_links": false,
+                    "access": false,
+                    "fields": false,
+                    "filter_groups": false,
+                    "filters": false
+                },
+                "access": {
+                    "type": "perm",
+                    "perm": "payment.payment.view.any"
+                },
+                "fields": {
+                    "created": {
+                        "id": "created",
+                        "table": "payment_status_item",
+                        "field": "created",
+                        "relationship": "psiid_last",
+                        "label": "Last update",
+                        "date_format": "long"
+                    },
+                    "title": {
+                        "id": "title",
+                        "table": "payment_status_item",
+                        "field": "title",
+                        "relationship": "psiid_last",
+                        "label": "Status"
+                    },
+                    "currency_code": {
+                        "id": "currency_code",
+                        "table": "payment",
+                        "field": "currency_code",
+                        "label": "",
+                        "exclude": true,
+                        "element_label_colon": false,
+                        "hide_alter_empty": false
+                    },
+                    "amount_total": {
+                        "id": "amount_total",
+                        "table": "payment_line_item",
+                        "field": "amount_total",
+                        "relationship": "pid_line_item",
+                        "group_type": "sum",
+                        "label": "Amount"
+                    },
+                    "title_specific": {
+                        "id": "title_specific",
+                        "table": "payment_method",
+                        "field": "title_specific",
+                        "relationship": "pmid",
+                        "label": "Payment method",
+                        "empty": "Unavailable",
+                        "hide_alter_empty": false
+                    },
+                    "name": {
+                        "id": "name",
+                        "table": "users",
+                        "field": "name",
+                        "relationship": "uid",
+                        "label": "User"
+                    },
+                    "operations": {
+                        "id": "operations",
+                        "table": "payment",
+                        "field": "operations"
+                    }
+                },
+                "filters": {
+                    "created": {
+                        "id": "created",
+                        "table": "payment_status_item",
+                        "field": "created",
+                        "relationship": "psiid_last",
+                        "operator": "between",
+                        "group": 1,
+                        "exposed": true,
+                        "expose": {
+                            "operator_id": "created_op",
+                            "label": "Last updated between",
+                            "operator": "created_op",
+                            "identifier": "updated",
+                            "remember": true
+                        }
+                    },
+                    "status": {
+                        "id": "status",
+                        "table": "payment_status_item",
+                        "field": "status",
+                        "relationship": "psiid_last",
+                        "group": 1,
+                        "exposed": true,
+                        "expose": {
+                            "operator_id": "status_op",
+                            "label": "Current status",
+                            "operator": "status_op",
+                            "identifier": "status",
+                            "remember": true,
+                            "multiple": true
+                        }
+                    },
+                    "amount_total_1": {
+                        "id": "amount_total_1",
+                        "table": "payment_line_item",
+                        "field": "amount_total",
+                        "relationship": "pid_line_item",
+                        "operator": "between",
+                        "group": 1,
+                        "exposed": true,
+                        "expose": {
+                            "operator_id": "amount_total_1_op",
+                            "label": "Total amount between",
+                            "operator": "amount_total_1_op",
+                            "identifier": "amount_total_1",
+                            "remember_roles": {
+                                "2": "2",
+                                "1": 0,
+                                "3": 0
+                            }
+                        }
+                    },
+                    "pmid": {
+                        "id": "pmid",
+                        "table": "payment_method",
+                        "field": "pmid",
+                        "relationship": "pmid",
+                        "group": 1,
+                        "exposed": true,
+                        "expose": {
+                            "operator_id": "pmid_op",
+                            "label": "Payment method",
+                            "operator": "pmid_op",
+                            "identifier": "pmid",
+                            "remember": true,
+                            "multiple": true,
+                            "remember_roles": {
+                                "2": "2",
+                                "1": 0,
+                                "3": 0
+                            }
+                        }
+                    },
+                    "uid": {
+                        "id": "uid",
+                        "table": "users",
+                        "field": "uid",
+                        "relationship": "uid",
+                        "value": "",
+                        "group": 1,
+                        "exposed": true,
+                        "expose": {
+                            "operator_id": "uid_op",
+                            "label": "User",
+                            "operator": "uid_op",
+                            "identifier": "uid",
+                            "remember_roles": {
+                                "2": "2",
+                                "1": 0,
+                                "3": 0
+                            }
+                        }
+                    }
+                },
+                "path": "admin/content/payment",
+                "menu": {
+                    "type": "tab",
+                    "title": "Payments",
+                    "weight": "0",
+                    "name": "management",
+                    "context": 0
+                }
+            }
+        },
+        "user_page": {
+            "display_title": "User's own payments",
+            "display_plugin": "page",
+            "display_options": {
+                "query": {
+                    "type": "views_query",
+                    "options": []
+                },
+                "defaults": {
+                    "hide_admin_links": false,
+                    "access": false,
+                    "fields": false,
+                    "arguments": false
+                },
+                "access": {
+                    "type": "payment_own_payment_overview"
+                },
+                "fields": {
+                    "created": {
+                        "id": "created",
+                        "table": "payment_status_item",
+                        "field": "created",
+                        "relationship": "psiid_last",
+                        "label": "Last update",
+                        "date_format": "long"
+                    },
+                    "title": {
+                        "id": "title",
+                        "table": "payment_status_item",
+                        "field": "title",
+                        "relationship": "psiid_last",
+                        "label": "Status"
+                    },
+                    "currency_code": {
+                        "id": "currency_code",
+                        "table": "payment",
+                        "field": "currency_code",
+                        "label": "",
+                        "exclude": true,
+                        "element_label_colon": false,
+                        "hide_alter_empty": false
+                    },
+                    "amount_total": {
+                        "id": "amount_total",
+                        "table": "payment_line_item",
+                        "field": "amount_total",
+                        "relationship": "pid_line_item",
+                        "group_type": "sum",
+                        "label": "Amount"
+                    },
+                    "title_generic": {
+                        "id": "title_generic",
+                        "table": "payment_method",
+                        "field": "title_generic",
+                        "relationship": "pmid",
+                        "label": "Payment method",
+                        "empty": "Unavailable"
+                    },
+                    "operations": {
+                        "id": "operations",
+                        "table": "payment",
+                        "field": "operations"
+                    }
+                },
+                "arguments": {
+                    "uid": {
+                        "id": "uid",
+                        "table": "payment",
+                        "field": "uid",
+                        "default_action": "not found",
+                        "default_argument_type": "fixed",
+                        "summary": {
+                            "number_of_records": "0",
+                            "format": "default_summary"
+                        },
+                        "summary_options": {
+                            "items_per_page": "25"
+                        }
+                    }
+                },
+                "path": "user/%/payment",
+                "menu": {
+                    "type": "tab",
+                    "title": "Payments",
+                    "weight": "0",
+                    "name": "user-menu"
+                }
+            }
+        }
+    }
+}

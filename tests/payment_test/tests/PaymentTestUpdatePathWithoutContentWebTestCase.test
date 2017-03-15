@@ -24,13 +24,13 @@ class PaymentTestUpdatePathWithoutContentWebTestCase extends UpdatePathTestCase 
    */
   function setUp() {
     $this->profile = 'testing';
-    $this->databaseDumpFiles = array(drupal_get_path('module', 'payment') . '/payment-database-dump.php');
+    $this->databaseDumpFiles = array(backdrop_get_path('module', 'payment') . '/payment-database-dump.php');
     parent::setUp();
     // Re-register the autoload functions that were unregistered by
     // UpdatePathTestCase::setUp(), because it also loads some module files
     // that work with classes.
-    spl_autoload_register('drupal_autoload_class');
-    spl_autoload_register('drupal_autoload_interface');
+    spl_autoload_register('backdrop_autoload_class');
+    spl_autoload_register('backdrop_autoload_interface');
     registry_rebuild();
   }
 

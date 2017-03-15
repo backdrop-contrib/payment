@@ -8,7 +8,7 @@
 /**
  * Tests module installation and uninstallation.
  */
-class PaymentmethodbasicTestModuleInstallUninstall extends DrupalWebTestCase {
+class PaymentmethodbasicTestModuleInstallUninstall extends BackdropWebTestCase {
 
   /**
    * {@inheritdoc}
@@ -44,7 +44,7 @@ class PaymentmethodbasicTestModuleInstallUninstall extends DrupalWebTestCase {
     $this->assertFalse(array_diff($names, $payment_method_names));
 
     module_disable(array('paymentmethodbasic'));
-    drupal_uninstall_modules(array('paymentmethodbasic'));
+    backdrop_uninstall_modules(array('paymentmethodbasic'));
     $this->assertFalse(module_exists('paymentmethodbasic'));
   }
 }

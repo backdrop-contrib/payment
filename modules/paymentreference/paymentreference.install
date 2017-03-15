@@ -78,38 +78,3 @@ function paymentreference_field_schema($field) {
 
   return $schema;
 }
-
-/**
- * Deletes orphaned items from {paymentreference}.
- */
-function paymentreference_update_7100(&$sandbox) {
-  $pids = db_query("SELECT pr.pid FROM {paymentreference} pr LEFT JOIN {payment} p ON pr.pid = p.pid WHERE p.pid IS NULL")->fetchCol();
-  if ($pids) {
-    db_delete('paymentreference')
-      ->condition('pid', $pids)
-      ->execute();
-  }
-}
-
-/**
- * Modify field lengths to follow Drupal core.
- */
-function paymentreference_update_7101() {
-  db_drop_index('paymentreference', 'instance');
-  db_change_field('paymentreference', 'bundle', 'bundle', array(
-    'type' => 'varchar',
-    'length' => 128,
-    'not null' => TRUE,
-  ));
-  db_change_field('paymentreference', 'entity_type', 'entity_type', array(
-    'type' => 'varchar',
-    'length' => 32,
-    'not null' => TRUE,
-  ));
-  db_change_field('paymentreference', 'field_name', 'field_name', array(
-    'type' => 'varchar',
-    'length' => 32,
-    'not null' => TRUE,
-  ));
-  db_add_index('paymentreference', 'instance', array('bundle', 'entity_type', 'field_name'));
-}

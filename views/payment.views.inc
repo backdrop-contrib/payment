@@ -6,44 +6,97 @@
  */
 
 /**
- * Implements hook_views_data_alter().
+ * Implements hook_views_data().
  */
-function payment_views_data_alter(&$data) {
-  // Payment.
-  $data['payment']['description']['field'] = array(
-    'handler' => 'PaymentViewsHandlerFieldTranslatableString',
-    'string_arguments_field' => 'description_arguments',
+function payment_views_data() {
+  $data['payment'] = array(
+    'table' => array(
+      'base' => array(
+        'title' => t('Payment'),
+      ),
+      'group' => t('Payment'),
+    ),
   );
-  $data['payment']['operations'] = array(
-    'title' => t('Operations'),
-    'real field' => 'pid',
+  $data['payment']['context'] = array(
+    'title' => t('Context'),
+    'help' => t('The payment context.'),
     'field' => array(
-      'handler' => 'PaymentViewsHandlerFieldPaymentOperations',
+      'handler' => 'views_handler_field',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
     ),
   );
-  $data['payment']['pid']['relationship'] = array(
-    'title' => t('Status items'),
-    'base' => 'payment_status_item',
-    'base field' => 'pid',
-    'handler' => 'views_handler_relationship',
-    'label' => t('Payment status item'),
-  );
-  $data['payment']['pid_line_item'] = array(
-    'title' => t('Line items'),
-    'real field' => 'pid',
-    'relationship' => array(
-      'title' => t('Line items'),
-      'base' => 'payment_line_item',
-      'base field' => 'pid',
-      'handler' => 'views_handler_relationship',
-      'label' => t('Line items'),
+  $data['payment']['currency_code'] = array(
+    'title' => t('Currency code'),
+    'help' => t('The payment currency.'),
+    'field' => array(
+      'handler' => 'views_handler_field',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
     ),
   );
-  $data['payment']['pmid']['relationship'] = array(
-    'title' => t('Payment method'),
-    'base' => 'payment_method',
-    'handler' => 'views_handler_relationship',
-    'label' => t('Payment method'),
+  $data['payment']['description'] = array(
+    'title' => t('Currency code'),
+    'help' => t('The payment currency.'),
+    'field' => array(
+      'handler' => 'PaymentViewsHandlerFieldTranslatableString',
+      'string_arguments_field' => 'description_arguments',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+  );
+  $data['payment']['pid'] = array(
+    'title' => t('PID'),
+    'help' => t('The payment ID.'),
+    'field' => array(
+      'handler' => 'views_handler_field',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+  );
+  $data['payment']['pmid'] = array(
+    'title' => t('PMID'),
+    'help' => t('The PMID.'),
+    'field' => array(
+      'handler' => 'views_handler_field',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
   );
   $data['payment']['psiid_first'] = array(
     'title' => t('First status item ID'),
@@ -92,6 +145,219 @@ function payment_views_data_alter(&$data) {
       'handler' => 'views_handler_relationship',
       'label' => t('Last status item'),
     ),
+  );
+  $data['payment']['uid'] = array(
+    'title' => t('Payment UID'),
+    'help' => t('The UID this payment belongs to.'),
+    'field' => array(
+      'handler' => 'views_handler_field',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+  );
+
+  // Payment methods.
+  $data['payment_method'] = array(
+    'table' => array(
+      'base' => array(
+        'title' => t('Payment method'),
+      ),
+      'group' => t('Payment method'),
+    ),
+  );
+  $data['payment_method']['controller_class_name'] = array(
+    'title' => t('Payment method controller class name'),
+    'help' => t('Payment method controller class name.'),
+    'field' => array(
+      'handler' => 'views_handler_field',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+  );
+  $data['payment_method']['enabled'] = array(
+    'title' => t('Payment method enabled'),
+    'help' => t('Payment method enabled.'),
+    'field' => array(
+      'handler' => 'views_handler_field',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+  );
+  $data['payment_method']['module'] = array(
+    'title' => t('Payment method module'),
+    'help' => t('Payment method module.'),
+    'field' => array(
+      'handler' => 'views_handler_field',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+  );
+  $data['payment_method']['name'] = array(
+    'title' => t('Payment method name'),
+    'help' => t('Payment method name.'),
+    'field' => array(
+      'handler' => 'views_handler_field',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+  );
+  $data['payment_method']['pmid'] = array(
+    'title' => t('Payment method PMID'),
+    'help' => t('Payment method PMID.'),
+    'field' => array(
+      'handler' => 'views_handler_field',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument',
+    ),
+    'filter' => array(
+      'handler' => 'PaymentViewsHandlerFilterPaymentMethodTitle',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+  );
+  $data['payment_method']['status'] = array(
+    'title' => t('Payment method status'),
+    'help' => t('Payment method status.'),
+    'field' => array(
+      'handler' => 'views_handler_field',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+  );
+  $data['payment_method']['title_generic'] = array(
+    'title' => t('Payment method title generic'),
+    'help' => t('Payment method title generic.'),
+    'field' => array(
+      'handler' => 'views_handler_field',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+  );
+  $data['payment_method']['title_specific'] = array(
+    'title' => t('Payment method title specific'),
+    'help' => t('Payment method title specific.'),
+    'field' => array(
+      'handler' => 'views_handler_field',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+  );
+  $data['payment_method']['uid'] = array(
+    'title' => t('Payment method UID'),
+    'help' => t('Payment method UID.'),
+    'field' => array(
+      'handler' => 'views_handler_field',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+  );
+
+  return $data;
+}
+
+/**
+ * Implements hook_views_data_alter().
+ */
+function payment_views_data_alter(&$data) {
+  $data['payment']['description']['field'] = array(
+    'handler' => 'PaymentViewsHandlerFieldTranslatableString',
+    'string_arguments_field' => 'description_arguments',
+  );
+  $data['payment']['operations'] = array(
+    'title' => t('Operations'),
+    'real field' => 'pid',
+    'field' => array(
+      'handler' => 'PaymentViewsHandlerFieldPaymentOperations',
+    ),
+  );
+  $data['payment']['pid']['relationship'] = array(
+    'title' => t('Status items'),
+    'base' => 'payment_status_item',
+    'base field' => 'pid',
+    'handler' => 'views_handler_relationship',
+    'label' => t('Payment status item'),
+  );
+  $data['payment']['pid_line_item'] = array(
+    'title' => t('Line items'),
+    'real field' => 'pid',
+    'relationship' => array(
+      'title' => t('Line items'),
+      'base' => 'payment_line_item',
+      'base field' => 'pid',
+      'handler' => 'views_handler_relationship',
+      'label' => t('Line items'),
+    ),
+  );
+  $data['payment']['pmid']['relationship'] = array(
+    'title' => t('Payment method'),
+    'base' => 'payment_method',
+    'handler' => 'views_handler_relationship',
+    'label' => t('Payment method'),
   );
   $data['payment']['uid']['relationship'] = array(
     'title' => t('User'),
@@ -289,7 +555,6 @@ function payment_views_data_alter(&$data) {
       'handler' => 'PaymentViewsHandlerFieldPaymentMethodOperations',
     ),
   );
-  $data['payment_method']['pmid']['filter']['handler'] = 'PaymentViewsHandlerFilterPaymentMethodTitle';
   $data['payment_method']['uid']['relationship'] = array(
     'title' => t('User'),
     'base' => 'users',

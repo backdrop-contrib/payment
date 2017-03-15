@@ -26,7 +26,7 @@ class PaymentTestEntityCrudWebTestCase extends PaymentWebTestCase {
    * Test payment method CRUD functionality.
    */
   function testPaymentMethodCRUD() {
-    $schema = drupal_get_schema('payment_method');
+    $schema = backdrop_get_schema('payment_method');
 
     // Test inserting a payment method.
     $payment_method_1 = new PaymentMethod(array(
@@ -93,7 +93,7 @@ class PaymentTestEntityCrudWebTestCase extends PaymentWebTestCase {
    * Test payment CRUD functionality.
    */
   function testPaymentCRUD() {
-    $schema = drupal_get_schema('payment');
+    $schema = backdrop_get_schema('payment');
     $payment_method = $this->paymentMethodCreate(1, payment_method_controller_load('PaymentMethodControllerUnavailable'));
     entity_save('payment_method', $payment_method);
 

@@ -32,9 +32,9 @@ class PaymentformTestLineItemFieldWidgetWebTestCase extends PaymentformWebTestCa
    * Test the widget's presence.
    */
   function testPaymentformLineItemFieldWidgetInputElements() {
-    $web_user = $this->drupalCreateUser(array('create ' . $this->content_type->type . ' content'));
-    $this->drupalLogin($web_user);
-    $this->drupalGet('node/add/page');
+    $web_user = $this->backdropCreateUser(array('create ' . $this->content_type->type . ' content'));
+    $this->backdropLogin($web_user);
+    $this->backdropGet('node/add/page');
     $elements = $this->xpath('//div[@id="edit-field-paymentform-und-line-item-container-0"]');
     $this->assertTrue(isset($elements[0]), 'The <em>Payment line item configuration</em> field widget shows the <em>payment_line_item</em> form element.');
   }

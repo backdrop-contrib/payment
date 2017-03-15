@@ -5,16 +5,16 @@
  * @file
  * Generates content for Payment 7.x-1.x.
  *
- * Run this script at the root of an existing Drupal 7 installation.
+ * Run this script at the root of an existing Backdrop 7 installation.
  * Steps to use this generation script:
- * - Install drupal 7.
- * - Run this script from your Drupal ROOT directory.
+ * - Install backdrop 7.
+ * - Run this script from your Backdrop ROOT directory.
  * - Use ./scripts/dump-database-d7.sh to generate the database dump.
  */
 
 // Define settings.
 $cmd = 'index.php';
-define('DRUPAL_ROOT', getcwd());
+define('BACKDROP_ROOT', getcwd());
 $_SERVER['HTTP_HOST']       = 'default';
 $_SERVER['PHP_SELF']        = '/index.php';
 $_SERVER['REMOTE_ADDR']     = '127.0.0.1';
@@ -25,12 +25,12 @@ $_SERVER['PHP_SELF']        = $_SERVER['REQUEST_URI'] = '/';
 $_SERVER['HTTP_USER_AGENT'] = 'console';
 $modules_to_enable          = array('payment', 'paymentform', 'paymentmethodbasic', 'paymentreference');
 
-// Bootstrap Drupal.
+// Bootstrap Backdrop.
 include_once './includes/bootstrap.inc';
-drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
+backdrop_bootstrap(BACKDROP_BOOTSTRAP_FULL);
 
 // Enable requested modules.
-require_once DRUPAL_ROOT . '/' . variable_get('password_inc', 'includes/password.inc');
+require_once BACKDROP_ROOT . '/' . variable_get('password_inc', 'includes/password.inc');
 include_once './modules/system/system.admin.inc';
 $form = system_modules();
 foreach ($modules_to_enable as $module) {
@@ -41,7 +41,7 @@ system_modules_submit(NULL, $form_state);
 unset($form_state);
 
 // Run cron after installing.
-drupal_cron_run();
+backdrop_cron_run();
 
 // Create two payment methods.
 $payment_method_unavailable = PaymentGenerate::paymentMethod();

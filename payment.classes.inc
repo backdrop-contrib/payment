@@ -8,12 +8,36 @@
 /**
  * Base class with common functionality.
  */
-class PaymentCommon {
+class PaymentCommon extends Entity {
   function __construct(array $properties = array()) {
     foreach ($properties as $property => $value) {
       $this->$property = $value;
     }
   }
+  /**
+   * Implements EntityInterface::id().
+   */
+  public function id() {}
+
+  /**
+   * Implements EntityInterface::entityType().
+   */
+  public function entityType() {}
+
+  /**
+   * Implements EntityInterface::bundle().
+   */
+  public function bundle() {}
+
+  /**
+   * Implements EntityInterface::label().
+   */
+  public function label() {}
+
+  /**
+   * Implements EntityInterface::uri().
+   */
+  public function uri() {}
 }
 
 /**
@@ -317,7 +341,7 @@ class Payment extends PaymentCommon {
 /**
  * Entity API controller for payment entities.
  */
-class PaymentEntityController extends EntityAPIController {
+class PaymentEntityController extends EntityDatabaseStorageController {
 
   /**
    * {@inheritdoc}
@@ -387,12 +411,12 @@ class PaymentEntityController extends EntityAPIController {
   /**
    * {@inheritdoc}
    */
-  function save($entity, DatabaseTransaction $transaction = NULL) {
+  function save(EntityInterface $entity) {
     $payment = $entity;
 
     // Save the payment.
     $payment->pmid = $payment->method->pmid;
-    $return = parent::save($payment, $transaction);
+    $return = parent::save($payment);
     unset($payment->pmid);
 
     // Save line items.
@@ -421,7 +445,7 @@ class PaymentEntityController extends EntityAPIController {
       // Statuses cannot be edited, so only save the ones without a PSIID set.
       if (!$status_item->psiid) {
         $status_item->pid = $payment->pid;
-        drupal_write_record('payment_status_item', $status_item);
+        backdrop_write_record('payment_status_item', $status_item);
       }
     }
     if ($update) {
@@ -454,7 +478,7 @@ class PaymentEntityController extends EntityAPIController {
         '#title' => t('Payment method'),
         '#markup' => check_plain($payment->method->title_generic),
       );
-      drupal_alter(array('payment_view', 'entity_view'), $payment_build, $type);
+      backdrop_alter(array('payment_view', 'entity_view'), $payment_build, $type);
     }
 
     return $build;
@@ -531,7 +555,7 @@ class PaymentMethod extends PaymentCommon {
    *
    * @var integer
    */
-  public $status = ENTITY_CUSTOM;
+  public $status = 1;
 
   /**
    * The specific human-readable title, e.g. "Paypal WPS".
@@ -588,6 +612,13 @@ class PaymentMethod extends PaymentCommon {
       rules_invoke_event('payment_validate', $payment, $this, $strict);
     }
   }
+
+  /**
+   * Implements EntityInterface::entityType().
+   */
+  public function entityType() {
+    return 'payment_method';
+  }
 }
 
 /**
@@ -609,7 +640,7 @@ class PaymentMethodUnavailable extends PaymentMethod {
   /**
    * {@inheritdoc}
    */
-  function __construct() {
+  function __construct(array $values) {
     $this->title_specific = $this->title_generic = t('Unavailable');
     $this->controller = payment_method_controller_load('PaymentMethodControllerUnavailable');
   }
@@ -618,7 +649,7 @@ class PaymentMethodUnavailable extends PaymentMethod {
 /**
  * Entity API controller for payment_method entities.
  */
-class PaymentMethodEntityController extends EntityAPIControllerExportable {
+class PaymentMethodEntityController extends EntityDatabaseStorageController {
 
   /**
    * {@inheritdoc}
@@ -681,9 +712,9 @@ class PaymentMethodEntityController extends EntityAPIControllerExportable {
   /**
    * {@inheritdoc}
    */
-  function save($entity, DatabaseTransaction $transaction = NULL) {
+  function save(EntityInterface $entity) {
     $entity->controller_class_name = $entity->controller->name;
-    $return = parent::save($entity, $transaction);
+    $return = parent::save($entity);
     // Cast non-string scalars to their original types, because some backends
     // store/return all variables as strings.
     $entity->pmid = (int) $entity->pmid;
@@ -718,35 +749,6 @@ class PaymentMethodEntityController extends EntityAPIControllerExportable {
       return $payment;
     }
     return FALSE;
-  }
-}
-
-/**
- * Features controller for payment_method entities.
- */
-class PaymentMethodFeaturesController extends EntityDefaultFeaturesController {
-
-  /**
-   * {@inheritdoc}
-   */
-  function export($data, &$export, $module_name = '') {
-    $pipe = parent::export($data, $export, $module_name);
-
-    // Add dependencies for the payment method controller classes.
-    $controller_class_names = array();
-    foreach (entity_load_multiple_by_name($this->type, $data) as $method) {
-      $controller_class_names[] = $method->controller->name;
-    }
-    $result = db_select('registry')
-      ->fields('registry', array('module'))
-      ->condition('name', $controller_class_names)
-      ->condition('type', 'class')
-      ->execute();
-    while ($module = $result->fetchField()) {
-      $export['dependencies'][$module] = $module;
-    }
-
-    return $pipe;
   }
 }
 
@@ -806,7 +808,7 @@ class PaymentMethodController {
    * The function name of the payment configuration form elements.
    *
    * Note that this is not a form ID and because the form will not be called
-   * using drupal_get_form(), it can only be altered by altering the form
+   * using backdrop_get_form(), it can only be altered by altering the form
    * payment_form(). The validate callback is expected to be a function with
    * the same name, but suffixed with "_validate". If this function exists, it
    * will be called automatically. $form_state['payment'] contains the Payment
@@ -830,7 +832,7 @@ class PaymentMethodController {
    * The function name of the payment method configuration form elements.
    *
    * Note that this is not a form ID and because the form will not be called
-   * using drupal_get_form(), it can only be altered by altering the form
+   * using backdrop_get_form(), it can only be altered by altering the form
    * payment_form_payment_method(). The validate callback is expected to be a
    * function with the same name, but suffixed with "_validate". If this
    * function exists, it will be called automatically.
@@ -907,7 +909,7 @@ class PaymentMethodController {
     if (empty($payment->description)) {
       throw new PaymentValidationDescriptionMissing(t('The payment description is not set.'));
     }
-    elseif (drupal_strlen($payment->description) > 255) {
+    elseif (backdrop_strlen($payment->description) > 255) {
       throw new PaymentValidationDescriptionTooLong(t('The payment description exceeds 255 characters.'));
     }
 

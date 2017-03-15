@@ -7,7 +7,7 @@
 /**
  * Provides reusable code for testing payments and payment methods.
  */
-class PaymentWebTestCase extends DrupalWebTestCase {
+class PaymentWebTestCase extends BackdropWebTestCase {
 
   /**
    * Overrides parent::setUp().
@@ -102,13 +102,13 @@ class PaymentWebTestCase extends DrupalWebTestCase {
    * @return NULL
    */
   function assertEntityPermission($entity, $entity_type_title, $callback, $operation, array $permissions = array(), array $access = array()) {
-    $user_access_permissions = &drupal_static('user_access');
+    $user_access_permissions = &backdrop_static('user_access');
 
     // Create the user accounts.
-    $anonymous = drupal_anonymous_user();
-    $root = drupal_anonymous_user();
+    $anonymous = backdrop_anonymous_user();
+    $root = backdrop_anonymous_user();
     $root->uid = 1;
-    $authenticated = drupal_anonymous_user();
+    $authenticated = backdrop_anonymous_user();
     $authenticated->uid = 2;
 
     $comment = $entity && isset($entity->uid) ? ' with UID ' . $entity->uid : NULL;
@@ -156,7 +156,7 @@ class PaymentWebTestCase extends DrupalWebTestCase {
    * @return string
    */
   function permissionLabel(array $permissions) {
-    $info = &drupal_static(__CLASS__ . '_permission');
+    $info = &backdrop_static(__CLASS__ . '_permission');
 
     if (is_null($info)) {
       $info = module_invoke_all('permission');

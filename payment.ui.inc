@@ -55,7 +55,7 @@ function payment_page_payment_view(Payment $payment) {
  * Builds common elements for a payment add/edit form.
  *
  * Note that this is not a form build callback and that this function was not
- * designed to be called using drupal_get_form(). Instead, create a real form
+ * designed to be called using backdrop_get_form(). Instead, create a real form
  * build callback that calls this function directly.
  *
  * @see payment_form_standalone()
@@ -100,7 +100,7 @@ function payment_form_embedded(array &$form_state, Payment $payment, array $pmid
   field_attach_form('payment', $payment, $elements, $form_state);
 
   $submit = array('payment_form_embedded_submit');
-  drupal_alter('payment_form', $elements, $form_state, $submit);
+  backdrop_alter('payment_form', $elements, $form_state, $submit);
 
   return array(
     'elements' => $elements,
@@ -113,7 +113,7 @@ function payment_form_embedded(array &$form_state, Payment $payment, array $pmid
  */
 function payment_form_embedded_validate(array $element, array &$form_state, array $form) {
   $root_element_parents = array_slice($element['#array_parents'], 0, -1);
-  $root_element = drupal_array_get_nested_value($form, $root_element_parents);
+  $root_element = backdrop_array_get_nested_value($form, $root_element_parents);
   $payment = $form_state['payment'];
   field_attach_form_validate('payment', $payment, $root_element, $form_state);
   field_attach_submit('payment', $payment, $root_element, $form_state);
@@ -222,7 +222,7 @@ function payment_form_payment_delete_submit(array $form, array &$form_state) {
   $payment = $form_state['payment'];
   entity_delete('payment', $payment->pid);
   $form_state['redirect'] = '<front>';
-  drupal_set_message(t('Payment !pid has been deleted.', array(
+  backdrop_set_message(t('Payment !pid has been deleted.', array(
     '!pid' => $payment->pid,
   )));
 }
@@ -305,14 +305,14 @@ function payment_method_form_add_access(PaymentMethodController $controller) {
  *   The name of the controller class for which to create a payment method.
  *
  * @return array
- *   A Drupal form.
+ *   A Backdrop form.
  */
 function payment_method_form_add($controller) {
   $payment_method = new PaymentMethod(array(
     'controller' => $controller,
   ));
 
-  return drupal_get_form('payment_form_payment_method', $payment_method);
+  return backdrop_get_form('payment_form_payment_method', $payment_method);
 }
 
 /**
@@ -430,7 +430,7 @@ function payment_form_payment_method_submit(array $form, array &$form_state) {
   $payment_method->uid = user_load_by_name($values['owner'])->uid;
   entity_save('payment_method', $payment_method);
   $form_state['redirect'] = 'admin/config/services/payment/method';
-  drupal_set_message(t('Payment method %title has been saved.', array(
+  backdrop_set_message(t('Payment method %title has been saved.', array(
     '%title' => $payment_method->title_specific,
   )));
 }
@@ -453,7 +453,7 @@ function payment_form_payment_method_delete_submit(array $form, array &$form_sta
   $payment_method = $form_state['payment_method'];
   entity_delete('payment_method', $payment_method->pmid);
   $form_state['redirect'] = 'admin/config/services/payment/method';
-  drupal_set_message(t('Payment method %title has been deleted.', array(
+  backdrop_set_message(t('Payment method %title has been deleted.', array(
     '%title' => $payment_method->title_specific,
   )));
 }
@@ -619,7 +619,7 @@ function payment_page_method_enable_disable($operation, PaymentMethod $payment_m
       break;
   }
   entity_save('payment_method', $payment_method);
-  drupal_goto('admin/config/services/payment/method');
+  backdrop_goto('admin/config/services/payment/method');
 }
 
 /**
@@ -634,11 +634,11 @@ function payment_page_method_clone(PaymentMethod $payment_method) {
   $payment_method = clone $payment_method;
   $payment_method->pmid = 0;
   $payment_method->name = '';
-  drupal_set_message(t('You are now editing an unsaved clone of payment method %title.', array(
+  backdrop_set_message(t('You are now editing an unsaved clone of payment method %title.', array(
     '%title' => $payment_method->title_specific,
   )));
 
-  return drupal_get_form('payment_form_payment_method', $payment_method);
+  return backdrop_get_form('payment_form_payment_method', $payment_method);
 }
 
 
@@ -723,7 +723,7 @@ function payment_form_process_amount_validate(array $element, array &$form_state
  * Implements form process callback for a payment_line_item element.
  */
 function payment_form_process_line_item(array $element, array &$form_state, array $form) {
-  $form_state[drupal_clean_css_identifier('payment_' . $element['#name'])] = $element['#parents'];
+  $form_state[backdrop_clean_css_identifier('payment_' . $element['#name'])] = $element['#parents'];
 
   // Fetch all line items to display elements for.
   $line_items = array();
@@ -802,7 +802,7 @@ function payment_form_process_line_item(array $element, array &$form_state, arra
     );
   }
   // "Add more line items" button.
-  $wrapper_id = drupal_html_id('payment-ajax-replace');
+  $wrapper_id = backdrop_html_id('payment-ajax-replace');
   $element['add_more'] = array(
     '#type' => 'submit',
     '#value' => t('Add a line item'),
@@ -814,7 +814,7 @@ function payment_form_process_line_item(array $element, array &$form_state, arra
       'event' => 'mousedown',
       'wrapper' => $wrapper_id,
     ),
-    '#name' => drupal_clean_css_identifier('payment_' . $element['#name']),
+    '#name' => backdrop_clean_css_identifier('payment_' . $element['#name']),
     '#access' => $element['#cardinality'] == 0 || $form_state['payment_line_item_count'] < $element['#cardinality'],
     '#id' => $wrapper_id,
     '#attributes' => array(
@@ -829,7 +829,7 @@ function payment_form_process_line_item(array $element, array &$form_state, arra
  * Implements form validate callback for a payment_line_item element.
  */
 function payment_form_process_line_item_validate(array $element, array &$form_state) {
-  $values = drupal_array_get_nested_value($form_state['values'], $element['#parents']);
+  $values = backdrop_array_get_nested_value($form_state['values'], $element['#parents']);
   // Don't let the submit button's value be validated.
   unset($values['add_more']);
   $line_items = array();
@@ -886,7 +886,7 @@ function payment_form_process_line_item_submit(array $form, array &$form_state) 
  * Implements form AJAX callback for payment_line_item elements.
  */
 function payment_form_process_line_item_submit_ajax_callback(array $form, array &$form_state) {
-  $element = drupal_array_get_nested_value($form, $form_state[$form_state['triggering_element']['#name']]);
+  $element = backdrop_array_get_nested_value($form, $form_state[$form_state['triggering_element']['#name']]);
   $container_key = 'container_' . ($form_state['payment_line_item_count'] - 1);
 
   return array(
@@ -973,7 +973,7 @@ function payment_form_process_method(array $element, array &$form_state, array &
       // the element enabled.
       '#disabled' => !empty($payment->method) && !isset($form_state['input']['_triggering_element_name']),
       '#attached' => array(
-        'js' => array(drupal_get_path('module', 'payment') . '/js/payment.js'),
+        'js' => array(backdrop_get_path('module', 'payment') . '/js/payment.js'),
       ),
       '#id' => 'payment-method-pmid',
     );
@@ -1006,7 +1006,7 @@ function payment_form_process_method(array $element, array &$form_state, array &
  * Implements form validate callback for a payment_method element.
  */
 function payment_form_process_method_validate(array $element, array &$form_state) {
-  $pmid = drupal_array_get_nested_value($form_state['values'], array_merge($element['#parents'], array('pmid')));
+  $pmid = backdrop_array_get_nested_value($form_state['values'], array_merge($element['#parents'], array('pmid')));
   if ($pmid) {
     $payment = $form_state['payment'];
     // Another payment method was selected, so rebuild the form.
@@ -1023,7 +1023,7 @@ function payment_form_process_method_validate(array $element, array &$form_state
 function payment_form_process_method_submit(array $form, array &$form_state) {
   $parents = $form_state['triggering_element'];
   array_pop($parents);
-  $pmid = drupal_array_get_nested_value($form_state['values'], array_merge($parents, array('pmid')));
+  $pmid = backdrop_array_get_nested_value($form_state['values'], array_merge($parents, array('pmid')));
   unset($pmid);
   $form_state['payment']->method = NULL;
   $form_state['rebuild'] = TRUE;
@@ -1183,10 +1183,21 @@ function payment_form_global_configuration(array $form, array &$form_state) {
   $form['payment_debug'] = array(
     '#type' => 'checkbox',
     '#title' => t('Log and display every <em>Payment</em> exception (<code>PaymentException</code>).'),
-    '#default_value' => variable_get('payment_debug', TRUE),
+    '#default_value' => state_get('payment_debug', TRUE),
   );
 
-  return system_settings_form($form);
+  $form['actions']['#type'] = 'actions';
+  $form['actions']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save configuration'),
+  );
+
+  return $form;
+}
+
+function payment_form_global_configuration_submit($form, &$form_state) {
+  state_set('payment_debug', $form_state['values']['payment_debug']);
+  backdrop_set_message(t('The configuration options have been saved.'));
 }
 
 /**

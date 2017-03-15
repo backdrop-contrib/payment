@@ -19,8 +19,8 @@ class PaymentGenerate {
    * @return PaymentMethod
    */
   static function paymentMethod($controller_class_name = 'PaymentMethodControllerUnavailable', $uid = 1) {
-    require_once './modules/simpletest/drupal_web_test_case.php';
-    $name = DrupalTestCase::randomName();
+    require_once './modules/simpletest/backdrop_web_test_case.php';
+    $name = BackdropTestCase::randomName();
     $controller = payment_method_controller_load($controller_class_name);
     $payment_method = new PaymentMethod(array(
       'controller' => $controller,

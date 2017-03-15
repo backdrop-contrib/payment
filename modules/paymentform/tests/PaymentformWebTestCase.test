@@ -19,7 +19,7 @@ class PaymentformWebTestCase extends PaymentWebTestCase {
   function setUp(array $modules = array()) {
     parent::setUp($modules + array('field', 'node', 'paymentform'));
 
-    $this->content_type = $this->drupalCreateContentType();
+    $this->content_type = $this->backdropCreateContentType();
     // Field configuration.
     $this->field_paymentform = field_create_field(array(
       'field_name' => 'field_paymentform',

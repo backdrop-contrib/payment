@@ -79,56 +79,11 @@ function paymentmethodbasic_payment_method_delete($entity) {
 }
 
 /**
- * A basic payment method controller.
- *
- * This controller always executes payments successfully, does not require
- * payment-specific information and does not transfer any money. It can be
- * useful to create a "collect on delivery" payment method, for instance.
- */
-class PaymentMethodBasicController extends PaymentMethodController {
-
-  public $controller_data_defaults = array(
-    'message' => '',
-    'status' => PAYMENT_STATUS_SUCCESS,
-    'text_format' => '',
-  );
-
-  public $payment_method_configuration_form_elements_callback = 'paymentmethodbasic_payment_method_configuration_form_elements';
-
-  public $payment_configuration_form_elements_callback = 'paymentmethodbasic_payment_configuration_form_elements';
-
-  function __construct() {
-    $this->title = t('Basic');
-    $this->description = t("A 'dumb' payment method type that always successfully executes payments, but never actually transfers money. It can be useful for <em>collect on delivery</em>, for instance.");
-  }
-
-  /**
-   * Implements PaymentMethodController::execute().
-   */
-  function execute(Payment $payment) {
-    $payment->setStatus(new PaymentStatusItem($payment->method->controller_data['status']));
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function validate(Payment $payment, PaymentMethod $payment_method, $strict) {
-    // This payment method controller does not have a minimum amount, so when
-    // the parent throws such an exception, catch it and do nothing.
-    try {
-      parent::validate($payment, $payment_method, $strict);
-    }
-    catch (PaymentValidationAmountBelowMinimumException $e) {
-    }
-  }
-}
-
-/**
  * Form build callback: implements
  * PaymentMethodController::payment_method_configuration_form_elements_callback.
  *
  * @return array
- *   A Drupal form.
+ *   A Backdrop form.
  */
 function paymentmethodbasic_payment_method_configuration_form_elements(array $form, array &$form_state) {
   $controller_data = $form_state['payment_method']->controller_data;
@@ -155,7 +110,7 @@ function paymentmethodbasic_payment_method_configuration_form_elements(array $fo
  * paymentmethodbasic_payment_method_configuration_form_elements().
  */
 function paymentmethodbasic_payment_method_configuration_form_elements_validate(array $element, array &$form_state) {
-  $values = drupal_array_get_nested_value($form_state['values'], $element['#parents']);
+  $values = backdrop_array_get_nested_value($form_state['values'], $element['#parents']);
   $form_state['payment_method']->controller_data['message'] = $values['message']['value'];
   $form_state['payment_method']->controller_data['status'] = $values['status'];
   $form_state['payment_method']->controller_data['text_format'] = $values['message']['format'];
@@ -175,4 +130,13 @@ function paymentmethodbasic_payment_configuration_form_elements(array $element, 
   );
 
   return $elements;
+}
+
+/**
+ * Implements hook_autoload_info().
+ */
+function paymentmethodbasic_autoload_info() {
+  return array(
+    'PaymentMethodBasicController' => 'paymentmethodbasic.classes.inc',
+  );
 }

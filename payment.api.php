@@ -152,10 +152,10 @@ function hook_payment_pre_execute(Payment $payment) {
  */
 function hook_payment_pre_finish(Payment $payment) {
   if (payment_status_is_or_has_ancestor($payment->getStatus()->status, PAYMENT_STATUS_SUCCESS)) {
-    drupal_set_message(t('Your payment was successfully completed.'));
+    backdrop_set_message(t('Your payment was successfully completed.'));
   }
   else {
-    drupal_set_message(t('Your payment was not completed.'));
+    backdrop_set_message(t('Your payment was not completed.'));
   }
 }
 
@@ -184,7 +184,7 @@ function hook_payment_validate(Payment $payment, PaymentMethod $payment_method, 
 /**
  * Alter the payment form.
  *
- * Because the payment form is not always used through drupal_get_form(), you
+ * Because the payment form is not always used through backdrop_get_form(), you
  * should use this hook, rather than hook_form_alter() or
  * hook_form_FORM_ID_alter() to make changes to the payment form.
  *
