@@ -9,6 +9,128 @@
  * Implements hook_views_data().
  */
 function payment_views_data() {
+  $data['payment_line_item'] = array(
+    'table' => array(
+      'base' => array(
+        'title' => t('Payment line item'),
+      ),
+      'group' => t('Payment line item'),
+    ),
+    // Field configuration.
+    'amount' => array(
+      'title' => t('Amount'),
+      'field' => array(
+        'handler' => 'views_handler_field_numeric',
+        'float' => TRUE,
+        'click sortable' => TRUE,
+      ),
+      'sort' => array(
+        'handler' => 'views_handler_sort',
+      ),
+      'filter' => array(
+        'handler' => 'views_handler_filter_numeric',
+      ),
+      'argument' => array(
+        'handler' => 'views_handler_argument_numeric',
+      ),
+    ),
+    'amount_total' => array(
+      'title' => t('Total amount'),
+      'field' => array(
+        'handler' => 'views_handler_field_numeric',
+        'float' => TRUE,
+        'click sortable' => TRUE,
+      ),
+      'sort' => array(
+        'handler' => 'views_handler_sort',
+      ),
+      'filter' => array(
+        'handler' => 'views_handler_filter_numeric',
+      ),
+      'argument' => array(
+        'handler' => 'views_handler_argument_numeric',
+      ),
+    ),
+    'description' => array(
+      'title' => t('Description'),
+      'field' => array(
+        'handler' => 'PaymentViewsHandlerFieldTranslatableString',
+        'string_arguments_field' => 'description_arguments',
+      ),
+    ),
+    'name' => array(
+      'title' => t('Machine name'),
+      'field' => array(
+        'handler' => 'views_handler_field',
+        'click sortable' => TRUE,
+      ),
+      'sort' => array(
+        'handler' => 'views_handler_sort',
+      ),
+      'filter' => array(
+        'handler' => 'views_handler_filter_string',
+      ),
+      'argument' => array(
+        'handler' => 'views_handler_argument_string',
+      ),
+    ),
+    'pid' => array(
+      'title' => t('Payment ID'),
+      'field' => array(
+        'handler' => 'views_handler_field_numeric',
+        'click sortable' => TRUE,
+      ),
+      'sort' => array(
+        'handler' => 'views_handler_sort',
+      ),
+      'filter' => array(
+        'handler' => 'views_handler_filter_numeric',
+      ),
+      'argument' => array(
+        'handler' => 'views_handler_argument_numeric',
+      ),
+      'relationship' => array(
+        'title' => t('Payment'),
+        'base' => 'payment',
+        'field' => 'pid',
+        'handler' => 'views_handler_relationship',
+        'label' => t('Payment'),
+      ),
+    ),
+    'quantity' => array(
+      'title' => t('Quantity'),
+      'field' => array(
+        'handler' => 'views_handler_field_numeric',
+        'click sortable' => TRUE,
+      ),
+      'sort' => array(
+        'handler' => 'views_handler_sort',
+      ),
+      'filter' => array(
+        'handler' => 'views_handler_filter_numeric',
+      ),
+      'argument' => array(
+        'handler' => 'views_handler_argument_numeric',
+      ),
+    ),
+    'tax_rate' => array(
+      'title' => t('Tax rate'),
+      'field' => array(
+        'handler' => 'views_handler_field_numeric',
+        'float' => TRUE,
+        'click sortable' => TRUE,
+      ),
+      'sort' => array(
+        'handler' => 'views_handler_sort',
+      ),
+      'filter' => array(
+        'handler' => 'views_handler_filter_numeric',
+      ),
+      'argument' => array(
+        'handler' => 'views_handler_argument_numeric',
+      ),
+    ),
+  );
   $data['payment'] = array(
     'table' => array(
       'base' => array(
@@ -356,6 +478,7 @@ function payment_views_data_alter(&$data) {
   $data['payment']['pmid']['relationship'] = array(
     'title' => t('Payment method'),
     'base' => 'payment_method',
+    'base field' => 'pmid',
     'handler' => 'views_handler_relationship',
     'label' => t('Payment method'),
   );
@@ -366,131 +489,6 @@ function payment_views_data_alter(&$data) {
     'label' => t('User'),
   );
 
-  // Payment line items. This is not an alteration, but implementing
-  // hook_views_data() prevents Entity API from exposing our entities to Views
-  // automatically. See http://drupal.org/node/1377364.
-  $data['payment_line_item'] = array(
-    'table' => array(
-      'base' => array(
-        'title' => t('Payment line item'),
-      ),
-      'group' => t('Payment line item'),
-    ),
-    // Field configuration.
-    'amount' => array(
-      'title' => t('Amount'),
-      'field' => array(
-        'handler' => 'views_handler_field_numeric',
-        'float' => TRUE,
-        'click sortable' => TRUE,
-      ),
-      'sort' => array(
-        'handler' => 'views_handler_sort',
-      ),
-      'filter' => array(
-        'handler' => 'views_handler_filter_numeric',
-      ),
-      'argument' => array(
-        'handler' => 'views_handler_argument_numeric',
-      ),
-    ),
-    'amount_total' => array(
-      'title' => t('Total amount'),
-      'field' => array(
-        'handler' => 'views_handler_field_numeric',
-        'float' => TRUE,
-        'click sortable' => TRUE,
-      ),
-      'sort' => array(
-        'handler' => 'views_handler_sort',
-      ),
-      'filter' => array(
-        'handler' => 'views_handler_filter_numeric',
-      ),
-      'argument' => array(
-        'handler' => 'views_handler_argument_numeric',
-      ),
-    ),
-    'description' => array(
-      'title' => t('Description'),
-      'field' => array(
-        'handler' => 'PaymentViewsHandlerFieldTranslatableString',
-        'string_arguments_field' => 'description_arguments',
-      ),
-    ),
-    'name' => array(
-      'title' => t('Machine name'),
-      'field' => array(
-        'handler' => 'views_handler_field',
-        'click sortable' => TRUE,
-      ),
-      'sort' => array(
-        'handler' => 'views_handler_sort',
-      ),
-      'filter' => array(
-        'handler' => 'views_handler_filter_string',
-      ),
-      'argument' => array(
-        'handler' => 'views_handler_argument_string',
-      ),
-    ),
-    'pid' => array(
-      'title' => t('Payment ID'),
-      'field' => array(
-        'handler' => 'views_handler_field_numeric',
-        'click sortable' => TRUE,
-      ),
-      'sort' => array(
-        'handler' => 'views_handler_sort',
-      ),
-      'filter' => array(
-        'handler' => 'views_handler_filter_numeric',
-      ),
-      'argument' => array(
-        'handler' => 'views_handler_argument_numeric',
-      ),
-      'relationship' => array(
-        'title' => t('Payment'),
-        'base' => 'payment',
-        'field' => 'pid',
-        'handler' => 'views_handler_relationship',
-        'label' => t('Payment'),
-      ),
-    ),
-    'quantity' => array(
-      'title' => t('Quantity'),
-      'field' => array(
-        'handler' => 'views_handler_field_numeric',
-        'click sortable' => TRUE,
-      ),
-      'sort' => array(
-        'handler' => 'views_handler_sort',
-      ),
-      'filter' => array(
-        'handler' => 'views_handler_filter_numeric',
-      ),
-      'argument' => array(
-        'handler' => 'views_handler_argument_numeric',
-      ),
-    ),
-    'tax_rate' => array(
-      'title' => t('Tax rate'),
-      'field' => array(
-        'handler' => 'views_handler_field_numeric',
-        'float' => TRUE,
-        'click sortable' => TRUE,
-      ),
-      'sort' => array(
-        'handler' => 'views_handler_sort',
-      ),
-      'filter' => array(
-        'handler' => 'views_handler_filter_numeric',
-      ),
-      'argument' => array(
-        'handler' => 'views_handler_argument_numeric',
-      ),
-    ),
-  );
   if (payment_currency_version() == 2) {
     $data['payment_line_item']['amount']['field']['handler'] = 'CurrencyAmountViewsHandlerField';
     $data['payment_line_item']['amount_total']['field']['handler'] = 'CurrencyAmountViewsHandlerField';

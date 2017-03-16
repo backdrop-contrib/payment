@@ -48,7 +48,7 @@ function payment_page_required_modules(array $modules) {
  * @return array
  */
 function payment_page_payment_view(Payment $payment) {
-  return entity_view('payment', array($payment));
+  return entity_get_controller('payment')->view(array($payment));
 }
 
 /**
@@ -1151,7 +1151,7 @@ function _payment_status_options_level(array $hierarchy, $depth) {
  */
 function payment_method_options() {
   $options = array();
-  foreach (entity_load('payment_method') as $payment_method) {
+  foreach (entity_load_multiple('payment_method') as $payment_method) {
     $options[$payment_method->pmid] = check_plain($payment_method->title_specific);
   }
   natcasesort($options);
