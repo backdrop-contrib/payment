@@ -120,13 +120,7 @@ function paymentform_field_validate($entity_type, $entity, $field, $instance, $l
 
       // Quantity.
       $base['property'] = 'quantity';
-      if (!is_int($line_item_data['quantity'])) {
-        $errors[$field['field_name']][$langcode][$delta][] = array(
-          'error' => 'paymentform_line_item_quantity_no_integer',
-          'message' => t('The quantity is no integer.'),
-        ) + $base;
-      }
-      elseif ($line_item_data['quantity'] < 0) {
+      if ($line_item_data['quantity'] < 0) {
         $errors[$field['field_name']][$langcode][$delta][] = array(
           'error' => 'paymentform_line_item_quantity_negative',
           'message' => t('The quantity cannot be negative.'),

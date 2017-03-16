@@ -169,6 +169,20 @@ class Payment extends PaymentCommon {
   }
 
   /**
+   * Implements EntityInterface::id().
+   */
+  function id() {
+    return $this->pid;
+  }
+
+  /**
+   * Implements EntityInterface::entityType().
+   */
+  public function entityType() {
+    return 'payment';
+  }
+
+  /**
    * Execute the actual payment.
    */
   function execute() {

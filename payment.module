@@ -1099,15 +1099,16 @@ function payment_debug($message, $file = '', $line = 0) {
  *   An integer major version, or FALSE if the module is not available.
  */
 function payment_currency_version() {
-  // Currency.module 7.x-1.x and 7.x-2.x both exist, but currency_load() only
-  // exists in 7.x-2.x.
-  if (module_exists('currency') && function_exists('currency_load')) {
-    return 2;
-  }
-  elseif (module_exists('currency_api')) {
-    return 1;
-  }
-  return FALSE;
+  return 1;
+
+  // Only one version of currency available for now.
+  // if (module_exists('currency') && function_exists('currency_load')) {
+    // return 2;
+  // }
+  // elseif (module_exists('currency_api')) {
+    // return 1;
+  // }
+  // return FALSE;
 }
 
 /**
@@ -1122,7 +1123,7 @@ function payment_currency_options() {
     return currency_options();
   }
   if ($version == 1) {
-    return currency_api_get_list();
+    return currency_get_list();
   }
   return array();
 }
