@@ -1,0 +1,23 @@
+[PaymentformTestFieldFormatterWebTestCase]
+name = Payment form formatter
+description = Tests the paymentform field formatter.
+group = Payment
+file = PaymentformTestFieldFormatterWebTestCase.test
+
+[PaymentformTestFieldWebTestCase]
+name = Payment form field
+description = Tests the paymentform field.
+group = Payment
+file = PaymentformTestFieldWebTestCase.test
+
+[PaymentformTestLineItemFieldWidgetWebTestCase]
+name = Payment form field widget
+description = Tests the paymentform_line_item field widget.
+group = Payment
+file = PaymentformTestLineItemFieldWidgetWebTestCase.test
+
+[PaymentformWebTestCase]
+name = Payment form
+description = Contains functionality shared by Paymentform test cases.
+group = Payment
+file = PaymentformWebTestCase.test

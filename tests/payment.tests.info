@@ -1,0 +1,5 @@
+[PaymentWebTestCase]
+name = Payment tests
+description = Provides reusable code for testing payments and payment methods.
+group = Payment
+file = PaymentWebTestCase.test

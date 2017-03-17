@@ -43,7 +43,7 @@ class PaymentTestUnavailableWebTestCase extends PaymentWebTestCase {
     $this->assertEqual($payment->method->controller->name, 'PaymentMethodControllerUnavailable', 'When loading a payment method, if its controller unavailable, it is replaced by PaymentMethodControllerUnavailable.');
 
     // Test deleting a payment method.
-    entity_delete('payment_method', $payment->method->pmid);
+    $payment_method->delete();
     $payment = entity_load_unchanged('payment', $payment->pid);
     $this->assertTrue(is_a($payment->method, 'PaymentMethodUnavailable'), 'When loading a payment, if its payment method is unavailable, it is replaced by PaymentMethodUnavailable.');
   }

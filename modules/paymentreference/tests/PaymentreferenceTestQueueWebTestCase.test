@@ -5,6 +5,8 @@
  * Contains class PaymentreferenceTestQueueWebTestCase.
  */
 
+include_once backdrop_get_path('module', 'payment') . '/tests/PaymentWebTestCase.test';
+
 /**
  * Tests the reference queue.
  */
@@ -112,7 +114,7 @@ class PaymentreferenceTestQueueWebTestCase extends PaymentWebTestCase {
     }
 
     // Test response to payment deletion.
-    entity_delete('payment', 1);
+    $payment->delete();
     $pid = paymentreference_load($entity_type, $bundles[1], $field_name, 2);
     $this->assertNotEqual($pid, 1, 'When deleting a payment, it is removed from the queue as well.');
 

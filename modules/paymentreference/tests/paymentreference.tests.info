@@ -1,0 +1,5 @@
+[PaymentreferenceTestQueueWebTestCase]
+name = Payment reference
+description = Tests the payment reference queue.
+group = Payment
+file = PaymentreferenceTestQueueWebTestCase.test

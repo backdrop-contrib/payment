@@ -5,6 +5,8 @@
  * Contains PaymentmethodbasicTestModuleInstallUninstall.
  */
 
+include_once backdrop_get_path('module', 'payment') . '/tests/PaymentWebTestCase.test';
+
 /**
  * Tests module installation and uninstallation.
  */
@@ -36,7 +38,7 @@ class PaymentmethodbasicTestModuleInstallUninstall extends BackdropWebTestCase {
 
     // Test default configuration.
     $names = array('collect_on_delivery', 'no_payment_required');
-    $payment_methods = entity_load('payment_method');
+    $payment_methods = entity_load_multiple('payment_method');
     $payment_method_names = array();
     foreach ($payment_methods as $payment_method) {
       $payment_method_names[] = $payment_method->name;

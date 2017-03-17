@@ -5,6 +5,8 @@
  * Contains class PaymentformWebTestCase.
  */
 
+include_once backdrop_get_path('module', 'payment') . '/tests/PaymentWebTestCase.test';
+
 /**
  * Contains functionality shared by Paymentform test cases.
  */

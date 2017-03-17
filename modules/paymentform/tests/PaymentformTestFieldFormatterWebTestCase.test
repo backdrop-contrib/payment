@@ -5,7 +5,7 @@
  * Contains class PaymentformTestFieldFormatterWebTestCase.
  */
 
-include_once backdrop_get_path('module', 'payment') . '/tests/PaymentWebTestCase.test';
+include_once backdrop_get_path('module', 'paymentform') . '/tests/PaymentFormWebTestCase.test';
 
 /**
  * Tests the paymentform field formatter.
@@ -32,6 +32,8 @@ class PaymentformTestFieldFormatterWebTestCase extends PaymentformWebTestCase {
    * Test the paymentform field formatter.
    */
   function testPaymentformFieldFormatter() {
+    $admin_user = $this->backdropCreateUser(array('administer users', 'access content'));
+    $this->backdropLogin($admin_user);
     $node = $this->backdropCreateNode(array(
       'type' => $this->content_type->type,
     ));

@@ -80,7 +80,7 @@ class PaymentTestEntityCrudWebTestCase extends PaymentWebTestCase {
     $this->assertTrue($count, 'A payment method is correctly updated.');
 
     // Test deleting a payment method.
-    entity_delete('payment_method', $payment_method_1->pmid);
+    $payment_method_1->delete();
     $count = db_select('payment_method')
       ->condition('pmid', $payment_method_1->pmid)
       ->countQuery()
@@ -142,7 +142,7 @@ class PaymentTestEntityCrudWebTestCase extends PaymentWebTestCase {
     $this->assertTrue($count, 'A payment is correctly updated.');
 
     // Test deleting a payment.
-    entity_delete('payment', $payment->pid);
+    $payment->delete();
     $count = db_select('payment')
       ->condition('pid', $payment->pid)
       ->countQuery()

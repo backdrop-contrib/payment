@@ -5,6 +5,8 @@
  * Contains class PaymentmethodbasicTestPaymentMethodBasicControllerWebTestCase.
  */
 
+include_once backdrop_get_path('module', 'payment') . '/tests/PaymentWebTestCase.test';
+
 /**
  * Tests PaymentMethodBasicController functionality.
  */
@@ -65,7 +67,7 @@ class PaymentmethodbasicTestPaymentMethodBasicControllerWebTestCase extends Paym
     $this->assertTrue($count, "An BasicPaymentMethodController payment method's controller data is updated correctly.");
 
     // Test deleting a payment method.
-    entity_delete('payment_method', $pmid);
+    $payment_method->delete();
     $count = db_query("SELECT COUNT(1) FROM {paymentmethodbasic} WHERE pmid = :pmid", array(
       ':pmid' => $pmid,
     ))->fetchField();

@@ -5,7 +5,7 @@
  * Contains class PaymentformTestFieldWebTestCase.
  */
 
-include_once backdrop_get_path('module', 'payment') . '/tests/PaymentWebTestCase.test';
+include_once backdrop_get_path('module', 'paymentform') . '/tests/PaymentFormWebTestCase.test';
 
 /**
  * Tests the paymentform field.
@@ -56,18 +56,6 @@ class PaymentformTestFieldWebTestCase extends PaymentformWebTestCase {
       $this->assertTrue($this->fieldValidationExceptionError($e, 'paymentform_line_item_name_empty'), $message);
     }
 
-    // Test that a non-integer quantity is invalid.
-    $line_item_data = array(
-      'quantity' => 1.0,
-    ) + $this->PaymentLineItemData;
-    $message = "The <em>Payment form</em> field's validation throws an error if the quantity amount is no integer";
-    try {
-      field_attach_validate('node', $node);
-      $this->assertTrue(FALSE, $message);
-    }
-    catch (FieldValidationException $e) {
-      $this->assertTrue($this->fieldValidationExceptionError($e, 'paymentform_line_item_quantity_no_integer'), $message);
-    }
     // Test that a negative quantity is invalid.
     $line_item_data = array(
       'quantity' => -1,

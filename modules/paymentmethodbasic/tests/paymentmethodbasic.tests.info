@@ -1,0 +1,11 @@
+[PaymentmethodbasicTestModuleInstallUninstall]
+name = Payment method basic install
+description = Tests module installation and uninstallation.
+group = Payment
+file = PaymentmethodbasicTestModuleInstallUninstall.test
+
+[PaymentmethodbasicTestPaymentMethodBasicControllerWebTestCase]
+name = Payment method basic controller
+description = Tests PaymentMethodBasicController functionality.
+group = Payment
+file = PaymentmethodbasicTestPaymentMethodBasicControllerWebTestCase.test
