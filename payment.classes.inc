@@ -384,6 +384,10 @@ class PaymentEntityController extends EntityDatabaseStorageController {
       // store/return all variables as strings.
       $payment->pid = (int) $payment->pid;
       $payment->uid = (int) $payment->uid;
+      // Sometimes context data doesn't unserialize.
+      if (is_string($payment->context_data)) {
+        $payment->context_data = unserialize($payment->context_data);
+      }
     }
 
     return $entities;
